@@ -1,0 +1,184 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.NoticeMapper">
+  
+  <!--查系统询消息记录  -->
+  <select id="getNoticesList" parameterType="map" resultType="map">
+    SELECT a.noticeid, a.title, a.content,a.delflag,a.issend, a.createrid, a.createtime,c.realname as sname FROM tick_notice a
+     LEFT JOIN t_dt_user c ON c.userid = a.createrid
+     <where>
+       <if test="title !=null and title !=''">and a.title LIKE "%"#{title}"%"</if>
+       <if test="noticeid !=null and noticeid !=''">and a.noticeid = #{noticeid}</if>
+       <if test="delflag !=null and delflag !=''">and a.delflag = #{delflag}</if>
+       <if test="createtime !=null and createtime !=''">and DATE(a.createtime) = #{createtime}</if>
+     </where>
+     ORDER BY a.createtime desc
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+  </select>
+  <!--查询系统消息总记录数  -->
+  <select id="getNoticesListNum" parameterType="map" resultType="int">
+    SELECT  COUNT(1) FROM tick_notice a
+     LEFT JOIN t_dt_user c ON c.userid = a.createrid
+     <where>
+       <if test="title !=null and title !=''">and a.title LIKE "%"#{title}"%"</if>
+       <if test="noticeid !=null and noticeid !=''">and a.noticeid = #{noticeid}</if>
+       <if test="delflag !=null and delflag !=''">and a.delflag = #{delflag}</if>
+       <if test="createtime !=null and createtime !=''">and DATE(a.createtime)  = #{createtime}</if>
+     </where>
+  </select>
+  <!--新增系统消息-->
+  <insert id="insertNotice" parameterType="map">
+		INSERT INTO  tick_notice
+		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="noticeid != null">noticeid,</if>
+			<if test="title !=null">title,</if>
+			<if test="content !=null">content,</if>
+			<if test="createrid !=null">createrid,</if>
+			<if test="createtime !=null">createtime,</if>
+			<if test="delflag !=null">delflag,</if>
+			<if test="issend !=null">issend,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="noticeid != null">#{noticeid},</if>
+			<if test="title !=null">#{title},</if>
+			<if test="content !=null">#{content},</if>
+			<if test="createrid !=null">#{createrid},</if>
+			<if test="createtime !=null">#{createtime},</if>
+			<if test="delflag !=null">#{delflag},</if>
+			<if test="delflag !=null">#{issend},</if>
+			
+		</trim> 
+	</insert>
+	<!-- 修改系统消息记录-->
+	<update id="updateNotice" parameterType="map">
+	  UPDATE `tick_notice` 
+	  <set>
+			<if test="title !=null">title = #{title},</if>
+			<if test="content !=null">content = #{content},</if>
+			<if test="delflag !=null">delflag = #{delflag},</if>
+			<if test="issend !=null">issend = #{issend},</if>
+	  </set>
+	  <where>
+	     noticeid =#{noticeid}
+	  </where>
+	</update>
+	
+	
+   <!-- 系统发送给所有用户的消息 -->
+   <select id="getSystemNoticeMembers" parameterType="map" resultType="map">
+    select  a.mid, a.noticeid, a.receiverid, a.isread, a.delflag, a.createtime,b.title,b.content,c.realname as rname from  tick_notice_member a
+    left join tick_notice b on a.noticeid = b.noticeid
+    left join t_dt_member c on c.memberid = a.receiverid
+     <where>
+       <if test="realname !=null and realname !=''">and c.realname LIKE "%"#{realname}"%"</if>
+       <if test="noticeid !=null and noticeid !=''">and a.noticeid = #{noticeid}</if>
+       <if test="delflag !=null and delflag !=''">and a.delflag = #{delflag}</if>
+     </where>
+     ORDER BY a.createtime desc
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+  </select>
+  <select id="getSystemNoticeMembersNum" parameterType="map" resultType="int">
+    select count(*)
+    from  tick_notice_member a
+    left join tick_notice b on a.noticeid = b.noticeid
+    left join t_dt_member c on c.memberid = a.receiverid
+     <where>
+       <if test="realname !=null and realname !=''">and c.realname LIKE "%"#{realname}"%"</if>
+       <if test="noticeid !=null and noticeid !=''">and a.noticeid = #{noticeid}</if>
+       <if test="delflag !=null and delflag !=''">and a.delflag = #{delflag}</if>
+     </where>
+  </select>
+  
+  <!-- 批量插入用户消息记录数 -->
+   <insert id="insertNoticesMember" parameterType="map">
+	   <foreach collection="dataList" item="item" separator=";">
+	      insert into tick_notice_member(mid,noticeid,receiverid,isread,delflag,createtime)
+	      values(
+	      
+	           #{item.mid},#{item.noticeid},#{item.receiverid},#{item.isread},#{item.delflag},#{item.createtime}
+	      )
+       </foreach>
+   </insert>
+   <!-- 查询业务消息 -->
+   <select id="getBusinessNoticeList" parameterType="map" resultType="map">
+     select a.businessid, a.orderid ,a.title, a.content, a.memberid, a.isread, a.createtime, a.delflag, a.`type`,b.realname as aname,
+     d.realname as gname,ifnull(e.jobtitle,f.projecttitle) as ordertitle
+     from tick_notice_business a  
+     left join t_dt_member b on a.memberid = b.memberid
+     left join tick_order c on a.orderid = a.orderid
+     left join t_dt_member d on d.memberid = c.publisherid
+     left join tick_job e on c.jobid = e.jobid
+     left join tick_project f on c.projectid = f.projectid
+      <where>
+       <if test="businessid !=null and businessid !=''">and a.businessid = #{businessid}</if>
+       <if test="title !=null and title !=''">and a.title like "%"#{title}"%"</if>
+       <if test="delflag !=null and delflag !=''">and a.delflag = #{delflag}</if>
+       <if test="type !=null and type !=''">and a.type = #{type}</if>
+     </where>
+     group by a.businessid
+     order by a.createtime desc
+      <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+   </select>
+   <!-- 查询业务消息总记录数 --> 
+    <select id="getBusinessNoticeListNum" parameterType="map" resultType="int">
+     select  count(*) from tick_notice_business a  
+      <where>
+       <if test="businessid !=null and businessid !=''">and a.businessid = #{businessid}</if>
+       <if test="title !=null and title !=''">and a.title like "%"#{title}"%"</if>
+       <if test="delflag !=null and delflag !=''">and a.delflag = #{delflag}</if>
+       <if test="type !=null and type !=''">and a.type = #{type}</if>
+     </where>
+    </select>
+    
+    <!-- 手机端页面 我的消息  -->
+    <select id="getAllNotice" parameterType="map" resultType="map">
+      select * from ( (select bu.businessid as id,bu.title,bu.content,bu.memberid as userid,bu.isread,bu.delflag,bu.createtime,1 as types,bu.url as url  from tick_notice_business bu  )
+       union all 
+        (select nm.mid as id,nc.title,nc.content,nm.receiverid as userid,nm.isread,nm.delflag,nm.createtime,2 as types,'' as url from tick_notice_member nm left join tick_notice nc on nc.noticeid = nm.noticeid) 
+       ) as t
+      <where>
+        t.delflag = 0
+        <if test="userid != null and userid != ''">and t.userid = #{userid}</if>
+      </where>
+      order by t.createtime desc
+      <if test="startnum !=null">limit #{startnum},#{rownum}</if>
+    </select>
+    <!-- 手机消息总记录数 -->
+    <select id="getAllNoticeCount" parameterType="map" resultType="int">
+     select count(*) from ( (select bu.businessid as id,bu.title,bu.content,bu.memberid as userid,bu.isread,bu.delflag,bu.createtime,1 as types,bu.url as url  from tick_notice_business bu  )
+     union all 
+      (select nm.mid as id,nc.title,nc.content,nm.receiverid as userid,nm.isread,nm.delflag,nm.createtime,2 as types,'' as url from tick_notice_member nm left join tick_notice nc on nc.noticeid = nm.noticeid) 
+     ) as t
+      <where>
+        t.delflag = 0
+        <if test="userid != null and userid != ''">and t.userid = #{userid}</if>
+      </where>
+    </select>
+    
+    <!-- 修改系统消息状态 -->
+    <update id="updateNoticeMemberStatus" parameterType="map">
+       update tick_notice_member 
+        <set>
+           <if test="isread != null and isread != ''">isread = #{isread},</if>
+           <if test="delflag != null and delflag != ''">delflag = #{delflag},</if>
+        </set>
+        <where>
+           <if test="id != null and id != ''">mid = #{id}</if>
+           <if test="mid != null and mid != ''">mid = #{mid}</if>
+        </where>
+    </update>
+    
+    <!-- 修改业务消息状态 -->
+    <update id="updateNoticeBusinessStatus" parameterType="map">
+       update tick_notice_business 
+        <set>
+           <if test="isread != null and isread != ''">isread = #{isread},</if>
+           <if test="delflag != null and delflag != ''">delflag = #{delflag},</if>
+        </set>
+        <where>
+           <if test="id != null and id != ''">businessid = #{id}</if>
+           <if test="businessid != null and businessid != ''">businessid = #{businessid}</if>
+        </where>
+    </update>
+    
+	
+</mapper>

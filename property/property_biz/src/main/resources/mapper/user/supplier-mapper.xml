@@ -1,0 +1,243 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.SupplierMapper">
+	<!-- 查询供应商信息 -->
+	<select id="getsupperlist" parameterType="map" resultType="map">
+		select sup.supplierid,sup.suppliername,sup.address,sup.longitudelatitude,sup.businesshours,sup.lat,sup.lon,
+		sup.contacter,sup.telephone,sup.products,sup.sharetimes,sup.readtimes,sup.outsideurl,
+		sup.createrid,sup.createtime,sup.updaterid,sup.updatetime,sup.delflag,sup.agencyid,
+		ag.agencyname,sup.provinceid,sup.cityid,sup.districtid,ar1.cname as provincename,
+		ar2.cname as cityname,ar3.cname as districtname,tdu.headimage,tdu.realname as createname,sup.supplierlog,sup.sourcepid,
+		round(6378.138*2*asin(sqrt(pow(sin(
+		(#{latitude}*pi()/180-sup.lat*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(sup.lat*pi()/180)*pow(sin( (#{longitude}*pi()/180-sup.lon*pi()/180)/2),2)))*1000) juli 
+ 		from tick_supplier sup
+ 		left join t_dt_user tdu on sup.createrid=tdu.userid
+ 		left join t_dt_agency ag on ag.agencyid = sup.agencyid
+ 		left join t_dt_area ar1 on ar1.areaid = sup.provinceid
+ 		left join t_dt_area ar2 on ar2.areaid = sup.cityid
+ 		left join t_dt_area ar3 on ar3.areaid = sup.districtid
+ 		<where>
+ 			and sup.delflag=0
+ 			<if test="null != supplierid and '' != supplierid">and sup.supplierid=#{supplierid}</if>
+ 			<if test="null != sourcepid and '' != sourcepid">and sup.sourcepid  like  "%"#{sourcepid}"%"</if>
+ 			<if test="null != suppliername and '' != suppliername">and sup.suppliername like "%"#{suppliername}"%"</if>
+ 			<if test="null != searchtext and '' != searchtext">
+ 			and (sup.suppliername like concat("%",#{searchtext},"%") 
+ 				or sup.address like concat("%",#{searchtext},"%")
+ 				or sup.contacter like concat("%",#{searchtext},"%")
+ 				or ar3.cname like concat("%",#{searchtext},"%"))</if>
+ 			<if test="maxjuli != null and maxjuli != ''">and round(6378.138*2*asin(sqrt(pow(sin(
+		(#{latitude}*pi()/180-sup.lat*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(sup.lat*pi()/180)*pow(sin( (#{longitude}*pi()/180-sup.lon*pi()/180)/2),2)))*1000) &lt; #{maxjuli}</if>
+ 		</where>
+ 		ORDER by juli
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<select id="getsuppernum" parameterType="map" resultType="int">
+		select  count(*)
+ 		from tick_supplier sup
+ 		left join t_dt_user tdu on sup.createrid=tdu.userid
+ 		left join t_dt_agency ag on ag.agencyid = sup.agencyid
+ 		left join t_dt_area ar1 on ar1.areaid = sup.provinceid
+ 		left join t_dt_area ar2 on ar2.areaid = sup.cityid
+ 		left join t_dt_area ar3 on ar3.areaid = sup.districtid
+ 		<where>
+ 			and sup.delflag=0
+ 			<if test="null != supplierid and '' != supplierid">and sup.supplierid=#{supplierid}</if>
+ 			<if test="null != sourcepid and '' != sourcepid">and sup.sourcepid  like  "%"#{sourcepid}"%"</if>
+ 			<if test="null != suppliername and '' != suppliername">and sup.suppliername like "%"#{suppliername}"%"</if>
+ 			<if test="null != searchtext and '' != searchtext">
+ 			and (sup.suppliername like concat("%",#{searchtext},"%") 
+ 				or sup.address like concat("%",#{searchtext},"%")
+ 				or sup.contacter like concat("%",#{searchtext},"%")
+ 				or ar3.cname like concat("%",#{searchtext},"%"))</if>
+ 		</where>
+	</select>
+	<!-- 查询供应商图片信息 -->
+	<select id="getsupperimg" parameterType="map" resultType="map">
+		select supimg.supplierimgid,supimg.supplierid,supimg.type,supimg.createrid,supimg.createtime
+		,supimg.delflag,img.imgid,img.url from tick_supplier_img supimg
+		LEFT JOIN t_img img on img.imgid = supimg.imgid
+ 		<where>
+ 			and supimg.delflag=0
+ 			<if test="null != supplierid and '' != supplierid">and supimg.supplierid=#{supplierid}</if>
+ 		</where>
+	</select>	
+	
+	<!-- 添加供应商信息 -->	
+	<insert id="insertsupper"  parameterType="java.util.Map">
+		INSERT INTO tick_supplier
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != supplierid and '' != supplierid">supplierid,</if>
+			<if test="null != suppliername and '' != suppliername">suppliername,</if>
+			<if test="null != agencyid and '' != agencyid">agencyid,</if>
+			<if test="null != address and '' != address">address,</if>
+			<if test="null != longitudelatitude and '' != longitudelatitude">longitudelatitude,</if>
+			<if test="null != businesshours and '' != businesshours">businesshours,</if>
+			<if test="null != contacter and '' != contacter">contacter,</if>
+			<if test="null != telephone and '' != telephone">telephone,</if>
+			<if test="null != products and '' != products">products,</if>
+			<if test="null != sharetimes and '' != sharetimes">sharetimes,</if>
+			<if test="null != readtimes and '' != readtimes">readtimes,</if>
+			<if test="null != outsideurl and '' != outsideurl">outsideurl,</if>
+			<if test="null != createrid and '' != createrid">createrid,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+			<if test="null != updaterid and '' != updaterid">updaterid,</if>
+			<if test="null != updatetime and '' != updatetime">updatetime,</if>
+			<if test="null != delflag and '' != delflag">delflag,</if>
+			<if test="null != provinceid and '' != provinceid">provinceid,</if>
+			<if test="null != cityid and '' != cityid">cityid,</if>
+			<if test="null != districtid and '' != districtid">districtid,</if>
+			<if test="null != supplierlog and '' != supplierlog">supplierlog,</if>
+			<if test="null != lon and '' != lon">lon,</if>
+			<if test="null != lat and '' != lat">lat,</if>
+			<if test="null != sourcepid and '' != sourcepid">sourcepid,</if>
+			
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != supplierid and '' != supplierid">#{supplierid},</if>
+			<if test="null != suppliername and '' != suppliername">#{suppliername},</if>
+			<if test="null != agencyid and '' != agencyid">#{agencyid},</if>
+			<if test="null != address and '' != address">#{address},</if>
+			<if test="null != longitudelatitude and '' != longitudelatitude">#{longitudelatitude},</if>
+			<if test="null != businesshours and '' != businesshours">#{businesshours},</if>
+			<if test="null != contacter and '' != contacter">#{contacter},</if>
+			<if test="null != telephone and '' != telephone">#{telephone},</if>
+			<if test="null != products and '' != products">#{products},</if>
+			<if test="null != sharetimes and '' != sharetimes">#{sharetimes},</if>
+			<if test="null != readtimes and '' != readtimes">#{readtimes},</if>
+			<if test="null != outsideurl and '' != outsideurl">#{outsideurl},</if>
+			<if test="null != createrid and '' != createrid">#{createrid},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+			<if test="null != updaterid and '' != updaterid">#{updaterid},</if>
+			<if test="null != updatetime and '' != updatetime">#{updatetime},</if>
+			<if test="null != delflag and '' != delflag">#{delflag},</if>
+			<if test="null != provinceid and '' != provinceid">#{provinceid},</if>
+			<if test="null != cityid and '' != cityid">#{cityid},</if>
+			<if test="null != districtid and '' != districtid">#{districtid},</if>
+			<if test="null != supplierlog and '' != supplierlog">#{supplierlog},</if>
+			<if test="null != lon and '' != lon">#{lon},</if>
+			<if test="null != lat and '' != lat">#{lat},</if>
+			<if test="null != sourcepid and '' != sourcepid">#{sourcepid},</if>
+		</trim>
+	</insert>
+	<!-- 添加供应商图片信息 -->	
+	<insert id="insertsupperimg"  parameterType="java.util.Map">
+		INSERT INTO tick_supplier_img
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != supplierimgid and '' != supplierimgid">supplierimgid,</if>
+			<if test="null != supplierid and '' != supplierid">supplierid,</if>
+			<if test="null != imgid and '' != imgid">imgid,</if>
+			<if test="null != type and '' != type">type,</if>
+			<if test="null != createrid and '' != createrid">createrid,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+			<if test="null != updaterid and '' != updaterid">updaterid,</if>
+			<if test="null != updatetime and '' != updatetime">updatetime,</if>
+			<if test="null != delflag and '' != delflag">delflag,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != supplierimgid and '' != supplierimgid">#{supplierimgid},</if>
+			<if test="null != supplierid and '' != supplierid">#{supplierid},</if>
+			<if test="null != imgid and '' != imgid">#{imgid},</if>
+			<if test="null != type and '' != type">#{type},</if>
+			<if test="null != createrid and '' != createrid">#{createrid},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+			<if test="null != updaterid and '' != updaterid">#{updaterid},</if>
+			<if test="null != updatetime and '' != updatetime">#{updatetime},</if>
+			<if test="null != delflag and '' != delflag">#{delflag},</if>
+		</trim>
+	</insert>
+	<!-- 添加供应商图片 -->	
+	<insert id="insertimg"  parameterType="java.util.Map">
+		INSERT INTO t_img
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != imgid and '' != imgid">imgid,</if>
+			<if test="null != name and '' != name">name,</if>
+			<if test="null != url and '' != url">url,</if>
+			<if test="null != suffix and '' != suffix">suffix,</if>
+			<if test="null != createrid and '' != createrid">createrid,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+			<if test="null != updaterid and '' != updaterid">updaterid,</if>
+			<if test="null != updatetime and '' != updatetime">updatetime,</if>
+			<if test="null != delflag and '' != delflag">delflag,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != imgid and '' != imgid">#{imgid},</if>
+			<if test="null != name and '' != name">#{name},</if>
+			<if test="null != url and '' != url">#{url},</if>
+			<if test="null != suffix and '' != suffix">#{suffix},</if>
+			<if test="null != createrid and '' != createrid">#{createrid},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+			<if test="null != updaterid and '' != updaterid">#{updaterid},</if>
+			<if test="null != updatetime and '' != updatetime">#{updatetime},</if>
+			<if test="null != delflag and '' != delflag">#{delflag},</if>
+		</trim>
+	</insert>
+	<!-- 修改商户信息 -->
+	<update id="updatesupper" parameterType="java.util.Map">
+		update tick_supplier
+		<set>
+			<if test="null != suppliername and '' != suppliername">suppliername=#{suppliername},</if>
+			<if test="null != area and '' != area">area=#{area},</if>
+			<if test="null != address and '' != address">address=#{address},</if>
+			<if test="null != longitudelatitude and '' != longitudelatitude">longitudelatitude=#{longitudelatitude},</if>
+			<if test="null != businesshours and '' != businesshours">businesshours=#{businesshours},</if>
+			<if test="null != contacter and '' != contacter">contacter=#{contacter},</if>
+			<if test="null != telephone and '' != telephone">telephone=#{telephone},</if>
+			<if test="null != products and '' != products">products=#{products},</if>
+			<if test="null != sharetimes and '' != sharetimes">sharetimes=#{sharetimes},</if>
+			<if test="null != readtimes and '' != readtimes">readtimes=#{readtimes},</if>
+			<if test="null != outsideurl and '' != outsideurl">outsideurl=#{outsideurl},</if>
+			<if test="null != createrid and '' != createrid">createrid=#{createrid},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != updaterid and '' != updaterid">updaterid=#{updaterid},</if>
+			<if test="null != updatetime and '' != updatetime">updatetime=#{updatetime},</if>
+			<if test="null != delflag and '' != delflag">delflag=#{delflag},</if>
+			<if test="null != agencyid and '' != agencyid">agencyid = #{agencyid},</if>
+			<if test="null != provinceid and '' != provinceid">provinceid = #{provinceid},</if>
+			<if test="null != cityid and '' != cityid">cityid = #{cityid},</if>
+			<if test="null != districtid and '' != districtid">districtid = #{districtid},</if>
+			<if test="null != supplierlog and '' != supplierlog">supplierlog = #{supplierlog},</if>
+			<if test="null != lon and '' != lon">lon = #{lon},</if>
+			<if test="null != lat and '' != lat">lat = #{lat},</if>
+			<if test="null != addsharetime and '' != addsharetime">sharetimes=ifnull(sharetimes,0)+#{addsharetime},</if>
+			<if test="null != addreadtime and '' != addreadtime">readtimes=ifnull(readtimes,0)+#{addreadtime},</if>
+			<if test="null != sourcepid and '' != sourcepid">sourcepid = #{sourcepid},</if>
+			
+		</set>
+		where supplierid =#{supplierid}
+	</update>
+	<update id="updatesupplierimg" parameterType="java.util.Map">
+		update tick_supplier_img
+		<set>
+			<if test="null != supplierid and '' != supplierid">supplierid=#{supplierid},</if>
+			<if test="null != imgid and '' != imgid">imgid=#{imgid},</if>
+			<if test="null != type and '' != type">type=#{type},</if>
+			<if test="null != createrid and '' != createrid">createrid=#{createrid},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != updaterid and '' != updaterid">updaterid=#{updaterid},</if>
+			<if test="null != updatetime and '' != updatetime">updatetime=#{updatetime},</if>
+			<if test="null != delflag and '' != delflag">delflag=#{delflag},</if>
+		</set>
+		where supplierimgid =#{supplierimgid}
+	</update>
+	<update id="updateimg" parameterType="java.util.Map">
+		update t_img
+		<set>
+			<if test="null != name and '' != name">name=#{name},</if>
+			<if test="null != url and '' != url">url=#{url},</if>
+			<if test="null != suffix and '' != suffix">suffix=#{suffix},</if>
+			<if test="null != createrid and '' != createrid">createrid=#{createrid},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != updaterid and '' != updaterid">updaterid=#{updaterid},</if>
+			<if test="null != updatetime and '' != updatetime">updatetime=#{updatetime},</if>
+			<if test="null != delflag and '' != delflag">delflag=#{delflag},</if>
+		</set>
+		where imgid =#{imgid}
+	</update>
+	<select id="getsupplierimage" parameterType="map" resultType="map">
+		select * from tick_supplier_img tsi
+		left join t_img ti on tsi.imgid=ti.imgid
+		<where>
+			<if test="supplierid != null and supplierid !=''">and tsi.supplierid=#{supplierid}</if>
+		</where>
+	</select>
+</mapper>

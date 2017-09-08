@@ -1,0 +1,817 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.weixin.backer.dao.MemberMapper">
+
+	<!-- 学科相关 -->
+	<delete id="deleteMember" parameterType="java.util.Map">
+		delete from
+		t_dt_member
+		where memberid=#{memberid}
+	</delete>
+
+	<select id="getMember" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+		memberid,openid,name,phone,city,attentiontime,integration,ifattention,CAST(nickname
+		AS CHAR CHARACTER SET utf8) nickname,headimg
+		from t_dt_member where
+		openid=#{openid}
+	</select>
+	<insert id="insertOwner" parameterType="java.util.Map">
+		<selectKey resultType="int" keyProperty="owid" order="AFTER">
+			SELECT
+			@@IDENTITY AS owid
+		</selectKey>
+		insert into
+		t_owner_info(availablebalance,frozenbalances,integral,createtime)
+		values(#{availablebalance},#{frozenbalances},#{integral},now())
+	</insert>
+	<insert id="updateMemberV2" parameterType="java.util.Map">
+		update t_dt_member
+		set
+		name=#{name},phone=#{phone},city=#{city},attentiontime=#{attentiontime},
+		integration=#{integration},ifattention=#{ifattention},nickname=#{nickname},headimg=#{headimg},
+		sex=#{sex},province=#{provinceid}
+		where openid=#{openid}
+	</insert>
+
+	<update id="cancelAttention" parameterType="java.util.Map">
+		update t_dt_member
+		set
+		ifattention=#{ifattention} where
+		openid=#{openid}
+	</update>
+	<update id="updateMemberAllInfo" parameterType="java.util.Map">
+		update
+		t_dt_member set
+		name=#{name},phone=#{phone},city=#{city},attentiontime=#{attentiontime},integration=#{integration},nickname=#{nickname},headimg=#{headimg},sex=#{sex},province=#{provinceid}
+		where
+		openid=#{openid}
+	</update>
+
+	<select id="getMemberid" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		select memberid from t_dt_member where openid = #{openid}
+	</select>
+
+	<select id="getIfRegisted" parameterType="java.util.Map"
+		resultType="java.lang.Integer">
+		select primaryid from t_dt_member where openid = #{openid}
+	</select>
+
+	<select id="getMemberByOpenid" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		select * from t_dt_member where openid = #{openid} and
+		roletype = 2
+	</select>
+
+	<select id="getAllMemberByOpenid" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		select * from t_dt_member where openid = #{openid}
+	</select>
+
+	<select id="getMemberInfo" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		<![CDATA[
+		SELECT m.memberid AS id, m.headimage AS imgurl,
+		'' as gradelevel,
+		CAST(m.nickname AS CHAR CHARACTER SET
+		utf8) as nickname,
+		'' point,'' totalpoint, '' mygangsname
+		FROM t_dt_member m
+		WHERE m.openid = #{openid}
+		]]>
+	</select>
+
+	<select id="getPoint" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select point from t_dt_member where openid = #{openid}
+	</select>
+
+	<update id="deductPoint" parameterType="java.util.Map">
+		update t_dt_member set
+		point = point-#{intePoint} where openid = #{openid}
+	</update>
+
+	<update id="gainPoint" parameterType="java.util.Map">
+		update t_dt_member set point = point + #{intecount}, totalpoint =
+		totalpoint + #{intecount}
+		<where>
+			1=1
+			<if test="null!=openid and ''!=openid"> and openid=#{openid}</if>
+			<if test="null!=memberid and ''!=memberid"> and memberid=#{memberid}</if>
+		</where>
+	</update>
+
+
+
+	<!--查询用户信息列表 -->
+	<select id="getMemberList" parameterType="map" resultType="map">
+		SELECT a.memberid, a.username, a.password,ifnull(a.realname,CAST(a.nickname AS char
+		character set utf8)) as realname, a.email,
+		a.idcard, a.businesscards, a.phone,
+		a.telephone, a.provinceid,
+		a.cityid, a.createtime, a.headimage, a.backgroundimage,
+		a.sex,
+		a.birthday,a.address,
+		a.openid, a.`status`, a.weixinnumber,
+		a.qqnumber,CAST(a.nickname AS char
+		character set utf8) nickname ,
+		a.ifattention, a.gtygroup,
+		a.authentication,d.companyintroduction,
+		a.auditstatus, a.authenticationfailurereasons, a.lasttime, a.unionid,
+		a.ifshield,
+		a.ifdelete,b.cname as provincename,c.cname as
+		cityname,d.companyimgurl,
+		d.extendid,d.idcardnum,d.idcardimgurl,d.personalintroduction,d.tickcoin,d.points,d.evaluationavg,d.individualstatus,d.enterprisestatus,d.companyname,d.channelid,
+		(SELECT COUNT(1) FROM tick_order o WHERE o.publisherid = a.memberid)as
+		ordernum,d.jobtype,d.perfectdegree,
+		(SELECT COUNT(1) FROM
+		tick_apply_order t WHERE t.applicantid = a.memberid)as
+		applynum,e.cname,d.iscompletion,d.isgive,f.realname as agencyname,
+		case
+		when d.individualstatus = 1 or d.enterprisestatus = 1 then 1
+		else 0 end
+		as
+		status_rz,
+		case
+		when d.individualstatus = 2 or d.enterprisestatus = 2
+		then 1
+		else 0 end as
+		refusetype,d.source
+		FROM t_dt_member a
+		LEFT JOIN t_dt_area b
+		on a.provinceid = b.areaid
+		LEFT JOIN t_dt_area c on c.areaid= a.cityid
+		LEFT JOIN tick_user_extend d on d.userid = a.memberid
+		LEFT JOIN
+		t_dict_data e on e.dataid = d.jobtype
+		LEFT JOIN t_dt_user f on f.userid = d.source
+		<where>
+			
+			<if test="agencyid != null and agencyid != ''">and d.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(a.lasttime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(a.lasttime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(a.lasttime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(a.lasttime,'%Y-%m-%d') &lt;= #{v_query_end}</if>	
+			
+			<if test="add_query !=null and add_query !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') = #{add_query}</if>  
+			<if test="add_query_ym !=null and add_query_ym !=''">and DATE_FORMAT(a.createtime,'%Y-%m') = #{add_query_ym}</if>  
+			<if test="add_query_start !=null and add_query_start !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt; #{add_query_start}</if>  
+			<if test="add_query_end !=null and add_query_end !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{add_query_end}</if>	
+		            
+			<if test="source !=null and source !=''">and d.source = #{source}</if>
+			<if test="memberid !=null and memberid !=''">and a.memberid = #{memberid}</if>
+			<if test="agencyname !=null and agencyname !=''">and f.realname LIKE "%"#{agencyname}"%"</if>
+			<if test="username !=null and username !=''">and a.username LIKE "%"#{username}"%"</if>
+			<if test="realname !=null and realname !=''">and a.realname LIKE "%"#{realname}"%"</if>
+			<if test="nickname !=null and nickname !=''">and a.nickname LIKE "%"#{nickname}"%"</if>
+			<if test="idcard !=null and idcard !=''">and a.idcard LIKE "%"#{idcard}"%"</if>
+			<if test="businesscards !=null and businesscards !=''">and a.businesscards LIKE "%"#{businesscards}"%"</if>
+			<if
+				test="authenticationfailurereasons !=null and authenticationfailurereasons !=''">and a.authenticationfailurereasons LIKE
+				"%"#{authenticationfailurereasons}"%"</if>
+			<if test="email !=null and email !=''">and a.email LIKE "%"#{email}"%"</if>
+			<if test="phone !=null and phone !=''">and a.phone LIKE "%"#{phone}"%"</if>
+			<if test="memberphone !=null and memberphone !=''">and a.phone = #{memberphone}</if>
+			<if test="telephone !=null and telephone !=''">and a.telephone LIKE "%"#{telephone}"%"</if>
+			<if test="createtime !=null and createtime !=''">and a.createtime = #{createtime}</if>
+			<if test="sex !=null and sex !=''">and a.sex = #{sex}</if>
+			<if test="birthday !=null and birthday !=''">and a.birthday = #{birthday}</if>
+			<if test="openid !=null and openid !=''">and a.openid = #{openid}</if>
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="weixinnumber !=null and weixinnumber !=''">and a.weixinnumber = #{weixinnumber}</if>
+			<if test="qqnumber !=null and qqnumber !=''">and a.qqnumber = #{qqnumber}</if>
+			<if test="ifattention !=null and ifattention !=''">and a.ifattention = #{ifattention}</if>
+			<if test="gtygroup !=null and gtygroup !=''">and a.gtygroup = #{gtygroup}</if>
+			<if test="authentication !=null and authentication !=''">and a.authentication = #{authentication}</if>
+			<if test="auditstatus !=null and auditstatus !=''">and a.auditstatus = #{auditstatus}</if>
+			<if test="lasttime !=null and lasttime !=''">and a.lasttime = #{lasttime}</if>
+			<if test="starttime !=null and starttime !=''">and a.lasttime &gt;= #{starttime}</if>
+			<if test="endtime !=null and endtime !=''">and a.lasttime &lt;= #{endtime}</if>
+			<if test="unionid !=null and unionid !=''">and a.unionid = #{unionid}</if>
+			<if test="ifshield !=null and ifshield !=''">and a.ifshield = #{ifshield}</if>
+			<if test="ifdelete !=null and ifdelete !=''">and a.ifdelete = #{ifdelete}</if>
+			<if test="password !=null and password !=''">and a.password = #{password}</if>
+			<if test="cityid !=null and cityid !=''">and a.cityid = #{cityid}</if>
+			<if test="provinceid !=null and provinceid !=''">and a.provinceid = #{provinceid}</if>
+			<if test="t_status !=null and t_status !=''">and ( d.enterprisestatus = 0 OR d.individualstatus = 0 or d.enterprisestatus = 3 OR d.individualstatus = 3)
+			</if>
+			<if test="companyname !=null and companyname !=''">and d.companyname LIKE "%"#{companyname}"%"</if>
+			<if test="loginname !=null and loginname !=''">and (a.phone=#{loginname} or a.username = #{loginname})</if>
+			<if test="sourcepid !=null and sourcepid !=''">and  d.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+			<if test="sourcelist != null and sourcelist != ''">
+				<foreach collection="sourcelist" item="item" open="and d.source in(" close=")" separator=",">
+					'${item}'
+				</foreach>
+			 </if>
+		</where>
+		ORDER BY lasttime desc
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<!--查询用户信息总记录数 -->
+	<select id="getMemberListNum" parameterType="map" resultType="int">
+		SELECT COUNT(1) FROM t_dt_member a
+		LEFT JOIN t_dt_area b on
+		a.provinceid = b.areaid
+		LEFT JOIN t_dt_area c on c.areaid= a.cityid
+		LEFT JOIN tick_user_extend d on d.userid = a.memberid
+		LEFT JOIN
+		t_dt_agency f on f.userid = d.source
+		<where>
+			
+			<if test="agencyid != null and agencyid != ''">and d.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(a.lasttime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(a.lasttime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(a.lasttime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(a.lasttime,'%Y-%m-%d') &lt;= #{v_query_end}</if>	
+			
+			<if test="add_query !=null and add_query !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') = #{add_query}</if>  
+			<if test="add_query_ym !=null and add_query_ym !=''">and DATE_FORMAT(a.createtime,'%Y-%m') = #{add_query_ym}</if>  
+			<if test="add_query_start !=null and add_query_start !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt; #{add_query_start}</if>  
+			<if test="add_query_end !=null and add_query_end !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{add_query_end}</if>	
+		
+			<if test="source !=null and source !=''">and d.source = #{source}</if>
+			<if test="starttime !=null and starttime !=''">and a.lasttime &gt;= #{starttime}</if>
+			<if test="endtime !=null and endtime !=''">and a.lasttime &lt;= #{endtime}</if>
+			<if test="memberid !=null and memberid !=''">and a.memberid = #{memberid}</if>
+			<if test="agencyname !=null and agencyname !=''">and f.agencyname LIKE "%"#{agencyname}"%"</if>
+			<if test="username !=null and username !=''">and a.username LIKE "%"#{username}"%"</if>
+			<if test="realname !=null and realname !=''">and a.realname LIKE "%"#{realname}"%"</if>
+			<if test="nickname !=null and nickname !=''">and a.nickname LIKE "%"#{nickname}"%"</if>
+			<if test="idcard !=null and idcard !=''">and a.idcard LIKE "%"#{idcard}"%"</if>
+			<if test="businesscards !=null and businesscards !=''">and a.businesscards LIKE "%"#{businesscards}"%"</if>
+			<if
+				test="authenticationfailurereasons !=null and authenticationfailurereasons !=''">and a.authenticationfailurereasons LIKE
+				"%"#{authenticationfailurereasons}"%"</if>
+			<if test="email !=null and email !=''">and a.email LIKE "%"#{email}"%"</if>
+			<if test="phone !=null and phone !=''">and a.phone LIKE "%"#{phone}"%"</if>
+			<if test="telephone !=null and telephone !=''">and a.telephone LIKE "%"#{telephone}"%"</if>
+			<if test="createtime !=null and createtime !=''">and a.createtime = #{createtime}</if>
+			<if test="sex !=null and sex !=''">and a.sex = #{sex}</if>
+			<if test="birthday !=null and birthday !=''">and a.birthday = #{birthday}</if>
+			<if test="openid !=null and openid !=''">and a.openid = #{openid}</if>
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="weixinnumber !=null and weixinnumber !=''">and a.weixinnumber = #{weixinnumber}</if>
+			<if test="qqnumber !=null and qqnumber !=''">and a.qqnumber = #{qqnumber}</if>
+			<if test="ifattention !=null and ifattention !=''">and a.ifattention = #{ifattention}</if>
+			<if test="gtygroup !=null and gtygroup !=''">and a.gtygroup = #{gtygroup}</if>
+			<if test="authentication !=null and authentication !=''">and a.authentication = #{authentication}</if>
+			<if test="auditstatus !=null and auditstatus !=''">and a.auditstatus = #{auditstatus}</if>
+			<if test="lasttime !=null and lasttime !=''">and a.lasttime = #{lasttime}</if>
+			<if test="unionid !=null and unionid !=''">and a.unionid = #{unionid}</if>
+			<if test="ifshield !=null and ifshield !=''">and a.ifshield = #{ifshield}</if>
+			<if test="ifdelete !=null and ifdelete !=''">and a.ifdelete = #{ifdelete}</if>
+			<if test="password !=null and password !=''">and a.password = #{password}</if>
+			<if test="cityid !=null and cityid !=''">and a.cityid = #{cityid}</if>
+			<if test="provinceid !=null and provinceid !=''">and a.provinceid = #{provinceid}</if>
+			<if test="t_status !=null and t_status !=''"> and ( d.enterprisestatus = 0 OR d.individualstatus = 0)</if>
+			<if test="companyname !=null and companyname !=''">and d.companyname LIKE "%"#{companyname}"%"</if>
+			<if test="sourcepid !=null and sourcepid !=''">and  d.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+		</where>
+	</select>
+
+	<!--新增会员 -->
+	<insert id="insertMember" parameterType="map">
+		INSERT INTO t_dt_member
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			<if test="memberid != null">memberid,</if>
+			<if test="username !=null">username,</if>
+			<if test="password !=null">password,</if>
+			<if test="realname !=null">realname,</if>
+			<if test="email !=null">email,</if>
+			<if test="idcard !=null">idcard</if>
+			<if test="businesscards !=null">businesscards,</if>
+			<if test="phone !=null">phone,</if>
+			<if test="telephone !=null">telephone,</if>
+			<if test="provinceid !=null">provinceid,</if>
+			<if test="cityid !=null">cityid,</if>
+			<if test="createtime !=null">createtime,</if>
+			<if test="headimage !=null">headimage,</if>
+			<if test="backgroundimage !=null">backgroundimage,</if>
+			<if test="sex !=null">sex,</if>
+			<if test="birthday !=null">birthday,</if>
+			<if test="openid !=null">openid,</if>
+			<if test="status !=null">status,</if>
+			<if test="weixinnumber !=null">weixinnumber,</if>
+			<if test="qqnumber !=null">qqnumber,</if>
+			<if test="nickname !=null">nickname,</if>
+			<if test="ifattention !=null">ifattention,</if>
+			<if test="gtygroup !=null">gtygroup,</if>
+			<if test="authentication !=null">authentication,</if>
+			<if test="auditstatus !=null">auditstatus,</if>
+			<if test="authenticationfailurereasons !=null">authenticationfailurereasons,</if>
+			<if test="lasttime !=null">lasttime,</if>
+			<if test="unionid !=null">unionid,</if>
+			<if test="ifshield !=null">ifshield,</if>
+			<if test="ifdelete !=null">ifdelete,</if>
+			<if test="address !=null">address,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="memberid != null">#{memberid},</if>
+			<if test="username !=null">#{username},</if>
+			<if test="password !=null">#{password},</if>
+			<if test="realname !=null">#{realname},</if>
+			<if test="email !=null">#{email},</if>
+			<if test="idcard !=null">#{idcard}</if>
+			<if test="businesscards !=null">#{businesscards},</if>
+			<if test="phone !=null">#{phone},</if>
+			<if test="telephone !=null">#{telephone},</if>
+			<if test="provinceid !=null">#{provinceid},</if>
+			<if test="cityid !=null">#{cityid},</if>
+			<if test="createtime !=null">#{createtime},</if>
+			<if test="headimage !=null">#{headimage},</if>
+			<if test="backgroundimage !=null">#{backgroundimage},</if>
+			<if test="sex !=null">#{sex},</if>
+			<if test="birthday !=null">#{birthday},</if>
+			<if test="openid !=null">#{openid},</if>
+			<if test="status !=null">#{status},</if>
+			<if test="weixinnumber !=null">#{weixinnumber},</if>
+			<if test="qqnumber !=null">#{qqnumber},</if>
+			<if test="nickname !=null">#{nickname},</if>
+			<if test="ifattention !=null">#{ifattention},</if>
+			<if test="gtygroup !=null">#{gtygroup},</if>
+			<if test="authentication !=null">#{authentication},</if>
+			<if test="auditstatus !=null">#{auditstatus},</if>
+			<if test="authenticationfailurereasons !=null">#{authenticationfailurereasons},</if>
+			<if test="lasttime !=null">#{lasttime},</if>
+			<if test="unionid !=null">#{unionid},</if>
+			<if test="ifshield !=null">#{ifshield},</if>
+			<if test="ifdelete !=null">#{ifdelete},</if>
+			<if test="address !=null">#{address},</if>
+		</trim>
+	</insert>
+	<!-- 修改会员信息 -->
+	<update id="updateMember" parameterType="map">
+		UPDATE `t_dt_member`
+		<set>
+			<if test="username !=null">username = #{username},</if>
+			<if test="password !=null">password = #{password},</if>
+			<if test="realname !=null">realname = #{realname},</if>
+			<if test="email !=null">email = #{email},</if>
+			<if test="idcard !=null">idcard = #{idcard},</if>
+			<if test="businesscards !=null">businesscards = #{businesscards},</if>
+			<if test="phone !=null">phone = #{phone},</if>
+			<if test="telephone !=null">telephone = #{telephone},</if>
+			<if test="provinceid !=null">provinceid = #{provinceid},</if>
+			<if test="cityid !=null">cityid = #{cityid},</if>
+			<if test="createtime !=null">createtime = #{createtime},</if>
+			<if test="headimage !=null">headimage = #{headimage},</if>
+			<if test="backgroundimage !=null">backgroundimage = #{backgroundimage},</if>
+			<if test="sex !=null">sex = #{sex},</if>
+			<if test="birthday !=null">birthday = #{birthday},</if>
+			<if test="openid !=null">openid = #{openid},</if>
+			<if test="status !=null">status = #{status},</if>
+			<if test="weixinnumber !=null">weixinnumber = #{weixinnumber},</if>
+			<if test="qqnumber !=null">qqnumber = #{qqnumber},</if>
+			<if test="nickname !=null">nickname = #{nickname},</if>
+			<if test="ifattention !=null">ifattention = #{ifattention},</if>
+			<if test="gtygroup !=null">gtygroup = #{gtygroup},</if>
+			<if test="authentication !=null">authentication = #{authentication},</if>
+			<if test="auditstatus !=null">auditstatus = #{auditstatus},</if>
+			<if test="authenticationfailurereasons !=null">authenticationfailurereasons =
+				#{authenticationfailurereasons},
+			</if>
+			<if test="lasttime !=null">lasttime = #{lasttime},</if>
+			<if test="unionid !=null">unionid = #{unionid},</if>
+			<if test="ifshield !=null">ifshield = #{ifshield},</if>
+			<if test="ifdelete !=null">ifdelete = #{ifdelete},</if>
+			<if test="address !=null">address = #{address},</if>
+		</set>
+		<where>
+			<if test="memberid != null">and memberid =#{memberid}</if>
+			<if test="openid != null">and openid =#{openid}</if>
+		</where>
+	</update>
+
+	<!-- 新增会员扩展表 -->
+	<insert id="insertExtend" parameterType="map">
+		INSERT INTO tick_user_extend
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			<if test="extendid != null">extendid,</if>
+			<if test="userid !=null">userid,</if>
+			<if test="idcardnum !=null">idcardnum,</if>
+			<if test="idcardimgurl !=null">idcardimgurl,</if>
+			<if test="personalintroduction !=null">personalintroduction,</if>
+			<if test="companyname !=null">companyname,</if>
+			<if test="companyimgurl !=null">companyimgurl,</if>
+			<if test="companyintroduction !=null">companyintroduction,</if>
+			<if test="tickcoin !=null">tickcoin,</if>
+			<if test="points !=null">points,</if>
+			<if test="evaluationavg !=null">evaluationavg,</if>
+			<if test="individualstatus !=null">individualstatus,</if>
+			<if test="enterprisestatus !=null">enterprisestatus,</if>
+			<if test="createrid !=null">createrid,</if>
+			<if test="createtime !=null">createtime,</if>
+			<if test="updaterid !=null">updaterid,</if>
+			<if test="updatetime !=null">updatetime,</if>
+			<if test="delflag !=null">delflag,</if>
+			<if test="source !=null">source,</if>
+			<if test="sourcetype !=null">sourcetype,</if>
+			<if test="provinceid !=null">provinceid,</if>
+			<if test="cityid !=null">cityid,</if>
+			<if test="device !=null">device,</if>
+			<if test="channelid !=null">channelid,</if>
+			<if test="origin !=null">origin,</if>
+			<if test="sourcepid !=null">sourcepid,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="extendid != null">#{extendid},</if>
+			<if test="userid !=null">#{userid},</if>
+			<if test="idcardnum !=null">#{idcardnum},</if>
+			<if test="idcardimgurl !=null">#{idcardimgurl},</if>
+			<if test="personalintroduction !=null">#{personalintroduction},</if>
+			<if test="companyname !=null">#{companyname},</if>
+			<if test="companyimgurl !=null">#{companyimgurl},</if>
+			<if test="companyintroduction !=null">#{companyintroduction},</if>
+			<if test="tickcoin !=null">#{tickcoin},</if>
+			<if test="points !=null">#{points},</if>
+			<if test="evaluationavg !=null">#{evaluationavg},</if>
+			<if test="individualstatus !=null">#{individualstatus},</if>
+			<if test="enterprisestatus !=null">#{enterprisestatus},</if>
+			<if test="createrid !=null">#{createrid},</if>
+			<if test="createtime !=null">#{createtime},</if>
+			<if test="updaterid !=null">#{updaterid},</if>
+			<if test="updatetime !=null">#{updatetime},</if>
+			<if test="delflag !=null">#{delflag},</if>
+			<if test="source !=null">#{source},</if>
+			<if test="sourcetype !=null">#{sourcetype},</if>
+			<if test="provinceid !=null">#{provinceid},</if>
+			<if test="cityid !=null">#{cityid},</if>
+			<if test="device !=null">#{device},</if>
+			<if test="channelid !=null">#{channelid},</if>
+			<if test="origin !=null">#{origin},</if>
+			<if test="sourcepid !=null">#{sourcepid},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改会员扩展信息 -->
+	<update id="updateExtend" parameterType="map">
+		UPDATE `tick_user_extend`
+		<set>
+			<if test="idcardnum != null and idcardnum != ''">idcardnum = #{idcardnum},</if>
+			<if test="idcardimgurl !=null and idcardimgurl !=''">idcardimgurl = #{idcardimgurl},</if>
+			<if test="personalintroduction !=null and personalintroduction != ''">personalintroduction = #{personalintroduction},</if>
+			<if test="companyname !=null and companyname != ''">companyname = #{companyname},</if>
+			<if test="companyimgurl !=null and companyimgurl != ''">companyimgurl = #{companyimgurl},</if>
+			<if test="companyintroduction !=null and companyintroduction !='' ">companyintroduction = #{companyintroduction},</if>
+			<if test="tickcoin !=null and tickcoin != ''">tickcoin = tickcoin+#{tickcoin},</if>
+			<if test="points !=null and points != ''">points = #{points},</if>
+			<if test="evaluationavg !=null">evaluationavg = #{evaluationavg},</if>
+			<if test="individualstatus !=null">individualstatus = #{individualstatus},</if>
+			<if test="enterprisestatus !=null">enterprisestatus = #{enterprisestatus},</if>
+			<if test="qrcodeurl !=null">qrcodeurl = #{qrcodeurl},</if>
+			<if test="jobtype !=null">jobtype = #{jobtype},</if>
+			<if test="updaterid !=null">updaterid = #{updaterid},</if>
+			<if test="updatetime !=null">updatetime = #{updatetime},</if>
+			<if test="delflag !=null">delflag = #{delflag},</if>
+			<if test="perfectdegree !=null and perfectdegree != ''">perfectdegree = #{perfectdegree},</if>
+			<if test="provinceid !=null and provinceid != ''">provinceid = #{provinceid},</if>
+			<if test="cityid !=null and cityid != ''">cityid = #{cityid},</if>
+			<if test="iscompletion !=null and iscompletion != ''">iscompletion = #{iscompletion},</if>
+			<if test="longitude !=null and longitude != ''">longitude = #{longitude},</if>
+			<if test="latitude !=null and latitude != ''">latitude = #{latitude},</if>
+			<if test="verifycode !=null and verifycode != ''">verifycode = #{verifycode},</if>
+			<if test="device !=null">device = #{device},</if>
+			<if test="channelid !=null">channelid = #{channelid},</if>
+			<if test="isgive !=null and isgive != ''">isgive = #{isgive},</if>
+		</set>
+		<where>
+			<if test="extendid != null and extendid != ''">extendid = #{extendid}</if>
+			<if test="userid != null and userid != ''">userid = #{userid}</if>
+			<if test="chid != null and chid != ''">channelid = #{chid}</if>
+		</where>
+	</update>
+	<!-- 批量修改会员认证信息（个人认证和企业认证） -->
+	<update id="updateExtendPrise" parameterType="map">
+		<foreach collection="idList" item="item" separator=";">
+			UPDATE `tick_user_extend`
+			<set>
+				<if test="individualstatus !=null">individualstatus = #{individualstatus},</if>
+				<if test="enterprisestatus !=null">enterprisestatus = #{enterprisestatus},</if>
+			</set>
+			<where>
+				extendid = '${item}'
+			</where>
+		</foreach>
+	</update>
+
+	<insert id="insertCoinRecord" parameterType="map">
+		INSERT INTO tick_coin_record
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			<if test="recordid != null">recordid,</if>
+			<if test="title !=null">title,</if>
+			<if test="description !=null">description,</if>
+			<if test="amount !=null">amount,</if>
+			<if test="pay_userid !=null">pay_userid,</if>
+			<if test="income_userid !=null">income_userid,</if>
+			<if test="paytime != null">paytime,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="recordid != null">#{recordid},</if>
+			<if test="title !=null">#{title},</if>
+			<if test="description !=null">#{description},</if>
+			<if test="amount !=null">#{amount},</if>
+			<if test="pay_userid !=null">#{pay_userid},</if>
+			<if test="income_userid !=null">#{income_userid},</if>
+			<if test="paytime != null">#{paytime},</if>
+		</trim>
+	</insert>
+	<select id="getShareCount" parameterType="map" resultType="int">
+		select count(0) from tick_coin_record where income_userid=#{memberid}
+		and to_days(paytime)=to_days(now())
+	</select>
+	<select id="getAreaInfo" parameterType="map" resultType="map">
+		select
+		areaid,parentid,datacode,cname,ename,priority,ifactive,createtime from
+		t_dt_area
+		where
+		ifactive = 1
+		<if test="parentid != null and parentid != ''">and parentid = #{parentid}</if>
+		<if test="areaid != null and areaid != ''">and areaid = #{areaid}</if>
+		<if test="cname != null and cname != ''">and cname like concat("%",#{cname},"%")</if>
+		<if test="iscityid !=null and iscityid == 1">and parentid != 4</if>
+		limit 1
+	</select>
+
+	<!-- 新增用户图片（身份证照和个人照片） 中间表 -->
+	<insert id="insertMemberImg" parameterType="map">
+		<foreach collection="memberImgArray" item="item" separator=";">
+			INSERT INTO tick_member_img
+			<trim prefix="(" suffixOverrides="," suffix=")">
+				<if test="item.memberimgid != null">memberimgid,</if>
+				<if test="item.memberid !=null">memberid,</if>
+				<if test="item.imgid !=null">imgid,</if>
+				<if test="item.type !=null">type,</if>
+				<if test="item.createrid !=null">createrid,</if>
+				<if test="item.createtime !=null">createtime,</if>
+				<if test="item.updaterid != null">updaterid,</if>
+				<if test="item.updatetime != null">updatetime,</if>
+				<if test="item.delflag != null">delflag,</if>
+			</trim>
+			<trim prefix="values ( " suffixOverrides="," suffix=")">
+				<if test="item.memberimgid != null">#{item.memberimgid},</if>
+				<if test="item.memberid !=null">#{item.memberid},</if>
+				<if test="item.imgid !=null">#{item.imgid},</if>
+				<if test="item.type !=null">#{item.type},</if>
+				<if test="item.createrid !=null">#{item.createrid},</if>
+				<if test="item.createtime !=null">#{item.createtime},</if>
+				<if test="item.updaterid != null">#{item.updaterid},</if>
+				<if test="item.updatetime != null">#{item.updatetime},</if>
+				<if test="item.delflag != null">#{item.delflag},</if>
+			</trim>
+		</foreach>
+	</insert>
+	<!-- 插入图片 -->
+	<insert id="insertimg" parameterType="java.util.Map">
+		<foreach collection="imgArray" item="item" separator=";">
+			INSERT INTO t_img
+			<trim prefix="(" suffix=")" suffixOverrides=",">
+				<if test="null != item.imgid and '' != item.imgid">imgid,</if>
+				<if test="null != item.name and '' != item.name">name,</if>
+				<if test="null != item.url and '' != item.url">url,</if>
+				<if test="null != item.suffix and '' != item.suffix">suffix,</if>
+				<if test="null != item.createrid and '' != item.createrid">createrid,</if>
+				<if test="null != item.createtime and '' != item.createtime">createtime,</if>
+				<if test="null != item.updaterid and '' != item.updaterid">updaterid,</if>
+				<if test="null != item.updatetime and '' != item.updatetime">updatetime,</if>
+				<if test="null != item.delflag and '' != item.delflag">delflag,</if>
+			</trim>
+			<trim prefix="values (" suffix=")" suffixOverrides=",">
+				<if test="null != item.imgid and '' != item.imgid">#{item.imgid},</if>
+				<if test="null != item.name and '' != item.name">#{item.name},</if>
+				<if test="null != item.url and '' != item.url">#{item.url},</if>
+				<if test="null != item.suffix and '' != item.suffix">#{item.suffix},</if>
+				<if test="null != item.createrid and '' != item.createrid">#{item.createrid},</if>
+				<if test="null != item.createtime and '' != item.createtime">#{item.createtime},</if>
+				<if test="null != item.updaterid and '' != item.updaterid">#{item.updaterid},</if>
+				<if test="null != item.updatetime and '' != item.updatetime">#{item.updatetime},</if>
+				<if test="null != item.delflag and '' != item.delflag">#{item.delflag},</if>
+			</trim>
+		</foreach>
+	</insert>
+
+
+	<!-- 删除用户图片 -->
+	<update id="updateMemberImg" parameterType="map">
+		UPDATE tick_member_img
+		<set>
+			<if test="delflag != null">delflag = #{delflag},</if>
+		</set>
+		<where>
+			memberimgid = #{memberimgid}
+		</where>
+	</update>
+
+	<!-- 删除用户图片 -->
+	<delete id="deleteMemberImg" parameterType="map">
+		delete from
+		tick_member_img where memberid=#{memberid}
+	</delete>
+
+	<!-- 查询用户图片（身份证照和个人照） -->
+	<select id="getMemberImgList" parameterType="map" resultType="map">
+		select a.memberimgid,a.`type`,a.delflag,b.imgid,b.name,b.url from
+		tick_member_img a left join t_img b on a.imgid = b.imgid
+		<where>
+			a.delflag = 0 and b.delflag = 0
+			<if test="memberid != null and memberid != ''">and a.memberid = #{memberid}</if>
+			<if test="type != null and type != ''">and a.type = #{type}</if>
+		</where>
+	</select>
+
+	<!-- 查询用户订单保险 -->
+	<select id="getInsuranceList" parameterType="map" resultType="map">
+		select c.orderno,
+		a.insuranceid,a.`status`,a.createtime,a.updatetime,b.nickname,b.username,b.realname,b.phone,b.phone,b.idcard,ifnull(d.jobtitle,e.projecttitle)
+		as title from tick_insurance_record a
+		left join t_dt_member b on
+		a.memberid = b.memberid
+		left join tick_order c on a.orderid = c.orderid
+		left join tick_job d on d.jobid = c.jobid
+		left join tick_project e on
+		e.projectid = c.projectid
+		<where>
+			<if test="insuranceid != null and insuranceid != ''">and a.insuranceid = #{insuranceid}</if>
+			<if test="status != null and status != ''">and a.status = #{status}</if>
+			<if test="createtime != null and createtime != ''">and a.createtime = #{createtime}</if>
+			<if test="phone != null and phone != ''">and b.phone like "%"#{phone}"%"</if>
+			<if test="realname != null and realname != ''">and b.realname like "%"#{realname}"%"</if>
+		</where>
+		order by a.createtime desc
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+
+	<!-- 查询用户订单保险 总记录数 -->
+	<select id="getInsuranceListNum" parameterType="map" resultType="int">
+		select count(*)
+		from tick_insurance_record a
+		left join t_dt_member b on
+		a.memberid = b.memberid
+		left join tick_order c on a.orderid = c.orderid
+		left join tick_job d on d.jobid = c.jobid
+		left join tick_project e on
+		e.projectid = c.projectid
+		<where>
+			<if test="insuranceid != null and insuranceid != ''">and a.insuranceid = #{insuranceid}</if>
+			<if test="status != null and status != ''">and a.status = #{status}</if>
+			<if test="createtime != null and createtime != ''">and a.createtime = #{createtime}</if>
+			<if test="phone != null and phone != ''">and b.phone like "%"#{phone}"%"</if>
+			<if test="realname != null and realname != ''">and b.realname like "%"#{realname}"%"</if>
+		</where>
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+
+	<!-- 修改用户保险状态 -->
+	<update id="updateInsurance" parameterType="map">
+		<foreach collection="dataList" item="item" separator=";">
+			update tick_insurance_record
+			<set>
+				<if test="item.status != null and item.status != ''">status =#{item.status},</if>
+				<if test="item.updaterid != null and item.updaterid != ''">updaterid =#{item.updaterid},</if>
+				<if test="item.updatetime != null and item.updatetime != ''">updatetime =#{item.updatetime},</if>
+			</set>
+			where insuranceid = #{item.insuranceid}
+		</foreach>
+	</update>
+
+	<!-- 新增用户统计 按照天统计 -->
+	<select id="getMemberCount" parameterType="map" resultType="map">
+		SELECT c_time.comparetime as tm,
+		DATE_FORMAT(c_time.comparetime,'%m-%d') as
+		comparetime,COUNT(tue.createtime) countnum
+		FROM t_xt_time c_time
+		left
+		join tick_user_extend tue
+		on
+		DATE_FORMAT(tue.createtime,'%Y-%m-%d') =
+		c_time.comparetime
+		<if test="agencyid != null and agencyid != ''">and tue.sourcepid like concat('%',#{agencyid},'%')</if>
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY DATE_FORMAT(c_time.comparetime,'%Y-%m-%d')
+	</select>
+	<!-- 新增用户统计 按照周统计 -->
+	<select id="getMemberCountByWeek" parameterType="map"
+		resultType="int">
+		select SUM(a.countnum) from (SELECT COUNT(tue.createtime) as countnum
+		FROM t_xt_time c_time
+		left join tick_user_extend tue
+		on
+		DATE_FORMAT(tue.createtime,'%Y-%m-%d') = c_time.comparetime
+		<if test="agencyid != null and agencyid != ''">and tue.sourcepid like concat('%',#{agencyid},'%')</if>
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime) a
+	</select>
+	<!-- 新增用户统计 按照年统计 -->
+	<select id="getMemberCountByYear" parameterType="map"
+		resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime,'%m') as
+		comparetime,COUNT(tue.createtime) countnum
+		FROM t_xt_time c_time
+		left
+		join tick_user_extend tue
+		on
+		DATE_FORMAT(tue.createtime,'%Y-%m-%d') =
+		c_time.comparetime
+		<if test="agencyid != null and agencyid != ''">and tue.sourcepid like concat('%',#{agencyid},'%')</if>
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY DATE_FORMAT(c_time.comparetime,'%Y-%m')
+	</select>
+	<!--查询用户信息列表 -->
+	<select id="geMemberOfComplete" parameterType="map" resultType="map">
+		SELECT
+		a.memberid,
+		a.username,
+		a.realname,
+		a.email,
+		a.idcard,
+		a.businesscards,
+		a.phone,
+		a.telephone,
+		a.provinceid,
+		a.cityid,
+		a.createtime,
+		a.headimage,
+		a.backgroundimage,
+		a.sex,
+		a.birthday,
+		a.address,
+		a.openid,
+		a.`status`,
+		a.weixinnumber,
+		a.qqnumber,
+		CAST(
+		a.nickname AS CHAR CHARACTER
+		SET utf8
+		) nickname,
+		a.ifattention,
+		a.gtygroup,
+		a.authentication,
+		d.companyintroduction,
+		a.auditstatus,
+		a.authenticationfailurereasons,
+		a.lasttime,
+		a.unionid,
+		a.ifshield,
+		a.ifdelete,
+		d.companyimgurl,
+		d.extendid,
+		d.idcardnum,
+		d.idcardimgurl,
+		d.personalintroduction,
+		d.tickcoin,
+		d.points,
+		d.evaluationavg,
+		d.individualstatus,
+		d.enterprisestatus,
+		d.companyname,
+		d.channelid,
+		t.applicantid,
+		t.applyorderid,
+		t.orderid,
+		t.publisherid
+		FROM
+		(
+		SELECT
+		o.applyorderid,o.applicantid,o.orderid,o.publisherid
+		FROM
+		tick_apply_order o
+		WHERE
+		o.orderid = #{orderid}
+		AND o. STATUS = '3'
+		)
+		t,
+		t_dt_member a,
+		tick_user_extend d
+		WHERE
+		t.applicantid = a.memberid
+		AND
+		t.applicantid = d.userid
+	</select>
+ 
+	<select id="getAgencyInfo" parameterType="map" resultType="map">
+		select tda.agencyid,tda.agencyname,tda.agencytype,tda.commissionrate,tda.userid,tda.parentid,tda.address,tda.phonenum,tda.contacter,tda.provinceid,
+		tda.cityid,tda.districtid,tda.createtime,tda.createrid,tda.roletype,parent.userid as parentuserid
+		from t_dt_agency tda 
+		left join t_dt_agency  parent on tda.parentid=parent.agencyid
+		<where>
+			<if test="userid != null and userid != ''">and tda.userid=#{userid}</if>
+		</where>
+		limit 1
+	</select>
+	<select id="getMemberByExtendid" parameterType="map" resultType="map">
+	    select openid,memberid
+	    from tick_user_extend tue 
+	    left join t_dt_member tdm on tdm.memberid=tue.userid
+	    <where>
+	        <if test="extendid != null and extendid != ''">and extendid=#{extendid}</if>
+	    </where>
+	    limit 1
+	</select>
+</mapper>

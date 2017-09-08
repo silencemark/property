@@ -1,0 +1,142 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.IndexMapper">
+	<update id="updatesysparam" parameterType="map">
+	    update sys_param
+	    <set>
+	        <if test="pvalue != null">pvalue=#{pvalue},</if>
+	    </set>
+	    <where>
+	        <if test="pkey != null">and pkey=#{pkey}</if>
+	    </where>
+	</update>
+	<!-- 得到banner列表 -->
+	<select id="getBannerList" parameterType="map" resultType="map">
+		select banner.imgurl,banner.linkurl from t_dt_banner_position position left join t_dt_banner banner on banner.positionid = position.id
+		where 
+			banner.status = 1
+			<if test="code != null and code != ''">and position.code = #{code}</if>
+		order by banner.priority desc
+	</select>
+	
+	<!-- 雇主得到发布的订单 -->
+	<select id="getEmployerOrderList" parameterType="map" resultType="map">
+		SELECT order_.orderid,order_.jobid,order_.projectid,order_.status,member.realname,member.headimage,
+		IFNULL(project.starttime,job.starttime) starttime,IFNULL(project.endtime,job.endtime) endtime,
+		IFNULL(project.address,job.workplace) address,IFNULL(project.projecttitle,job.jobtitle) title,
+		IFNULL(job.recruitmentnum,0) sumcount,order_.jobid,order_.projectid
+		FROM tick_order order_
+		LEFT JOIN tick_job job ON order_.jobid = job.jobid
+		LEFT JOIN tick_project project ON order_.projectid = project.projectid
+		LEFT JOIN t_dt_member member ON order_.publisherid = member.memberid
+		where order_.delflag = 0
+			<if test="memberid != null and memberid != ''">and order_.publisherid = #{memberid}</if>
+			<if test="status != null ">and order_.status = #{status}</if>
+			and IFNULL(project.starttime,job.starttime) &gt; now()
+		<!-- GROUP BY apply.orderid -->
+		ORDER BY order_.createtime DESC
+	</select>
+	
+	<!-- 得到接收订单的人数 -->
+	<select id="giveOrderNum" parameterType="map" resultType="int">
+		select count(0) from tick_apply_order 
+		<where>
+			<if test="orderid != null and orderid != ''">and orderid = #{orderid}</if>
+		</where>
+	</select>
+	
+	<!-- 工人得到接收的订单 -->
+	<select id="getWorkmanOrderList" parameterType="map" resultType="map">
+		SELECT 
+		member.headimage,member.realname,CAST(member.nickname AS char character set utf8) nickname,
+		IFNULL(project.projecttitle,job.jobtitle) as title ,
+		IFNULL(project.starttime,job.starttime) starttime,
+		IFNULL(job.recruitmentnum,0) sumcount,
+		apply.status,ifnull(data1.cname,data2.cname) jobname,
+		extend_e.companyname,apply.applyorderid,
+		apply.orderid,apply.publisherid,
+		order_.jobid,order_.projectid,extend_e.evaluationavg
+		,apply.ifpay
+		FROM tick_apply_order apply 
+		
+		LEFT JOIN tick_order order_ ON apply.orderid = order_.orderid
+		
+		LEFT JOIN tick_job job ON order_.jobid = job.jobid
+		
+		LEFT JOIN tick_project project ON order_.projectid = project.projectid
+		
+		LEFT JOIN t_dt_member member ON member.memberid = order_.publisherid
+		
+		LEFT JOIN t_dict_data data1 ON data1.dataid = job.jobtype
+		
+		LEFT JOIN t_dict_data data2 ON data2.dataid = project.ownedindustry
+		
+		LEFT JOIN tick_user_extend extend_e ON order_.publisherid = extend_e.userid
+		where apply.delflag = 0 and order_.delflag = 0
+		<if test="memberid != null and memberid != ''">and apply.applicantid = #{memberid}</if>
+		 
+		and (IFNULL(project.starttime,job.starttime) &gt; now() and order_.status = 1)
+		ORDER BY apply.createtime DESC 
+	</select>
+	
+	<!-- 查询字典表 -->
+	<select id="getDictData" parameterType="map" resultType="map">
+		select dataid,typeid,datacode,cname,ename,remark,priority,ifactive,parentid from t_dict_data
+		where 
+			ifactive = 1
+			<if test="typeid != null and typeid != ''">and typeid = #{typeid}</if>
+			<if test="dataid != null and dataid != ''">and dataid = #{dataid}</if>
+			<if test="parentid != null and parentid != ''">and parentid = #{parentid}</if>
+			<if test="ifparentidone != null and ifparentidone != ''"> and parentid is null</if>
+		order by priority
+	</select>
+	<!-- 查询区域表 -->
+	<select id="getAreaInfo" parameterType="map" resultType="map">
+		select areaid,parentid,datacode,cname,ename,priority,ifactive,createtime from t_dt_area
+		where
+			ifactive = 1
+			<if test="parentid != null and parentid != ''">and parentid = #{parentid}</if>
+			<if test="areaid != null and areaid != ''">and areaid = #{areaid}</if>
+			<if test="cname != null and cname != ''">and cname like concat("%",#{cname},"%")</if>
+			<if test="iscityid !=null and iscityid == 1">and parentid != 4</if>
+			<if test="provincename != null and provincename !=''">and cname =#{provincename}</if>
+		order by priority 
+		<if test="startnum != null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getMemberInfo" parameterType="map" resultType="map">
+		select  tdm.memberid,tdm.username,tdm.password,tdm.realname,tdm.email,tdm.address,tdm.idcard,tdm.businesscards,
+		tdm.phone,tdm.telephone,tdm.provinceid,tdm.cityid,tdm.createtime,tdm.headimage,tdm.backgroundimage,tdm.sex,
+		tdm.birthday,tdm.openid,tdm.status,tdm.weixinnumber,tdm.qqnumber,CAST(tdm.nickname AS char character set utf8) nickname,tdm.ifattention,tdm.gtygroup,
+		tdm.authentication,tdm.auditstatus,tdm.authenticationfailurereasons,tdm.lasttime,tdm.unionid,tdm.ifshield,
+		tue.extendid,tue.userid,tue.idcardnum,tue.idcardimgurl,tue.personalintroduction,tue.companyname,tue.companyimgurl,tue.companyintroduction,tue.tickcoin,
+		tue.points,tue.evaluationavg,tue.individualstatus,tue.enterprisestatus,tue.qrcodeurl,tue.jobtype,tue.createrid,tue.createtime,tue.updaterid,tue.updatetime,tue.delflag,
+		tue.perfectdegree,tue.iscompletion,tdd.cname as jobtypename,tdd1.dataid as parentjobtype,tdd1.cname as parentjobtypename,tue.longitude,tue.latitude,tue.lasttype
+		,tue.channelid,tue.device
+		from t_dt_member tdm 
+		left join tick_user_extend tue on tdm.memberid=tue.userid
+		left join t_dict_data tdd on tue.jobtype=tdd.dataid
+		left join t_dict_data tdd1 on tdd1.dataid=tdd.parentid
+		<where>
+			<if test="memberid != null and memberid != ''">and tdm.memberid =#{memberid}</if>
+			<if test="openid != null and openid != ''">and tdm.openid =#{openid}</if>
+		</where>
+		limit 1
+	</select>
+	<select id="getDictInfo" parameterType="map" resultType="map">
+		select dataid,typeid,datacode,cname,ename,remark,priority,ifactive,parentid from t_dict_data
+		where 
+			ifactive = 1
+			<if test="dataid != null and dataid != ''">and dataid = #{dataid}</if>
+			<if test="parentid != null and parentid != ''">and parentid = #{parentid}</if>
+			<if test="ifparentidone != null and ifparentidone != ''"> and parentid is null</if>
+			limit 1
+	</select>
+	<update id="updateUserExtend" parameterType="map">
+		update tick_user_extend
+		<set>
+			<if test="lasttype != null and lasttype != ''">lasttype=#{lasttype},</if>
+		</set>
+		<where>
+			<if test="userid != '' and userid != null">and userid=#{userid}</if>
+		</where>
+	</update>
+</mapper>

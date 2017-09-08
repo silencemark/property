@@ -1,0 +1,54 @@
+@charset "utf-8";
+
+
+/* 内容审核 */
+.containerContentReview .webMain .mainBody h1 { font-size: 24px; line-height: 28px; color: #556066; padding: 0 30px 5px 30px;}
+.containerContentReview .webMain .mainBody h2 { font-size: 14px; color: #89949a; line-height: 20px; padding: 0 30px 15px 30px;}
+.containerContentReview .webMain .mainBody h2 span { color: #5cacdf; padding-left: 5px;}
+.containerContentReview .webMain .mainBody .article { padding: 15px 30px 50px 30px; border-top: 1px solid #e9efef; border-bottom: 1px solid #e9efef;}
+.containerContentReview .webMain .mainBody .article * { font-size: 14px; line-height: 22px; color: #556066;}
+
+/* 粉丝数据 */
+.containerFansInfo .webMain .mainBody .head img { display: block; width: 100px; height: 100px;}
+
+/* 模块列表 */
+.containerModuleList .webMain .mainBody .table .t1 { width: 100px; text-align: center;}
+.containerModuleList .webMain .mainBody .table .t2 { width: auto; text-indent: 20px;}
+.containerModuleList .webMain .mainBody .table .t3 { width: 200px; text-align: center;}
+.containerModuleList .webMain .mainBody .table tr.stop { background: #fff4f0;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

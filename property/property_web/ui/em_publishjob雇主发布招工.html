@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" >
+<title>雇主发布招工</title>
+<link href="style/public.css" type="text/css" rel="stylesheet">
+<link href="style/page.css" type="text/css" rel="stylesheet">
+<script type="text/javascript" src="scripts/jquery-1.10.2.min.js"></script>
+<link href="scripts/mobiscrol/css/mobiscroll.custom-2.6.2.min.css" type="text/css" rel="stylesheet">  
+<script type="text/javascript" src="scripts/mobiscrol/js/mobiscroll.custom-2.6.2.min.js"></script>
+</head>
+
+<body>
+<!--头部-->
+<div class="headbox">
+	<div class="title f-20">发布招工</div>
+    <a href="#" class="ico_back f-16">返回</a>
+    <a href="#" class="ico_list">更多</a>
+</div>
+
+<div class="from_publish">
+    <ul>
+    	<li>
+        	<span>项目名称</span><input type="text" class="text_01" placeholder="项目名称">
+            <div class="sel_box">
+            	<a href="#">历史项目名称一</a>
+                <a href="#">历史项目名称二</a>
+                <a href="#">历史项目名称三</a>
+            </div>
+        	<div class="clear"></div>
+        </li>
+        <li><span>订单标题</span><input type="text" class="text_01" placeholder="填写标题"><div class="clear"></div></li>
+        <li><span>工种</span><i class="sel" onClick="window.location.href='menu_page二级选项卡.html'">选择工种</i><div class="clear"></div></li>
+        <li><span>薪资<em>(元/天)</em></span><input type="text" class="text_01" placeholder="0"><div class="clear"></div></li>
+         <li><span>结算方式</span><select class="sel_02"><option>按天结算</option><option>按月结算</option></select><div class="clear"></div></li>
+        <li><span>用工时间<em>(开始)</em></span><input type="text" class="time" id="starttime"><div class="clear"></div></li>
+        <li><span>用工时间<em>(开始)</em></span><input type="text" class="time" id="endtime"><div class="clear"></div></li>
+      <li><span>工作地点</span><input type="text" class="text_01" placeholder="填写地点"><div class="clear"></div></li>
+        <li><span>招聘人数</span><input type="text" class="text_01" placeholder="0"><div class="clear"></div></li>
+      <li><span>工作要求</span><div class="clear"></div></li>
+        <li><div class="text_area"><textarea class="text_02" placeholder="请填写用工需求,10-200字"></textarea></div></li>
+        <li><span>联系人</span><input type="text" class="text_01" placeholder="王先生"><div class="clear"></div></li>
+        <li><span>联系电话</span><input type="text" class="text_01" placeholder="18288669900"><div class="clear"></div></li>
+    </ul>
+</div>
+<div class="main_bigbtn"><input type="button" value="发布招工"></div>
+
+<!--底部导航-->
+<div class="bottom_none"></div>
+<div class="bottom_menu">
+	<ul>
+    	<li class="dq"><a href="#"><b class="bg_home"></b><span>首页</span></a></li>
+        <li><a href="#"><b class="bg_supplier"></b><span>供应商</span></a></li>
+        <li><a href="#"><b class="bg_msg"></b><span>消息</span></a></li>
+        <li><a href="#"><b class="bg_user"><em>8</em></b><span>我的</span></a></li>
+    </ul>
+</div>
+<!--底部导航-->
+<script type="text/javascript">
+$(function(){
+	var currYear = (new Date()).getFullYear();	
+	var opt={};
+	opt.date = {preset : 'date', dateFormat: 'yy-mm-dd' };
+	//opt.datetime = { preset : 'datetime', minDate: new Date(2012,3,10,9,22), maxDate: new Date(2014,7,30,15,44), stepMinute: 5  };
+	opt.datetime = {preset : 'datetime', dateFormat: 'yy-mm-dd' }; 
+	opt.time = {preset : 'time'};
+	opt.default = { 
+		theme: 'android-ics', //皮肤样式 
+        display: 'modal', //显示方式  
+        mode: 'scroller', //日期选择模式
+        dateOrder : 'yymmdd', 
+		lang:'zh',
+        startYear:currYear - 10, //开始年份
+        endYear:currYear + 10 //结束年份
+	};    
+	$('#starttime').scroller('destroy').scroller($.extend(opt['datetime'], opt['default']));
+	$('#endtime').scroller('destroy').scroller($.extend(opt['datetime'], opt['default'])); 
+})
+</script>
+</body>
+</html>

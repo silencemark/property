@@ -1,0 +1,836 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.SystemMapper">
+
+	<!-- baner位置列表 -->
+	<select id="getbannerListHome" parameterType="map" resultType="map">
+		select m.id,m.imgurl,m.linkurl,m.positionid,m.status,m.priority,
+		t1.name as positionname,t1.size
+		from t_dt_banner m
+		left join t_dt_banner_position t1 on t1.id = m.positionid
+		<where>
+			<if test="name !='' and name!=null">and m.name like "%"#{name}"%"</if>
+			<if test="positionid !='' and positionid!=null">and m.positionid =#{positionid}</if>
+		</where>
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- baner位置列表数量 -->
+	<select id="getbannerListHomeNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0) from t_dt_banner m
+		<where>
+			<if test="name !='' and name!=null">and m.name like concat("%",#{name},"%")</if>
+			<if test="positionid !='' and positionid!=null">and m.positionid =#{positionid}</if>
+		</where>
+	</select>
+	<!-- baner详情列表 -->
+	<select id="getbannerPositionListHome" parameterType="map"
+		resultType="map">
+		select m.id,m.name,m.code,m.createtime,m.userid,m.size,
+		t1.realname
+		from t_dt_banner_position m
+		left join t_dt_user t1 on t1.userid = m.userid
+		order by m.createtime
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- banner详情列表数量 -->
+	<select id="getbannerPositionListHomeNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0)
+		from t_dt_banner_position m
+	</select>
+	<!-- 修改banner -->
+	<update id="updateBanner" parameterType="map">
+		update t_dt_banner
+		<set>
+			<if test="imgurl != null and '' !=imgurl">imgurl = #{imgurl},</if>
+			<if test="linkurl != null and '' !=linkurl">linkurl = #{linkurl},</if>
+			<if test="positionid != null and '' !=positionid">positionid = #{positionid},</if>
+			<if test="status !=null and '' !=status">status = #{status},</if>
+			<if test="priority !=null and '' !=priority">priority = #{priority},</if>
+
+		</set>
+		where
+		id =#{id}
+	</update>
+	<!-- 新增banner -->
+	<insert id="insertBanner" parameterType="map">
+		insert into t_dt_banner
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			id,
+			<if test="imgurl != null and '' !=imgurl">imgurl,</if>
+			<if test="linkurl != null and '' !=linkurl">linkurl,</if>
+			<if test="positionid != null and '' !=positionid">positionid,</if>
+			<if test="status !=null and '' !=status">status,</if>
+			<if test="priority !=null and '' !=priority">priority,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			REPLACE(UUID(),'-',''),
+			<if test="imgurl != null and '' !=imgurl">#{imgurl},</if>
+			<if test="linkurl != null and '' !=linkurl">#{linkurl},</if>
+			<if test="positionid != null and '' !=positionid">#{positionid},</if>
+			<if test="status !=null and '' !=status">#{status},</if>
+			<if test="priority !=null and '' !=priority">#{priority},</if>
+		</trim>
+		<selectKey order="AFTER" keyProperty="siteid" resultType="int">
+			select @@IDENTITY as id
+		</selectKey>
+	</insert>
+	<!-- 删除banner -->
+	<delete id="deleteBanner" parameterType="map">
+		delete from t_dt_banner
+		where id=#{id}
+	</delete>
+	<!-- 查询用户信息 -->
+	<select id="getUserInfo" parameterType="map" resultType="map">
+		select tdu.userid,tdu.username,tdu.password,tdu.realname,tdu.email,tdu.phone,tdu.telephone,tdu.createtime,tdu.headimage,tdu.sex,tdu.cityid,tdu.status,tdu.birthday,tdu.provinceid,tdu.audit
+		from t_dt_user tdu
+		where status=1
+		<if test="userid != null and userid!=''">and tdu.userid=#{userid}</if>
+		<if test="username != null and username!=''">and tdu.username=#{username}</if>
+		<if test="password != null and password !=''">and tdu.password=#{password}</if>
+		limit 1
+	</select>
+	<!-- 重置用户密码 -->
+	<update id="resetPwd" parameterType="map">
+		update t_dt_user
+		<set>
+			<if test="password != null and '' !=password">password = #{password},</if>
+		</set>
+		where
+		userid=#{userid}
+	</update>
+	<!-- 用户具有菜单权限 -->
+	<select id="getMenuList" parameterType="map" resultType="map">
+		select
+		tdf.id,parentid,tdf.name,tdf.linkurl,tdf.status,tdf.priority,tdf.createtime,tdf.remark
+		from t_dt_function tdf
+		left join t_as_rolefunction tar on
+		tdf.id=tar.funid
+		left JOIN t_as_userrole tau on tar.roleid=tau.roleid
+		left join t_dt_user tuser on tau.userid=tuser.userid
+		<where>
+			<if test="userid !='' and userid !=null">and tuser.userid=#{userid}</if>
+			and tdf.status=1
+		</where>
+		group by tdf.id
+		order by tdf.priority
+	</select>
+	<!-- 菜单管理 -->
+	<select id="getFunctionList" parameterType="map" resultType="map">
+		select
+		tdf1.id,tdf1.parentid,tdf1.name,tdf1.linkurl,tdf1.status,tdf1.priority,tdf1.createtime,tdf1.remark,tdf2.name
+		as parentname from t_dt_function tdf1
+		left join t_dt_function tdf2 on
+		tdf1.parentid=tdf2.id
+		<where>
+			<if test="name !='' and name!=null">and tdf1.name like concat("%"#{name}"%")</if>
+			<if test="parentid !='' and parentid !=null">and tdf1.parentid=#{parentid}</if>
+		</where>
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- 菜单管理数量 -->
+	<select id="getFunctionListNum" parameterType="map" resultType="int">
+		select count(0) from t_dt_function tdf1
+		left join t_dt_function tdf2 on
+		tdf1.parentid=tdf2.id
+		<where>
+			<if test="name !='' and name!=null">and tdf1.name like concat("%"#{name}"%")</if>
+			<if test="parentid !='' and parentid !=null">and tdf1.parentid=#{parentid}</if>
+		</where>
+	</select>
+	<!-- 新增菜单 -->
+	<insert id="insertFunction" parameterType="map">
+		insert into
+		t_dt_function(id,parentid,name,linkurl,status,priority,createtime,remark)
+		values(REPLACE(UUID(),'-',''),#{parentid},#{name},#{linkurl},#{status},#{priority},now(),#{remark})
+	</insert>
+	<!-- 修改菜单 -->
+	<update id="updateFunction" parameterType="map">
+		update t_dt_function
+		<set>
+			<if test="parentid !=null and parentid != ''"> parentid=#{parentid},</if>
+			<if test="name !=null and name != ''"> name=#{name},</if>
+			<if test="linkurl !=null and linkurl != ''">linkurl=#{linkurl},</if>
+			<if test="status !=null and status != ''">status=#{status},</if>
+			<if test="priority !=null and priority != ''"> priority=#{priority},</if>
+			<if test="remark !=null and remark != ''">remark=#{remark},</if>
+		</set>
+		<where>
+			<if test="id !=null and id != ''">and id=#{id}</if>
+		</where>
+	</update>
+	<!-- 删除菜单 -->
+	<delete id="deleteFunction" parameterType="map">
+		delete from
+		t_dt_function where id=#{id}
+	</delete>
+	<!-- 新增用户 -->
+	<insert id="insertUser" parameterType="map">
+		insert into t_dt_user
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			userid,
+			<if test="username != null and username != ''">username,</if>
+			<if test="password != null and password != ''">password,</if>
+			<if test="realname != null and realname != ''">realname,</if>
+			<if test="email != null and email != ''">email,</if>
+			<if test="phone != null and phone != ''">phone,</if>
+			<if test="telephone != null and telephone != ''">telephone,</if>
+			<if test="createtime !=null and createtime != ''">createtime,</if>
+			<if test="status != null">status,</if>
+			<if test="provinceid != null">provinceid,</if>
+			<if test="headimage != null and headimage != ''">headimage,</if>
+			<if test="sex != null">sex,</if>
+			<if test="birthday != null">birthday,</if>
+			<if test="openid != null">openid,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			REPLACE(UUID(),'-',''),
+			<if test="username != null and username != ''">#{username},</if>
+			<if test="password != null and password != ''">#{password},</if>
+			<if test="realname != null and realname != ''">#{realname},</if>
+			<if test="email != null and email != ''">#{email},</if>
+			<if test="phone != null and phone != ''">#{phone},</if>
+			<if test="telephone != null and telephone != ''">#{telephone},</if>
+			<if test="createtime !=null and createtime != ''">#{createtime},</if>
+			<if test="status != null">#{status},</if>
+			<if test="provinceid != null">#{provinceid},</if>
+			<if test="headimage != null and headimage != ''">#{headimage},</if>
+			<if test="sex != null">#{sex},</if>
+			<if test="birthday != null">#{birthday},</if>
+			<if test="openid != null">#{openid},</if>
+		</trim>
+		<selectKey order="AFTER" keyProperty="userid" resultType="int">
+			select @@IDENTITY as userid
+		</selectKey>
+	</insert>
+	<!-- 查询角色列表 -->
+	<select id="getRole" resultType="map">
+		select
+		roleid,rolename,createtime,status,remark from t_dt_role where status=1
+	</select>
+	<!-- 修改用户 -->
+	<update id="updateUser" parameterType="map">
+		update t_dt_user
+		<set>
+			<if test="username != null and '' !=username">username = #{username},</if>
+			<if test="password != null and '' !=password">password = #{password},</if>
+			<if test="realname != null and '' !=realname">realname = #{realname},</if>
+			<if test="email !=null and '' !=email">email = #{email},</if>
+			<if test="phone !=null and '' !=phone">phone = #{phone},</if>
+			<if test="telephone !=null and ''!= telephone">telephone = #{telephone},</if>
+			<if test="createtime != null and '' != createtime">createtime = #{createtime},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="provinceid != null">provinceid = #{provinceid},</if>
+			<if test="headimage != null and headimage != ''">headimage = #{headimage},</if>
+			<if test="sex != null">sex = #{sex},</if>
+			<if test="birthday != null">birthday = #{birthday},</if>
+			<if test="openid != null">openid = #{openid},</if>
+			<if test="ewm != null">ewm = #{ewm},</if>
+		</set>
+		where
+		userid =#{userid}
+	</update>
+
+	<!-- 查询用户列表 -->
+	<select id="getUserList" resultType="map" parameterType="map">
+		select t.userid,t.username,t.password,t.realname,t.email,
+		t.phone,t.telephone,t.createtime,t.status,t.provinceid,area.cname
+		provincename,t.ewm,
+		t.headimage,t.sex,t.birthday,t.openid,r.roleids,r.rolenames from
+		t_dt_user t
+		LEFT JOIN
+		(select GROUP_CONCAT(roleid)
+		roleids,userid,GROUP_CONCAT(rolename) rolenames from(select
+		userid,asuserrole.roleid,dtrole.rolename from t_as_userrole asuserrole
+		INNER JOIN t_dt_role dtrole on asuserrole.roleid = dtrole.roleid
+		GROUP
+		BY dtrole.roleid,asuserrole.userid) a group by userid)
+		r on t.userid =
+		r.userid
+		left join t_dt_area area on t.provinceid = area.areaid
+		<where>
+			<if test="null != userid and '' != userid"> and t.userid=#{userid} </if>
+			<if test="null != username and '' != username"> and t.username like CONCAT("%",#{username},"%") </if>
+			<if test="null != userpassword and '' != userpassword"> and t.password=#{password} </if>
+			<if test="null != realname and '' != realname"> and t.realname like CONCAT("%",#{realname},"%") </if>
+			<if test="null != email and '' != email"> and t.email like CONCAT("%",#{email},"%") </if>
+			<if test="null != phone and '' != phone"> and t.phone like CONCAT("%",#{phone},"%") </if>
+			<if test="null != telephone and ''!= telephone"> and t.telephone like CONCAT("%",#{telephone},"%") </if>
+			<if test="null != status  and status != ''"> and t.status=#{status} </if>
+			<if test="null != sex"> and t.sex=#{sex} </if>
+			<if test="null != birthday"> and t.birthday=#{birthday} </if>
+		</where>
+		order by t.createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- 查询用户列表数量 -->
+	<select id="getUserListNum" resultType="int" parameterType="map">
+		select count(0) from t_dt_user t
+		<where>
+			<if test="null != userid and '' != userid"> and t.userid=#{userid} </if>
+			<if test="null != username and '' != username"> and t.username like CONCAT("%",#{username},"%") </if>
+			<if test="null != userpassword and '' != userpassword"> and t.password=#{password} </if>
+			<if test="null != realname and '' != realname"> and t.realname like CONCAT("%",#{realname},"%") </if>
+			<if test="null != email and '' != email"> and t.email like CONCAT("%",#{email},"%") </if>
+			<if test="null != phone and '' != phone"> and t.phone like CONCAT("%",#{phone},"%") </if>
+			<if test="null != telephone and ''!= telephone"> and t.telephone like CONCAT("%",#{telephone},"%") </if>
+			<if test="null != status  and status != ''"> and t.status=#{status} </if>
+			<if test="null != sex"> and t.sex=#{sex} </if>
+			<if test="null != birthday"> and t.birthday=#{birthday} </if>
+		</where>
+	</select>
+
+
+	<!-- 保存角色菜单功能 -->
+	<insert id="saveRoleFunction" parameterType="map">
+		insert into t_as_rolefunction(rolefunctionid,roleid,funid,createtime)
+		values
+		<foreach collection="roleFunList" item="item" index="index"
+			separator=",">
+			(REPLACE(UUID(),'-',''),#{item.roleid},#{item.funid},now())
+		</foreach>
+	</insert>
+
+	<!-- 新增角色 -->
+	<insert id="insertRole" parameterType="map">
+		insert into
+		t_dt_role(roleid,rolename,status,remark)
+		values(REPLACE(UUID(),'-',''),#{name},#{status},#{remark})
+	</insert>
+
+	<!-- 修改角色 -->
+	<update id="updateRole" parameterType="java.util.Map">
+		update t_dt_role
+		<set>
+			<if test="name !=null and ''!=name">rolename = #{name},</if>
+			<if test="status !=null and ''!=status">status = #{status},</if>
+			<if test="remark !=null and ''!=remark">remark = #{remark},</if>
+		</set>
+		where roleid =#{roleid}
+	</update>
+
+	<!-- 删除角色 -->
+	<delete id="deleteRole" parameterType="java.util.Map">
+		delete from t_dt_role
+		where roleid =#{roleid}
+	</delete>
+
+	<!-- 删除用户角色 -->
+	<delete id="deleteUserRole" parameterType="java.util.Map">
+		delete from t_as_userrole
+		<where>
+			<if test="null!=userid and ''!=userid"> and userid=#{userid} </if>
+			<if test="list != null">
+				<foreach collection="list" item="item" open="AND roleid IN("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="null!=userroleid and ''!=userroleid"> and userroleid=#{userroleid} </if>
+		</where>
+	</delete>
+
+	<!-- 赋予用户角色 -->
+	<insert id="saveUserRole" parameterType="java.util.Map">
+		insert into t_as_userrole(userroleid,userid,roleid,createtime)
+		values
+		<foreach collection="userRoleList" item="item" index="index"
+			separator=",">
+			(REPLACE(UUID(),'-',''),#{item.userid},#{item.roleid},now())
+		</foreach>
+	</insert>
+
+	<!-- 新增角色菜单 -->
+	<insert id="insertRoleFunction" parameterType="java.util.Map">
+		insert into
+		t_as_rolefunction(rolefunctionid,roleid,funid,createtime)
+		values
+		(REPLACE(UUID(),'-',''),#{roleid},#{funid},now())
+	</insert>
+
+	<!-- 修改角色菜单 -->
+	<update id="updateRoleFunction" parameterType="java.util.Map">
+		update t_as_rolefunction
+		<set>
+			<if test="'' != roleid and roleid != null">roleid =#{roleid},</if>
+			<if test="'' != funid and funid != null">funid =#{funid},</if>
+		</set>
+		where rolefunctionid=#{rolefunctionid}
+	</update>
+
+
+	<!-- 删除角色菜单 -->
+	<delete id="deleteRoleFunction" parameterType="java.util.Map">
+		delete from t_as_rolefunction
+		<where>
+			<if test="null!=roleid and ''!=roleid"> and roleid=#{roleid} </if>
+			<if test="list != null">
+				<foreach collection="list" item="item" open="AND funid IN("
+					separator="," close=")">
+					#{item.funid}
+				</foreach>
+			</if>
+			<if test="null!=rolefunid and ''!=rolefunid"> and rolefunctionid=#{rolefunctionid} </if>
+		</where>
+	</delete>
+
+	<!-- 得到角色列表 -->
+	<select id="getRoleList" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		select r.createtime,r.roleid,r.rolename,r.status,r.remark
+		,GROUP_CONCAT(distinct CAST(f.id
+		AS char(10))) funids
+		from t_dt_role
+		r
+		left join t_as_rolefunction rf on r.roleid=rf.roleid
+		left join
+		t_dt_function f on rf.funid=f.id
+		<where>
+			<if test="null!=name and ''!=name"> and r.name like "%"#{name}"%" </if>
+			<if test="null!=status and ''!=status"> and r.status=#{status}</if>
+			<if test="null!=remark and ''!=remark"> and r.remark like "%"#{remark}"%" </if>
+		</where>
+		GROUP BY r.roleid
+		order by r.roleid desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+
+	<!-- 得到角色列表数量 -->
+	<select id="getRoleListNum" parameterType="java.util.Map"
+		resultType="java.lang.Integer">
+		select count(0) from t_dt_role
+		<where>
+			<if test="null!=name and ''!=name"> and rolename like "%"#{name}"%" </if>
+			<if test="null!=status and ''!=status"> and status=#{status}</if>
+			<if test="null!=remark and ''!=remark"> and remark like "%"#{remark}"%" </if>
+		</where>
+	</select>
+
+	<!-- 得到所有权限列表 -->
+	<select id="getRoleListAll" resultType="java.util.Map">
+		select
+		roleid,rolename,status,remark from t_dt_role
+	</select>
+
+	<!-- 得到所有方法列表 -->
+	<select id="getFunctionListAll" resultType="java.util.Map">
+		select
+		parentid,id
+		funid,name from t_dt_function
+	</select>
+
+	<!-- 查询用户权限 -->
+	<select id="findFactFunByRole" parameterType="java.util.Map"
+		resultType="java.lang.String">
+		select tdf.id funid from t_as_rolefunction tar
+		left join t_dt_function
+		tdf on tar.funid=tdf.id
+		<where>
+			<if test="null!=roleid and ''!=roleid">
+				and roleid=#{roleid}
+			</if>
+		</where>
+	</select>
+
+	<!-- 角色菜单 -->
+	<select id="getRoleFunctionList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select tar.rolefunctionid,tdr.roleid,tdr.rolename as
+		rolename,tdf.id
+		funid,tdf.name as funname,tar.createtime from
+		t_as_rolefunction tar
+		left join t_dt_role tdr on tar.roleid=tdr.roleid
+		left join
+		t_dt_function tdf on tar.funid=tdf.id
+		<where>
+			<if test="'' != rolename and rolename != null">and tdr.name like "%"#{rolename}"%"</if>
+			<if test="'' != funname and funname != null">and tdf.name like "%"#{funname}"%"</if>
+		</where>
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+
+	<!-- 角色菜单数量 -->
+	<select id="getRoleFunctionListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0) from t_as_rolefunction tar
+		left join t_dt_role tdr on
+		tar.roleid=tdr.roleid
+		left join t_dt_function tdf on
+		tar.funid=tdf.id
+		<where>
+			<if test="'' != rolename and rolename != null">and tdr.name like "%"#{rolename}"%"</if>
+			<if test="'' != funname and funname != null">and tdf.name like "%"#{funname}"%"</if>
+		</where>
+	</select>
+
+	<!-- 查询地区数量 -->
+	<select id="getAreaCount" parameterType="map" resultType="int">
+		select count(0) from t_dt_area
+		<where>
+			<if test="parentid != null and parentid != ''">and parentid = #{parentid}</if>
+			<if test="ifactive != null">and ifactive = #{ifactive}</if>
+			<if test="areaid != null and areaid != ''">and areaid = #{areaid}</if>
+			<if test="cname != null and cname != ''">and cname like concat('%',#{cname},'%')</if>
+		</where>
+	</select>
+
+	<!-- 查询地区列表 -->
+	<select id="getAreaList" parameterType="map" resultType="map">
+		select
+		areaid,parentid,datacode,cname,ename,priority,ifactive,createtime,areatype
+		from t_dt_area
+		<where>
+			<if test="parentid != null and parentid != ''">and parentid = #{parentid}</if>
+			<if test="ifactive != null">and ifactive = #{ifactive}</if>
+			<if test="areaid != null and areaid != ''">and areaid = #{areaid}</if>
+			<if test="cname != null and cname != ''">and cname like concat('%',#{cname},'%')</if>
+			<if test="areatype != null and areatype != ''">and areatype = #{areatype}</if>
+		</where>
+		order by priority
+		<if test="startnum != null">limit #{startnum},#{rownum}</if>
+	</select>
+
+	<!-- 新增地区 -->
+	<insert id="insertArea" parameterType="map">
+		insert into t_dt_area
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			createtime,
+			ifactive,
+			<if test="parentid != null and '' !=parentid">parentid,</if>
+			<if test="cname != null and '' !=cname">cname,</if>
+			<if test="priority != null and '' !=priority">priority,</if>
+			<if test="areatype != null">areatype,</if>
+
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			now(),
+			1,
+			<if test="parentid != null and '' !=parentid">#{parentid},</if>
+			<if test="cname != null and '' !=cname">#{cname},</if>
+			<if test="priority != null and '' !=priority">#{priority},</if>
+			<if test="areatype != null">#{areatype},</if>
+		</trim>
+	</insert>
+
+	<!-- 修改地区 -->
+	<update id="updateArea" parameterType="map">
+		update t_dt_area
+		<set>
+			<if test="cname != null and cname !=''">cname = #{cname},</if>
+			<if test="priority != null and priority !=''">priority = #{priority},</if>
+			<if test="ifactive != null">ifactive = #{ifactive},</if>
+		</set>
+		where
+		areaid =#{areaid}
+	</update>
+
+	<!-- 参数列表信息 -->
+	<select id="getParams" parameterType="map" resultType="map">
+		SELECT
+		*
+		FROM
+		sys_param
+		<where>
+			<if test="paramid != null and paramid != ''">and paramid = #{paramid}</if>
+			<if test="pcategory != null">and pcategory = #{pcategory}</if>
+			<if test="pkey != null and pkey != ''">and pkey = #{pkey}</if>
+			<if test="pvalue != null and pvalue != ''">and pvalue = #{pvalue}</if>
+			<if test="pname != null and pname != ''">and pname like concat('%',#{pname},'%')</if>
+			<if test="pdesc != null and pdesc != ''">and pdesc like concat('%',#{pdesc},'%')</if>
+			<if test="createrid != null and createrid != ''">and createrid = #{createrid}</if>
+			<if test="updaterid != null and updaterid != ''">and updaterid = #{updaterid}</if>
+			
+		</where>
+		order by updatetime desc
+		<if test="startnum != null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getCommissionList" parameterType="map" resultType="map">
+		select tda.agencyid,tda.agencyname,tda.agencytype,tda.commissionrate,tda.userid,tda.parentid,
+		tda.address,tda.phonenum,tda.contacter,tda.provinceid,tda.cityid,tda.districtid,tda.createtime,tda.createrid,tda.updaterid,tda.updatetime,tda.delflag,
+		us.username ,a1.cname as provincename,a2.cname as cityname,a3.cname as districtname,cy.agencyname as parentname,
+		us.password,(select count(0) from t_dt_agency where parentid=tda.agencyid) as soncount
+		from t_dt_agency tda
+		left join t_dt_user us on us.userid = tda.userid
+		left join t_dt_area a1 on a1.areaid = tda.provinceid
+		left join t_dt_area a2 on a2.areaid = tda.cityid
+		left join t_dt_area a3 on a3.areaid = tda.districtid
+		left join t_dt_agency cy on cy.agencyid = tda.parentid
+		<where>
+ 		    tda.delflag = 0
+ 			<if test="null != parentid">and tda.parentid=#{parentid}</if>
+ 			<if test="null != parentuserid">and cy.userid=#{parentuserid}</if>
+ 			<if test="null != salerid and salerid != ''">and tda.userid=#{salerid}</if>
+ 			<if test="null != parentagencyid and parentagencyid != '' ">and cy.userid=#{parentagencyid} or tda.userid=#{parentagencyid}</if>
+ 			<if test="null != ownagencyid and '' != ownagencyid">and tda.agencyid not in (#{ownagencyid})</if>
+ 			<if test="null != agencyid and '' != agencyid">and tda.agencyid=#{agencyid}</if>
+ 			<if test="null != userid and '' != userid">and tda.userid=#{userid}</if>
+ 			<if test="null != agencyname and '' != agencyname">and tda.agencyname like concat("%",#{agencyname},"%")</if>
+ 			<if test="null != username and '' != username">and us.username like  concat("%",#{username},"%")</if>
+ 		</where>
+ 		ORDER BY tda.createtime desc
+     	<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<select id="getCommissionListNum" parameterType="map" resultType="int">
+		select count(0) from t_dt_agency tda
+		left join t_dt_user us on us.userid = tda.userid
+		left join t_dt_area a1 on a1.areaid = tda.provinceid
+		left join t_dt_area a2 on a2.areaid = tda.cityid
+		left join t_dt_area a3 on a3.areaid = tda.districtid
+		left join t_dt_agency cy on cy.agencyid = tda.parentid
+		<where>
+ 		 	tda.delflag = 0
+ 			<if test="null != parentid">and tda.parentid=#{parentid}</if>
+ 			<if test="null != parentuserid">and cy.userid=#{parentuserid}</if>
+ 			<if test="null != salerid and salerid != ''">and tda.userid=#{salerid}</if>
+ 			<if test="null != parentagencyid and parentagencyid != '' ">and cy.userid=#{parentagencyid} or tda.userid=#{parentagencyid}</if>
+ 			<if test="null != ownagencyid and '' != ownagencyid">and tda.agencyid not in (#{ownagencyid})</if>
+ 			<if test="null != agencyid and '' != agencyid">and tda.agencyid=#{agencyid}</if>
+ 			<if test="null != userid and '' != userid">and tda.userid=#{userid}</if>
+ 			<if test="null != agencyname and '' != agencyname">and tda.agencyname like concat("%",#{agencyname},"%")</if>
+ 			<if test="null != username and '' != username">and us.username like  concat("%",#{username},"%")</if>
+ 		</where>
+	</select>
+	<select id="getAmountAll" parameterType="map" resultType="string">
+		select ifnull(sum(ttr.amount),0) as amount from  tick_trade_record ttr  
+		left join tick_user_extend tue on tue.userid=ttr.pay_userid
+		left join t_dt_agency tda on tda.userid=tue.source
+		<where>
+			<if test="agencyid != null and agencyid != ''">and tda.agencyid=#{agencyid}</if>
+			<if test="parentid != null and parentid != ''">and tda.parentid=#{parentid}</if>
+		</where> 
+	</select>
+   <!-- 判断用户角色  -->
+   <select id="judgeUserRoles" parameterType="map" resultType="map">
+     select  userroleid, userid, roleid, createtime from  t_as_userrole 
+     <where>
+        <if test="userid != null and userid != ''">userid = #{userid}</if>
+     </where> 
+   </select>
+
+   <!-- 根据角色查询系统用户 -->
+  <select id="getUserListByRoleId" parameterType="map" resultType="map">
+    select u.userid,u.username,u.realname,ro.rolename,ro.roleid from t_dt_user u 
+	left join t_as_userrole r on u.userid = r.userid
+	left join t_dt_role ro on ro.roleid = r.roleid
+	<where>
+	   <if test="roleid != null and roleid != ''">ro.roleid = #{roleid}</if>
+	</where>
+  </select>
+
+	<select id="getActiveMembers" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime,'%m-%d') as comparetime,COUNT(m.lasttime) countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select lasttime from  t_dt_member tdm LEFT JOIN tick_user_extend tue ON tdm.memberid = tue.userid 
+ 		<where>
+ 		<if test="agencyid != null and agencyid != ''">and tue.sourcepid like concat("%",#{agencyid},"%")</if>
+		<if test="sourcepid != null and sourcepid != ''">and tue.sourcepid like concat("%",#{sourcepid},"%")</if>
+ 		</where>) m 
+ 		ON DATE_FORMAT(m.lasttime, '%Y-%m-%d') = c_time.comparetime		
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime
+	</select>
+	<select id="getActiveMounthcount" parameterType="map" resultType="int">
+		select SUM(a.countnum) from (SELECT COUNT(m.lasttime) as countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select lasttime from  t_dt_member tdm LEFT JOIN tick_user_extend tue ON tdm.memberid = tue.userid 
+ 		<where>
+ 		<if test="agencyid != null and agencyid != ''">and tue.sourcepid like concat("%",#{agencyid},"%")</if>
+		<if test="sourcepid != null and sourcepid != ''">and tue.sourcepid like concat("%",#{sourcepid},"%")</if>
+ 		</where>) m 
+ 		ON DATE_FORMAT(m.lasttime, '%Y-%m-%d') = c_time.comparetime		
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime) a
+	</select>
+	<select id="getActiveMembersbyYear" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime,'%m') as comparetime,COUNT(m.lasttime) countnum
+ 				  FROM t_xt_time c_time
+ 		LEFT JOIN (select lasttime from  t_dt_member tdm LEFT JOIN tick_user_extend tue ON tdm.memberid = tue.userid 
+ 		<where>
+ 		<if test="agencyid != null and agencyid != ''">and tue.sourcepid like concat("%",#{agencyid},"%")</if>
+		<if test="sourcepid != null and sourcepid != ''">and tue.sourcepid like concat("%",#{sourcepid},"%")</if>
+ 		</where>) m 
+ 		ON DATE_FORMAT(m.lasttime, '%Y-%m-%d') = c_time.comparetime			  
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY DATE_FORMAT(c_time.comparetime,'%Y-%m')
+	</select>
+
+	<select id="getMemberList" parameterType="map" resultType="map">
+		select tdu.userid,tdu.username,tdu.phone,tdu.realname,tda.agencyname
+		from t_dt_user tdu
+		right join t_as_userrole tau on tdu.userid=tau.userid
+		left join t_dt_agency tda  on tdu.userid=tda.userid
+		<where>
+			tdu.userid  is not null 
+			<if test="roleid!= null and roleid != ''">and tau.roleid=#{roleid}</if>
+			<if test="parentid!= null">and tda.parentid in (select agencyid from t_dt_agency where userid = #{parentid})</if>
+			<if test="parentid_v!= null">and tda.parentid = #{parentid_v}</if> 
+		</where>
+	</select>
+	 
+	<select id="getGrabsinglelist" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime,'%m-%d') as comparetime,COUNT(a.createtime) countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime,tue.source from tick_apply_order tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.applicantid 
+		<where>
+			status = 3
+			<if test="agencyid != null and agencyid != ''">and tue.source=#{agencyid}</if>
+		</where>
+		) a 
+		 ON DATE_FORMAT(a.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime
+	</select>
+	<select id="getGrabsinglecount" parameterType="map" resultType="int">
+		select SUM(a.countnum) from (SELECT COUNT(a1.createtime) as countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime,tue.source from tick_apply_order tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.applicantid 
+		<where>
+			status = 3 
+			<if test="agencyid != null and agencyid != ''">and tue.source=#{agencyid}</if>
+		</where>
+		) a1
+		 ON DATE_FORMAT(a1.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime) a
+	</select>
+	<select id="getGrabsinglebyYear" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime, '%m') AS comparetime, COUNT(a.createtime) AS countnum
+		FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime,tue.source from tick_apply_order tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.applicantid 
+		<where>
+			<if test="salerid != null and salerid != ''">and tue.source=#{salerid}</if>
+			<if test="agencyid != null and agencyid != ''">and tue.source=#{agencyid}</if>
+		</where>
+		) a  
+		 ON DATE_FORMAT(a.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY DATE_FORMAT(c_time.comparetime,'%Y-%m')
+	</select>
+	<!-- 发布订单  -->
+	<select id="getpublishorderlist" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime,'%m-%d') as comparetime,COUNT(a.createtime) countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime from tick_order tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.publisherid 
+		<where>
+			<if test="salerid != null and salerid != ''">and tue.source=#{salerid}</if>
+			<if test="agencyid != null and agencyid != ''">and tue.source=#{agencyid}</if>
+		</where>
+		) a  
+		 ON DATE_FORMAT(a.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime
+	</select>
+	<select id="getpublishordercount" parameterType="map" resultType="int">
+		select SUM(a.countnum) from (SELECT COUNT(a1.createtime) as countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime from tick_order tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.publisherid 
+		<where>
+			tao.delflag = 0   
+			<if test="salerid != null and salerid != ''">and tue.source=#{salerid}</if>
+			<if test="agencyid != null and agencyid != ''">and tue.source=#{agencyid}</if>
+		</where>
+		) a1
+		 ON DATE_FORMAT(a1.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime) a
+	</select>
+	<select id="getpublishorderbyYear" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime, '%m') AS comparetime, COUNT(a.createtime) AS countnum
+		FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime from tick_order tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.publisherid 
+		<where>
+			<if test="salerid != null and salerid != ''">and tue.source=#{salerid}</if>
+			<if test="agencyid != null and agencyid != ''">and tue.source=#{agencyid}</if>
+		</where>
+		) a  
+		 ON DATE_FORMAT(a.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY DATE_FORMAT(c_time.comparetime,'%Y-%m')
+	</select>
+	<!-- 交易金额  -->
+	<select id="gettraderecordlist" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime,'%m-%d') as comparetime, COUNT(a.createtime) AS count,SUM(a.amount) countnum
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime,tao.amount from tick_trade_record tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.pay_userid 
+		<where>
+			<if test="agencyid != null and agencyid != ''">and tue.sourcepid  like "%"#{agencyid}"%"</if>
+		</where>
+		) a  
+		 ON DATE_FORMAT(a.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime
+	</select>
+	<select id="gettraderecordcount" parameterType="map" resultType="map">
+		select ifnull(SUM(a.amount),0) as tradeamount from (SELECT  COUNT(a1.createtime) AS count,SUM(a1.amount) amount
+ 				  FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime,tao.amount from tick_trade_record tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.pay_userid 
+		<where>
+			<if test="agencyid != null and agencyid != ''">and tue.sourcepid like "%"#{agencyid}"%"</if>
+		</where>
+		) a1
+		 ON DATE_FORMAT(a1.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY c_time.comparetime) a
+	</select>
+	<select id="gettraderecordbyYear" parameterType="map" resultType="map">
+		SELECT DATE_FORMAT(c_time.comparetime, '%m') AS comparetime, COUNT(a.createtime) AS count,SUM(a.amount) countnum
+		FROM t_xt_time c_time
+		LEFT JOIN (select tao.createtime,tao.amount from tick_trade_record tao LEFT JOIN tick_user_extend tue ON tue.userid = tao.pay_userid 
+		<where>
+			<if test="agencyid != null and agencyid != ''">and tue.sourcepid like "%"#{agencyid}"%"</if>
+		</where>
+		) a  
+		 ON DATE_FORMAT(a.createtime, '%Y-%m-%d') = c_time.comparetime
+		<where>
+			<if test="starttime != null and starttime != ''">and c_time.comparetime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and c_time.comparetime &lt;= #{stoptime}</if>
+		</where>
+		GROUP BY DATE_FORMAT(c_time.comparetime,'%Y-%m')
+	</select>
+	<select id="getAgencyMap" parameterType="map" resultType="map">
+		select * from t_dt_agency
+		<where>
+			<if test="agencyid != null and agencyid != '' ">and agencyid=#{agencyid}</if>
+			<if test="parentid != null and parentid != '' ">and parentid=#{parentid}</if>
+		</where>
+	</select>
+	<select id="getRoleListByUserid" parameterType="map" resultType="map">
+		select roleid from t_as_userrole tau
+		<where>
+			<if test="userid != null and userid !=''">and tau.userid=#{userid}</if>
+		</where>
+	</select>
+</mapper>

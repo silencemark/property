@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		   http://code.alibabatech.com/schema/dubbo
+		   http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+<!-- dubbo 服务消费者配置begin-->
+	<!-- 消费方应用名，用于计算依赖关系，不是匹配条件，不要与提供方一样 -->
+	<dubbo:application name="consumer-of-helloworld-app" />
+	<!-- 使用multicast广播注册中心暴露发现服务地址
+	<dubbo:registry address="multicast://224.5.6.7:1234" />
+	 -->
+
+	<dubbo:protocol name="dubbo" port="20881" /> 
+	<dubbo:registry address="zookeeper://localhost:2181" check="false" />
+    <!-- <dubbo:registry protocol="zookeeper"  address="139.196.20.181:11181" check="false" /> -->
+   	<!--  <dubbo:reference id="testService" interface="com.lr.backer.service.TestService"/> -->
+
+	<dubbo:reference id="workersService" interface="com.lr.backer.service.WorkersService"/>
+   	<dubbo:reference id="orderService" interface="com.lr.backer.service.OrderService"/>
+   	<dubbo:reference id="employerService" interface="com.lr.backer.service.EmployerService"/>
+    <dubbo:reference id="indexService" interface="com.lr.backer.service.IndexService"/>
+    <dubbo:reference id="systemService" interface="com.lr.backer.service.SystemService"/>
+    <dubbo:reference id="noticeService" interface="com.lr.backer.service.NoticeService"/>
+    <dubbo:reference id="dictionarieService" interface="com.lr.backer.service.DictionarieService"/>
+    <dubbo:reference id="supplierService" interface="com.lr.backer.service.SupplierService"/>
+    <dubbo:reference id="complaintService" interface="com.lr.backer.service.ComplaintService"/>
+    <dubbo:reference id="tradeService" interface="com.lr.backer.service.TradeService"/>
+    <dubbo:reference id="evaluationService" interface="com.lr.backer.service.EvaluationService"/>
+    <dubbo:reference id="agencyService" interface="com.lr.backer.service.AgencyService"/>
+    <dubbo:reference id="myService" interface="com.lr.backer.service.MyService"/>
+
+	<dubbo:reference id="memberService" interface="com.lr.weixin.backer.service.MemberService" />
+	<dubbo:reference id="batteryService" interface="com.lr.weixin.backer.service.BatteryService" />
+	<dubbo:reference id="weiXinSetService" interface="com.lr.weixin.backer.service.WeiXinSetService" />
+	<dubbo:reference id="systemWXService" interface="com.lr.weixin.backer.service.SystemWXService" />
+
+	<!-- dubbo 服务消费者配置end-->
+	
+	</beans>

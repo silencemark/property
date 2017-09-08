@@ -1,0 +1,370 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.WorkersMapper">
+
+	<!-- 得到项目列表 -->
+	<select id="getProjectList" parameterType="map" resultType="map">
+		select
+		projectid,projecttitle,ownedindustry,ifdiscuss,projectamount,starttime,endtime,settlementmethod,projectarea,address,
+		projectdescription,contacter,telephone,createrid,createtime,updaterid,updatetime,delflag
+		from tick_project tp
+		<where>
+			<if test="ownedindustry != null and ownedindustry != ''">and ownedindustry =#{ownedindustry}</if>
+		</where>
+	</select>
+
+	<select id="getHireWorkerList" parameterType="map" resultType="map">
+		select
+		tj.jobid,tj.projectname,tj.jobtitle,tj.jobtype,tj.salary,tj.workplace,tj.starttime,tj.endtime,tj.recruitmentnum,tj.jobrequirements,tj.contacter,tj.telephone,tj.createrid,tj.createtime,
+		tj.updaterid,tj.updatetime,tj.delflag,tdm.realname,tdm.authentication,tdm.headimage,tue.companyname,tdd.datacode
+		as settlementmethod,tj.longitude,tj.latitude,
+		round(6378.138*2*asin(sqrt(pow(sin(
+		(#{latitude}*pi()/180-tj.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(tj.latitude*pi()/180)*pow(sin(
+		(#{longitude}*pi()/180-tj.longitude*pi()/180)/2),2)))*1000) juli
+		from
+		tick_job tj
+		left join t_dt_member tdm on tj.createrid=tdm.memberid
+		left
+		join tick_user_extend tue on tj.createrid=tue.userid
+		left join
+		t_dict_data tdd on tj.settlementmethod=tdd.dataid
+		left join tick_order
+		torder on torder.jobid=tj.jobid
+		left join t_dict_data tdd1 on
+		tj.jobtype=tdd1.dataid
+		<where>
+			<if test="jobtype != null and jobtype != ''">and tj.jobtype=#{jobtype}</if>
+			<if test="parentjobtype != null and parentjobtype != ''">and tdd1.parentid=#{parentjobtype}</if>
+			<if test="areaid != null and areaid != ''">and tj.projectarea =#{areaid}</if>
+			<if test="provinceid != null and provinceid != ''">and tj.projectprovince =#{provinceid}</if>
+			<if test="starttime != null and starttime != ''">and tj.starttime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and tj.starttime &lt;= #{stoptime}</if>
+			<if test="minsalary != null and minsalary != ''">and tj.salary &gt;= #{minsalary}</if>
+			<if test="maxsalary != null and maxsalary != ''">and tj.salary &lt;= #{maxsalary}</if>
+			<if test="applycreateid != null and applycreateid != ''">and torder.publisherid!=#{applycreateid}</if>
+			 <!-- and
+				torder.orderid not in(select orderid from tick_apply_order where
+				applicantid=#{applycreateid}) -->
+			<if test="maxjuli != null and maxjuli != ''">and round(6378.138*2*asin(sqrt(pow(sin(
+				(#{latitude}*pi()/180-tj.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(tj.latitude*pi()/180)*pow(sin(
+				(#{longitude}*pi()/180-tj.longitude*pi()/180)/2),2)))*1000) &lt;
+				#{maxjuli}</if>
+			<foreach collection="killers" open="and tj.createrid not in ("
+				close=")" item="item" separator=",">
+				'${item}'
+			</foreach>
+			and tj.starttime >=DATE_ADD(NOW(),INTERVAL -24 hOUR)
+		</where>
+		ORDER BY torder.status,tj.starttime
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<select id="getHireWorkerListNum" parameterType="map"
+		resultType="int">
+		select count(*)
+		from tick_job tj
+		left join t_dt_member tdm on
+		tj.createrid=tdm.memberid
+		left join tick_user_extend tue on
+		tj.createrid=tue.userid
+		left join t_dict_data tdd on
+		tj.settlementmethod=tdd.dataid
+		left join tick_order torder on
+		torder.jobid=tj.jobid
+		<where>
+			<if test="jobtype != null and jobtype != ''">and tj.jobtype=#{jobtype}</if>
+			<if test="cityname != null and cityname != ''">and tj.workplace like concat("%",#{cityname},"%")</if>
+			<if test="starttime != null and starttime != ''">and tj.createtime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and tj.createtime &lt;= #{stoptime}</if>
+			<if test="minsalary != null and minsalary != ''">and tj.salary &gt;= #{minsalary}</if>
+			<if test="maxsalary != null and maxsalary != ''">and tj.salary &lt;= #{maxsalary}</if>
+			<if test="applycreateid != null and applycreateid != ''">and torder.publisherid!=#{applycreateid}</if><!-- and
+				torder.orderid not in(select orderid from tick_apply_order where
+				applicantid=#{applycreateid}) -->
+			<foreach collection="killers" open="and tj.createrid not in ("
+				close=")" item="item" separator=",">
+				'${item}'
+			</foreach>
+			and tj.starttime >=DATE_ADD(NOW(),INTERVAL -24 hOUR)
+		</where>
+	</select>
+
+
+	<select id="getJobInfo" parameterType="map" resultType="map">
+		select
+		tjob.jobid,tjob.projectname,tjob.jobtitle,tjob.jobtype,tdd1.cname as
+		jobtypename,tjob.salary,tjob.workplace,tjob.starttime,tjob.endtime,tjob.settlementmethod,
+		tjob.recruitmentnum,tjob.jobrequirements,tjob.contacter,tjob.telephone,tjob.createrid,tjob.createtime,tjob.updaterid,tjob.updatetime,tjob.delflag,
+		tue.companyname,tdd.cname as
+		settlementmethodname,torder.orderid,tjob.longitude,tjob.latitude,CAST(tdm.nickname
+		AS char character set utf8) nickname,
+		tjob.projectarea,tjob.projectprovince,tda.cname as cityname,tda1.cname
+		as provincename,torder.orderno,torder.noticenum,tdm.realname
+		from
+		tick_job tjob
+		left join tick_user_extend tue on tjob.createrid=tue.userid
+		left join
+		t_dict_data tdd on tjob.settlementmethod=tdd.dataid
+		left join
+		t_dict_data tdd1 on tjob.jobtype=tdd1.dataid
+		left join tick_order
+		torder on tjob.jobid=torder.jobid
+		left join t_dt_member tdm on
+		tdm.memberid=tjob.createrid
+		left join t_dt_area tda on
+		tjob.projectarea=tda.areaid
+		left join t_dt_area tda1 on
+		tjob.projectprovince=tda1.areaid
+		<where>
+			<if test="jobid != null and jobid != ''">and tjob.jobid=#{jobid}</if>
+			<if test="orderid != null and orderid != ''">and torder.orderid=#{orderid}</if>
+		</where>
+		limit 1
+	</select>
+	<select id="attenmap" parameterType="map" resultType="map">
+		select attentionid,attentionerid,userid,createtime from
+		tick_apply_order
+		<where>
+			<if test="attentionerid != null and attentionerid != '' ">and attentionerid=#{attentionerid}</if>
+			<if test="userid != null and userid != '' ">and userid=#{userid}</if>
+		</where>
+	</select>
+	<insert id="insertApplyOrder" parameterType="map">
+		insert into tick_apply_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="applyorderid != null and applyorderid != ''">applyorderid,</if>
+			<if test="orderid != null and orderid != ''">orderid,</if>
+			<if test="applicantid != null and applicantid != ''">applicantid,</if>
+			<if test="publisherid != null and publisherid != ''">publisherid,</if>
+			<if test="status != null">status,</if>
+			<if test="quotation != null and quotation != ''">quotation,</if>
+			<if test="quotationdescription != null and quotationdescription != ''">quotationdescription,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="updaterid != null and updaterid != ''">updaterid,</if>
+			<if test="updatetime != null and updatetime != ''">updatetime,</if>
+			<if test="ifattention != null">ifattention,</if>
+			<if test="delflag != null">delflag,</if>
+			<if test="longitude != null and longitude != ''">longitude,</if>
+			<if test="latitude != null and latitude != ''">latitude,</if>
+			<if test="orderno != null and orderno != ''">orderno,</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="applyorderid != null and applyorderid != ''">#{applyorderid},</if>
+			<if test="orderid != null and orderid != ''">#{orderid},</if>
+			<if test="applicantid != null and applicantid != ''">#{applicantid},</if>
+			<if test="publisherid != null and publisherid != ''">#{publisherid},</if>
+			<if test="status != null">#{status},</if>
+			<if test="quotation != null and quotation != ''">#{quotation},</if>
+			<if test="quotationdescription != null and quotationdescription != ''">#{quotationdescription},</if>
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="updaterid != null and updaterid != ''">#{updaterid},</if>
+			<if test="updatetime != null and updatetime != ''">#{updatetime},</if>
+			<if test="ifattention != null">#{ifattention},</if>
+			<if test="delflag != null">#{delflag},</if>
+			<if test="longitude != null and longitude != ''">#{longitude},</if>
+			<if test="latitude != null and latitude != ''">#{latitude},</if>
+			<if test="orderno != null and orderno != ''">#{orderno},</if>
+		</trim>
+	</insert>
+	<select id="getAttention" parameterType="map" resultType="map">
+		select * from tick_attention
+		<where>
+			<if test="attentionerid != null and attentionerid != ''">and attentionerid=#{attentionerid}</if>
+			<if test="userid != null and userid != ''">and userid=#{userid}</if>
+		</where>
+		limit 1
+	</select>
+
+	<select id="getProjectChartList" parameterType="map" resultType="map">
+		select
+		tp.projectid,tp.projecttitle,tp.ownedindustry,tp.ifdiscuss,tp.projectamount,tp.starttime,tp.endtime,tp.settlementmethod,
+		tp.projectarea,tp.address,tp.projectdescription,tp.contacter,tp.telephone,tp.createrid,tp.createtime,tp.updaterid,tp.updatetime,tp.delflag,
+		tdm.realname,tdm.authentication,tdm.headimage,tue.companyname,tp.longitude,tp.latitude,
+		round(6378.138*2*asin(sqrt(pow(sin(
+		(#{latitude}*pi()/180-tp.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(tp.latitude*pi()/180)*pow(sin(
+		(#{longitude}*pi()/180-tp.longitude*pi()/180)/2),2)))*1000) juli
+		from
+		tick_project tp
+		left join t_dt_member tdm on tp.createrid=tdm.memberid
+		left join tick_user_extend tue on tp.createrid=tue.userid
+		left join
+		tick_order torder on torder.projectid=tp.projectid
+		left join t_dt_area
+		tda on tp.projectarea=tda.areaid
+		left join t_dt_area tda1 on
+		tda.parentid=tda1.areaid
+		left join t_dict_data tdd on
+		tp.ownedindustry=tdd.dataid
+		<where>
+			<if test="jobtype != null and jobtype != ''">and tp.ownedindustry=#{jobtype}</if>
+			<if test="parentjobtype != null and parentjobtype != ''">and tdd.parentid=#{parentjobtype}</if>
+			<if test="areaid != null and areaid != ''">and tp.projectarea=#{areaid}</if>
+			<if test="provinceid != null and provinceid != ''">and tp.projectprovince =#{provinceid}</if>
+			<if test="starttime != null and starttime != ''">and tp.starttime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and tp.starttime &lt;= #{stoptime}</if>
+			<if test="minsalary != null and minsalary != ''">and tp.projectamount &gt;= #{minsalary}</if>
+			<if test="maxsalary != null and maxsalary != ''">and tp.projectamount &lt;= #{maxsalary}</if>
+			<if test="applycreateid != null and applycreateid != ''">and torder.publisherid!=#{applycreateid}</if>
+			<!--  and
+				torder.orderid not in(select orderid from tick_apply_order where
+				applicantid=#{applycreateid}) -->
+			<if test="maxjuli != null and maxjuli != ''">and round(6378.138*2*asin(sqrt(pow(sin(
+				(#{latitude}*pi()/180-tp.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(tp.latitude*pi()/180)*pow(sin(
+				(#{longitude}*pi()/180-tp.longitude*pi()/180)/2),2)))*1000) &lt;
+				#{maxjuli}</if>
+			<foreach collection="killers" open="and tp.createrid not in ("
+				close=")" item="item" separator=",">
+				'${item}'
+			</foreach>
+			and tp.starttime >=DATE_ADD(NOW(),INTERVAL -24 hOUR)
+		</where>
+		ORDER BY torder.status,tp.starttime
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+
+	<select id="getProjectChartListNum" parameterType="map"
+		resultType="int">
+		select count(0)
+		from tick_project tp
+		left join t_dt_member tdm on
+		tp.createrid=tdm.memberid
+		left join tick_user_extend tue on
+		tp.createrid=tue.userid
+		left join tick_order torder on
+		torder.projectid=tp.projectid
+		left join t_dt_area tda on
+		tp.projectarea=tda.areaid
+		left join t_dt_area tda1 on
+		tda.parentid=tda1.areaid
+		<where>
+			<if
+				test="areaid != null and areaid != '' and cityname != null and cityname != ''">and (tp.projectarea=#{areaid} or tda.parentid=#{areaid} or
+				tda1.parentid=#{areaid} or tp.address like
+				concat("%",#{cityname},"%"))</if>
+			<if test="jobtype != null and jobtype != ''">and tp.ownedindustry=#{jobtype}</if>
+			<if test="starttime != null and starttime != ''">and tp.starttime &gt;= #{starttime}</if>
+			<if test="stoptime != null and stoptime != ''">and tp.starttime &lt;= #{stoptime}</if>
+			<if test="minsalary != null and minsalary != ''">and tp.projectamount &gt;= #{minsalary}</if>
+			<if test="maxsalary != null and maxsalary != ''">and tp.projectamount &lt;= #{maxsalary}</if>
+			<if test="applycreateid != null and applycreateid != ''">and torder.publisherid!=#{applycreateid} </if>
+			<!-- and
+				torder.orderid not in(select orderid from tick_apply_order where
+				applicantid=#{applycreateid}) -->
+			<if test="maxjuli != null and maxjuli != ''">and round(6378.138*2*asin(sqrt(pow(sin(
+				(#{latitude}*pi()/180-tp.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(tp.latitude*pi()/180)*pow(sin(
+				(#{longitude}*pi()/180-tp.longitude*pi()/180)/2),2)))*1000) &lt;
+				#{maxjuli}</if>
+			<foreach collection="killers" open="and tp.createrid not in ("
+				close=")" item="item" separator=",">
+				'${item}'
+			</foreach>
+			and tp.starttime >=DATE_ADD(NOW(),INTERVAL -24 hOUR)
+		</where>
+
+	</select>
+
+
+
+	<select id="getProjectInfo" parameterType="map" resultType="map">
+		select
+		tp.projectid,tp.projecttitle,tp.ownedindustry,tp.ifdiscuss,tp.projectamount,tp.starttime,tp.endtime,tp.settlementmethod,
+		tp.projectarea,tp.address,tp.projectdescription,tp.contacter,tp.telephone,tp.createrid,tp.createtime,tp.updaterid,tp.updatetime,tp.delflag,
+		tdm.realname,tdm.authentication,tdm.headimage,tue.companyname,torder.orderid,tdd.cname
+		as jobtypename,tda.cname as cityname,tda1.cname as
+		provincename,torder.orderno
+		from tick_project tp
+		left join t_dt_member
+		tdm on tp.createrid=tdm.memberid
+		left join tick_user_extend tue on
+		tp.createrid=tue.userid
+		left join tick_order torder on
+		torder.projectid=tp.projectid
+		left join tick_apply_order tao on
+		tao.orderid=torder.orderid
+		left join t_dict_data tdd on
+		tp.ownedindustry=tdd.dataid
+		left join t_dt_area tda on
+		tp.projectarea=tda.areaid
+		left join t_dt_area tda1 on
+		tp.projectprovince=tda1.areaid
+		<where>
+			<if test="projectid != null and projectid != ''">and tp.projectid=#{projectid}</if>
+			<if test="orderid != null and orderid != ''">and torder.orderid=#{orderid}</if>
+		</where>
+		limit 1
+	</select>
+	<select id="getApplyOrder" parameterType="map" resultType="map">
+		select tao.*,torder.*,torder.publisherid as orderpublisherid from
+		tick_apply_order tao
+		left join tick_order torder on tao.orderid=torder.orderid
+		<where>
+			<if test="orderid != null and orderid != ''">and tao.orderid=#{orderid}</if>
+			<if test="applicantid != null and applicantid != ''">and tao.applicantid=#{applicantid}</if>
+			<if test="applyorderid != null and applyorderid != ''">and tao.applyorderid=#{applyorderid}</if>
+		</where>
+		limit 1
+	</select>
+	<select id="getApplyJobOrder" parameterType="map" resultType="map">
+		select tj.* from tick_apply_order tao
+		left join tick_order torder on
+		tao.orderid=torder.orderid
+		left join tick_job tj on
+		torder.jobid=tj.jobid
+		<where>
+			<if test="isjobid != null and isjobid != ''">and torder.jobid is not null</if>
+			<if test="applicantid != null and applicantid != ''">and tao.applicantid=#{applicantid}</if>
+			<if test="status != null">and torder.status=#{status}</if>
+			<foreach collection="taostatus" open="and tao.status in ("
+				close=")" item="item" separator=",">
+				${item}
+			</foreach>
+			<if test="status != null">and torder.status=#{status}</if>
+		</where>
+	</select>
+
+	<!-- 判断订单是否过期 -->
+	<select id="getOrderInfo" parameterType="map" resultType="map">
+		select
+		   a.failuretime,
+		   case
+		     when a.failuretime &gt; now() then 1
+	         else 0
+		     end as isend,
+		  a.jobid,
+		  a.projectid,
+		  b.recruitmentnum
+		from tick_order a
+		left join tick_job b on b.jobid = a.jobid
+		<where>
+			<if test="orderid != null and orderid != ''">and a.orderid=#{orderid}</if>
+		</where>
+	</select>
+   
+   <!-- 查询当前订单雇主已经成交了多少人 -->
+   <select id="getApplyNum" parameterType="map" resultType="int">
+     select count(*)  from tick_apply_order 
+     <where>
+        <if test="orderid != null and orderid != ''">and orderid = #{orderid}</if>
+        <if test="statusList != null ">and status in (
+			   <foreach collection="statusList" item="item"  separator=","> 
+			     #{item}
+			   </foreach>
+			   )
+			</if> 
+     </where>
+   </select>
+	<select id="getApplyOrderList" parameterType="map" resultType="map">
+	    select tao.applicantid,tao.applyorderid,torder.jobid,torder.projectid,tao.orderid,tdm.memberid,tdm.openid,tue.channelid
+	    from tick_apply_order tao 
+	    left join tick_order torder on tao.orderid=torder.orderid
+	    left join t_dt_member tdm on tao.applicantid=tdm.memberid
+	    left join tick_user_extend tue on tdm.memberid=tue.userid
+	    <where>
+	        <if test="orderid != null and orderid != ''">and tao.orderid=#{orderid}</if>
+	        <foreach collection="statuslist" open="and tao.status in ("
+				close=")" item="item" separator=",">
+				${item}
+			</foreach>
+	    </where>
+	</select>
+</mapper>

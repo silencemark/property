@@ -1,0 +1,1447 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.weixin.backer.dao.WeiXinSetMapper">
+
+	<!-- 素材图片 -->
+	<!-- select imgid,groupid,name,img,roletype,primaryid from g_dt_img ; -->
+	<delete id="deleteDTImg" parameterType="java.util.Map">
+		delete from g_dt_img where imgid=#{imgid}
+	</delete>
+	<insert id="insertDTImg" parameterType="java.util.Map">
+		insert into g_dt_img
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != groupid and '' != groupid">groupid,</if>
+			<if test="null != name and '' != name">name,</if>
+			<if test="null != img and '' != img">img,</if>
+			<if test="null != roletype and '' != roletype">roletype,</if>
+			<if test="null != primaryid and '' != primaryid">primaryid,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != groupid and '' != groupid">#{groupid},</if>
+			<if test="null != name and '' != name">#{name},</if>
+			<if test="null != img and '' != img">#{img},</if>
+			<if test="null != roletype and '' != roletype">#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">#{primaryid},</if>
+		</trim>
+	</insert>
+	<update id="updateDTImg" parameterType="java.util.Map">
+		update g_dt_img
+		<set>
+			<if test="null != groupid and '' != groupid">groupid=#{groupid},</if>
+			<if test="null != name and '' != name">name=#{name},</if>
+			<if test="null != img and '' != img">img=#{img},</if>
+			<if test="null != roletype and '' != roletype">roletype=#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">primaryid=#{primaryid},</if>
+			<if test="null != mediaid and '' != mediaid">mediaid=#{mediaid},</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime">uploadwxtime=#{uploadwxtime},</if>
+		</set>
+		where imgid=#{imgid}
+	</update>
+	<select id="getDTImg" resultType="java.util.Map" parameterType="java.util.Map">
+		select imgid,groupid,name,img,roletype,primaryid,mediaid,uploadwxtime 
+		from g_dt_img
+		where imgid=#{imgid}
+	</select>
+	<select id="getDTImgList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select imgid,groupid,name,img,roletype,primaryid ,mediaid,uploadwxtime
+		from g_dt_img
+		<where> 1=1 
+			<if test="null!= imgid and ''!= imgid"> and imgid=#{imgid} </if>
+			<if test="null!= groupid and ''!= groupid"> and groupid=#{groupid}" </if>
+			<if test="null!= name and ''!= name"> and name like "%"#{name}"%" </if>
+			<if test="null!= img and ''!= img"> and img=#{img} </if>
+			<if test="null!= roletype and ''!= roletype"> and roletype=#{roletype} </if>
+			<if test="null!= primaryid and ''!= primaryid"> and primaryid=#{primaryid} </if>
+			<if test="null != mediaid and '' != mediaid"> and mediaid=#{mediaid}</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime"> and uploadwxtime=#{uploadwxtime}</if>
+		</where>
+		order by imgid desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDTImgListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0) 	from g_dt_img
+		<where> 1=1 
+			<if test="null!= imgid and ''!= imgid"> and imgid=#{imgid} </if>
+			<if test="null!= groupid and ''!= groupid"> and groupid like "%"#{groupid}"%" </if>
+			<if test="null!= name and ''!= name"> and name like "%"#{name}"%" </if>
+			<if test="null!= img and ''!= img"> and img=#{img} </if>
+			<if test="null!= roletype and ''!= roletype"> and roletype=#{roletype} </if>
+			<if test="null!= primaryid and ''!= primaryid"> and primaryid=#{primaryid} </if>
+			<if test="null != mediaid and '' != mediaid"> and mediaid=#{mediaid}</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime"> and uploadwxtime=#{uploadwxtime}</if>
+		</where>
+	</select>
+	
+	
+	<!-- 图文素材 -->
+	<delete id="deleteDTImgText" parameterType="java.util.Map">
+		delete from g_dt_imgtext where imgtextid=#{imgtextid}
+	</delete>
+	<insert id="insertDTImgText" parameterType="java.util.Map">
+		insert into g_dt_imgtext
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != imgtexttype and '' != imgtexttype">imgtexttype,</if>
+			<if test="null != roletype and '' != roletype">roletype,</if>
+			<if test="null != primaryid and '' != primaryid">primaryid,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != imgtexttype and '' != imgtexttype">#{imgtexttype},</if>
+			<if test="null != roletype and '' != roletype">#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">#{primaryid},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+		</trim>
+	</insert>
+	<update id="updateDTImgText" parameterType="java.util.Map">
+		update g_dt_imgtext
+		<set>
+			<if test="null != imgtexttype and '' != imgtexttype">imgtexttype=#{imgtexttype},</if>
+			<if test="null != roletype and '' != roletype">roletype=#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">primaryid=#{primaryid},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != mediaid and '' != mediaid">mediaid=#{mediaid},</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime">uploadwxtime=#{uploadwxtime},</if>
+		</set>
+		where imgtextid=#{imgtextid}
+	</update>
+	<select id="getMaxDTImgTextID" parameterType="java.util.Map" resultType="java.lang.String">
+		select max(imgtextid) from g_dt_imgtext
+	</select>
+	
+	<!-- select imgtextlistid,imgtextid,title,author,imgurl,linkurl,content,ifviewcontent,summary,ifforward,roletype,primaryid 
+	from g_dt_imgtext ; -->
+	<delete id="deleteDTImgTextItem" parameterType="java.util.Map">
+		delete from g_dt_imgtextlist 
+		<where> 1=1 
+			<if test="null != imgtextid and '' != imgtextid"> and imgtextid=#{imgtextid}</if>
+			<if test="null != imgtextlistid and '' != imgtextlistid"> and imgtextlistid=#{imgtextlistid}</if>
+		</where>
+	</delete>
+	<insert id="insertDTImgTextItem" parameterType="java.util.Map">
+		insert into g_dt_imgtextlist
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != imgtextid and '' != imgtextid">imgtextid,</if>
+			<if test="null != title and '' != title">title,</if>
+			<if test="null != author and '' != author">author,</if>
+			<if test="null != imgurl and '' != imgurl">imgurl,</if>
+			<if test="null != linkurl and '' != linkurl">linkurl,</if>
+			<if test="null != content and '' != content">content,</if>
+			<if test="null != ifviewcontent and '' != ifviewcontent">ifviewcontent,</if>
+			<if test="null != summary and '' != summary">summary,</if>
+			<if test="null != ifforward and '' != ifforward">ifforward,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != imgtextid and '' != imgtextid">#{imgtextid},</if>
+			<if test="null != title and '' != title">#{title},</if>
+			<if test="null != author and '' != author">#{author},</if>
+			<if test="null != imgurl and '' != imgurl">#{imgurl},</if>
+			<if test="null != linkurl and '' != linkurl">#{linkurl},</if>
+			<if test="null != content and '' != content">#{content},</if>
+			<if test="null != ifviewcontent and '' != ifviewcontent">#{ifviewcontent},</if>
+			<if test="null != summary and '' != summary">#{summary},</if>
+			<if test="null != ifforward and '' != ifforward">#{ifforward},</if>
+		</trim>
+	</insert>
+	<update id="updateDTImgTextItem" parameterType="java.util.Map">
+		update g_dt_imgtextlist
+		<set>
+			<if test="null != imgtextid and '' != imgtextid">imgtextid=#{imgtextid},</if>
+			<if test="null != title and '' != title">title=#{title},</if>
+			<if test="null != author and '' != author">author=#{author},</if>
+			<if test="null != imgurl and '' != imgurl">imgurl=#{imgurl},</if>
+			linkurl=#{linkurl},
+			<if test="null != content and '' != content">content=#{content},</if>
+			<if test="null != ifviewcontent and '' != ifviewcontent">ifviewcontent=#{ifviewcontent},</if>
+			<if test="null != summary and '' != summary">summary=#{summary},</if>
+			<if test="null != ifforward and '' != ifforward">ifforward=#{ifforward},</if>
+			<if test="null != thumbmediaid and '' != thumbmediaid">thumbmediaid=#{thumbmediaid},</if>
+			<if test="null != thumbwxtime and '' != thumbwxtime">thumbwxtime=#{thumbwxtime},</if>
+		</set>
+		where imgtextlistid=#{imgtextlistid}
+	</update>
+	<select id="getDTImgTextItem" resultType="java.util.Map" parameterType="java.util.Map">
+		select itl.imgtextlistid,itl.imgtextid,itl.title,itl.author,itl.imgurl,itl.linkurl,itl.content,itl.ifviewcontent,itl.summary,
+		itl.ifforward,it.roletype,it.primaryid ,it.createtime,itl.thumbmediaid,itl.thumbwxtime,it.mediaid,it.uploadwxtime
+		from g_dt_imgtextlist itl
+		left join g_dt_imgtext it on (it.imgtextid=itl.imgtextid)
+		where itl.imgtextlistid=#{imgtextlistid}
+	</select>
+	<select id="getDTImgTextItemList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select itl.imgtextlistid,itl.imgtextid,itl.title,itl.author,itl.imgurl,itl.linkurl,itl.content,itl.ifviewcontent,itl.summary,
+		itl.ifforward,it.roletype,it.primaryid ,itl.thumbmediaid,itl.thumbwxtime,it.mediaid,it.uploadwxtime
+		from g_dt_imgtextlist itl
+		left join g_dt_imgtext it on (it.imgtextid=itl.imgtextid)
+		<where> 1=1
+			<if test="null != imgtextlistid and '' != imgtextlistid"> and itl.imgtextlistid=#{imgtextlistid}</if>
+			<if test="null != imgtextid and '' != imgtextid"> and itl.imgtextid=#{imgtextid}</if>
+			<if test="null != title and '' != title"> and itl.title=#{title}</if>
+			<if test="null != author and '' != author"> and itl.author=#{author}</if>
+			<if test="null != imgurl and '' != imgurl"> and itl.imgurl=#{imgurl}</if>
+			<if test="null != linkurl and '' != linkurl"> and itl.linkurl=#{linkurl}</if>
+			<if test="null != content and '' != content"> and itl.content=#{content}</if>
+			<if test="null != ifviewcontent and '' != ifviewcontent"> and itl.ifviewcontent=#{ifviewcontent}</if>
+			<if test="null != summary and '' != summary"> and itl.summary=#{summary}</if>
+			<if test="null != ifforward and '' != ifforward"> and itl.ifforward=#{ifforward}</if>
+			<if test="null != roletype and '' != roletype"> and it.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and it.primaryid=#{primaryid}</if>
+			<if test="null != thumbmediaid and '' != thumbmediaid"> and itl.thumbmediaid=#{thumbmediaid}</if>
+			<if test="null != mediaid and '' != mediaid"> and it.mediaid=#{mediaid}</if>
+		</where>
+		order by itl.imgtextid desc,itl.imgtextlistid asc
+	</select>
+	
+	<select id="getDTImgTextChildList" parameterType="java.util.Map" resultType="java.util.Map">
+	select imgtextlistid,imgtextid,title,author,imgurl,linkurl,content,ifviewcontent,summary,ifforward,thumbmediaid,thumbwxtime
+	from g_dt_imgtextlist
+	<where> 1=1 
+		<if test="null != parentList and parentList.size>0">
+			and imgtextid in (
+		   <foreach collection="parentList" item="item" index="index" separator=",">
+			#{item}
+	  		</foreach>)
+		</if>
+	</where> 
+	order by imgtextid desc,imgtextlistid asc
+	</select>
+	<select id="getDTImgTextList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select dit.imgtextid,dit.imgtexttype,dit.roletype,dit.primaryid,dit.createtime,dit.mediaid,dit.uploadwxtime 
+		from g_dt_imgtext   dit
+		<where>
+			<if test="null != title and '' != title">
+				and exists(select 0 from g_dt_imgtextlist ditl where ditl.title like "%"#{title}"%"
+				and ditl.imgtextid=dit.imgtextid)
+			</if>
+			<if test="null != imgtextid and '' != imgtextid"> and dit.imgtextid=#{imgtextid}</if>
+			<if test="null != imgtexttype and '' != imgtexttype"> and dit.imgtexttype=#{imgtexttype}</if>
+			<if test="null != roletype and '' != roletype"> and dit.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dit.primaryid=#{primaryid}</if>
+			<if test="null != createtime and '' != createtime"> and dit.createtime=#{createtime}</if>
+			<if test="null != mediaid and '' != mediaid"> and dit.mediaid=#{mediaid}</if>
+			and EXISTS (select 0 from g_dt_imgtextlist ditl where ditl.imgtextid=dit.imgtextid) 
+		</where>
+		order by dit.imgtextid desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDTImgTextListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0) 
+		from g_dt_imgtext   dit
+		<where> 1=1
+			<if test="null != title and '' != title">
+				and exists(select 0 from g_dt_imgtextlist ditl where ditl.title like "%"#{title}"%"
+				and ditl.imgtextid=dit.imgtextid)
+			</if>
+			<if test="null != imgtextid and '' != imgtextid"> and dit.imgtextid=#{imgtextid}</if>
+			<if test="null != imgtexttype and '' != imgtexttype"> and dit.imgtexttype=#{imgtexttype}</if>
+			<if test="null != roletype and '' != roletype"> and dit.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dit.primaryid=#{primaryid}</if>
+			<if test="null != createtime and '' != createtime"> and dit.createtime=#{createtime}</if>
+			<if test="null != mediaid and '' != mediaid"> and dit.mediaid=#{mediaid}</if>
+			and EXISTS (select 0 from g_dt_imgtextlist ditl where ditl.imgtextid=dit.imgtextid)
+		</where>
+	</select>
+	
+	
+	<!-- 查看粉丝的车辆 -->
+	<!-- select id,memberid,cartype,tiretype from t_dt_member_cars -->
+	<delete id="deleteMemberCar" parameterType="java.util.Map">
+		delete from t_dt_member_cars where id=#{id}
+	</delete>
+	<insert id="insertMemberCar" parameterType="java.util.Map">
+		insert into t_dt_member_cars
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != memberid and '' != memberid">memberid,</if>
+			<if test="null != cartype and '' != cartype">cartype,</if>
+			<if test="null != tiretype and '' != tiretype">tiretype,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != memberid and '' != memberid">#{memberid},</if>
+			<if test="null != cartype and '' != cartype">#{cartype},</if>
+			<if test="null != tiretype and '' != tiretype">#{tiretype},</if>
+		</trim>
+	</insert>
+	<update id="updateMemberCar" parameterType="java.util.Map">
+		update t_dt_member_cars
+		<set>
+			<if test="null != memberid and '' != memberid">memberid=#{memberid},</if>
+			<if test="null != cartype and '' != cartype">cartype=#{cartype},</if>
+			<if test="null != tiretype and '' != tiretype">tiretype=#{tiretype},</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getMemberCar" resultType="java.util.Map" parameterType="java.util.Map">
+		select dmc.id,dmc.memberid,dmc.cartype,dmc.tiretype ,
+		gcb.car brandname,gcm.name cartypename,gct.name tiretypename
+		from t_dt_member_cars dmc
+		left join g_car_models gcm on (dmc.cartype=gcm.modelsid)
+		left join g_car_brand gcb on (gcm.brandid=gcb.brandid)
+		left join g_car_tiremodels gct on (dmc.tiretype=gct.tireid)
+		where dmc.id=#{id}
+	</select>
+	<select id="getMemberCarList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select dmc.id,dmc.memberid,dmc.cartype,dmc.tiretype ,
+		gcb.car brandname,gcm.name cartypename,gct.name tiretypename,
+		dmc.flatratio,dmc.tread,diameter
+		from t_dt_member_cars dmc
+		left join g_car_models gcm on (dmc.cartype=gcm.modelsid)
+		left join g_car_brand gcb on (gcm.brandid=gcb.brandid)
+		left join g_car_tiremodels gct on (dmc.tiretype=gct.tireid)
+		<where>
+			<if test="null != id and '' != id"> and dmc.id=#{id}</if>
+			<if test="null != memberid and '' != memberid"> and dmc.memberid=#{memberid}</if>
+			<if test="null != cartype and '' != cartype"> and dmc.cartype=#{cartype}</if>
+			<if test="null != tiretype and '' != tiretype"> and dmc.tiretype=#{tiretype}</if>
+		</where>
+		order by dmc.id desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getMemberCarListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0)
+		from t_dt_member_cars dmc
+		left join g_car_models gcm on (dmc.cartype=gcm.modelsid)
+		left join g_car_brand gcb on (gcm.brandid=gcb.brandid)
+		left join g_car_tiremodels gct on (dmc.tiretype=gct.tireid)
+		<where>
+			<if test="null != id and '' != id"> and dmc.id=#{id}</if>
+			<if test="null != memberid and '' != memberid"> and dmc.memberid=#{memberid}</if>
+			<if test="null != cartype and '' != cartype"> and dmc.cartype=#{cartype}</if>
+			<if test="null != tiretype and '' != tiretype"> and dmc.tiretype=#{tiretype}</if>
+		</where>
+	</select>
+	
+	<!-- 粉丝会员 -->
+	<delete id="deleteMember" parameterType="java.util.Map">
+		delete from t_dt_member
+		where memberid=#{memberid}
+	</delete>
+	
+	<select id="getMember" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT email,
+		memberid,openid,name,phone,province,city,attentiontime,integration,ifattention,CAST(nickname
+		AS CHAR CHARACTER SET utf8) nickname,headimg,gaintime
+		from t_dt_member 
+		<where>
+			<if test="null != openid and '' != openid"> and openid=#{openid}</if>
+			<if test="null != memberid and '' != memberid"> and memberid=#{memberid}</if>
+		</where>
+	</select>
+	<select id="getMemberView" resultType="java.util.Map" parameterType="java.util.Map">
+		select dm.roletype,dm.primaryid,
+		'' agencyname,
+		dm.gtygroup gtygroup,dm.agencygroup ,
+		dm.memberid,dm.openid,dm.name,dm.phone,dm.attentiontime,dm.integration,dm.ifattention,CAST(dm.nickname
+		AS CHAR CHARACTER SET utf8) nickname,dm.headimg,dm.sex,
+		dm.province,dm.city,
+		dm.email,dm.gaintime,dm.canceltime,case when ISNULL(t.carnum) then 0 else t.carnum end carnum
+		from t_dt_member dm 
+		left join (select dmc.memberid,count(0) carnum from t_dt_member_cars dmc group by dmc.memberid) t on (t.memberid=dm.memberid)
+		<where> 1=1 
+			<if test="null != openid and '' != openid"> and dm.openid=#{openid}</if>
+			<if test="null != memberid and '' != memberid"> and dm.memberid=#{memberid}</if>
+		</where>
+	</select>
+	<select id="getMemberActivityNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+	select sum(case when t.cishu is null then 0 else t.cishu end) cishu from (
+select gr.openid, count(distinct ga.infoid) cishu ,1 activitytype
+from g_hd_ggk_result gr 
+left join g_hd_ggk_award ga on (gr.awardid=ga.id and ga.state=0)
+group by gr.openid 
+union
+select gr.openid, count(distinct ga.infoid) cishu ,2 activitytype
+from g_hd_wheel_result gr 
+left join g_hd_wheel_award ga on (gr.awardid=ga.id and ga.state=0)
+group by gr.openid 
+union
+select dm.openid, count(distinct ga.sorrowid) cishu ,3 activitytype
+from g_hd_sorrow_result gr 
+left join g_hd_sorrow_question ga on (gr.quesid=ga.id and ga.state=0)
+left join t_dt_member dm on (dm.memberid=gr.memberid)
+group by dm.openid 
+union
+select gr.openid, count(distinct ga.infoid) cishu ,4 activitytype
+from g_hd_vote_result gr 
+left join g_hd_vote_award ga on (gr.awardid=ga.id and ga.state=0)
+group by gr.openid  ) t
+left join t_dt_member dm on (dm.openid=t.openid)
+<where>
+<if test="null != openid and '' != openid"> and dm.openid=#{openid}</if>
+<if test="null != memberid and '' != memberid"> and dm.memberid=#{memberid}</if>
+</where>
+group by dm.memberid limit 1
+	</select>
+	
+	<insert id="insertMember" parameterType="java.util.Map">
+		insert into
+		t_dt_member(openid,name,phone,city,attentiontime,integration,ifattention,nickname,headimg,email,gaintime,sex,province) values
+		(#{openid},#{name},#{phone},#{city},#{attentiontime},#{integration},#{ifattention},#{nickname},#{headimg},#{email},#{gaintime},#{sex},#{province})
+	</insert>
+	<update id="updateNickName" parameterType="java.util.Map">
+		update t_dt_member set
+		nickname=#{nickname},gaintime=#{gaintime}
+		where openid=#{openid}
+	</update>
+	
+	<select id="getMemberOpenList" resultType="java.util.Map">
+		select openid from
+		t_dt_member where gaintime is null 
+	</select>
+	<select id="getAgencyMemberList" resultType="java.util.Map" parameterType="java.util.Map">
+		select memberid,openid from t_dt_member 
+		 
+	</select>
+
+	<update id="attentionMember" parameterType="java.util.Map">
+		update t_dt_member set ifattention=1 
+		where openid=#{openid}
+	</update>
+	<!-- 批量分组 -->
+	<update id="updategtygroup" parameterType="java.util.Map">
+		update t_dt_member set gtygroup =#{gtygroup}
+		where memberid=#{memberid}
+		
+	</update>
+	<update id="updateMember" parameterType="java.util.Map">
+		update t_dt_member
+		<set>
+			<if test="name != null and ''!=name">name = #{name},</if>
+			<if test="phone != null and ''!=phone">phone = #{phone},</if>
+			<if test="province != null and ''!=province">province = #{province},</if>
+			<if test="city != null and ''!=city">city = #{city},</if>
+			<if test="email != null and ''!=email">email = #{email},</if>
+			<if test="gaintime != null and ''!=gaintime">gaintime = #{gaintime},</if>
+			<if test="gtygroup != null">gtygroup = #{gtygroup},</if>
+		</set>
+		where openid=#{openid}
+	</update>
+	
+	<update id="updateDefaultGroup" parameterType="java.util.Map">
+		update t_dt_member set gtygroup=0
+		where gtygroup=#{gtygroup}
+	</update>
+	
+	<update id="cancalMember" parameterType="java.util.Map">
+		update t_dt_member set
+		ifattention=0,canceltime=#{canceltime} where
+		openid=#{openid}
+	</update>
+	
+	<delete id="deleteAllMember">
+		delete from t_dt_member
+	</delete>
+	
+	<select id="getMemberList" resultType="java.util.Map"
+		parameterType="java.util.LinkedHashMap">
+		select dm.roletype,dm.primaryid,
+		'' agencyname,
+		dm.gtygroup gtygroup,dm.agencygroup ,
+		dm.memberid,dm.openid,dm.name,dm.phone,dm.attentiontime,dm.integration,dm.ifattention,CAST(dm.nickname
+		AS CHAR CHARACTER SET utf8) nickname,dm.headimg,dm.sex,
+		dm.province,dm.city,
+		dm.email,dm.gaintime,dm.canceltime,case when ISNULL(t.carnum) then 0 else t.carnum end carnum
+		from t_dt_member dm 
+		left join (select dmc.memberid,count(0) carnum from t_dt_member_cars dmc group by dmc.memberid) t on (t.memberid=dm.memberid)
+		<where>1=1 
+			<if test="null == agencyid or '' == agencyid">
+				<if test="null!=provinceid and ''!=provinceid"> and exists ( select 0 from  t_dt_area where id=#{provinceid} and name=dm.province)</if>
+				<if test="null!=cityid and ''!=cityid"> and exists ( select 0 from  t_dt_area where id=#{cityid} and name=dm.city)</if>
+			</if>
+			<if test="'-1' == agencyid">
+				and (dm.roletype is null or dm.roletype=1 )
+				<if test="null!=provinceid and ''!=provinceid">  and exists ( select 0 from  t_dt_area where id=#{provinceid} and name=dm.province)</if>
+				<if test="null!=cityid and ''!=cityid"> and exists ( select 0 from  t_dt_area where id=#{cityid} and name=dm.city)</if>
+			</if>
+			<if test="null != roletype and '' != roletype"> and dm.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dm.primaryid=#{primaryid}</if>
+			
+			<if test="null!=openid and ''!=openid"> and dm.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dm.name like "%"#{name}"%"</if>
+			<if test="null!=phone and ''!=phone"> and dm.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname"> and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like
+				"%"#{nickname}"%"</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dm.ifattention=#{ifattention}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dm.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dm.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dm.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dm.canceltime &lt;= #{cancelendtime}
+			</if>
+			<!-- <if test="null!=gtygroup and ''!=gtygroup">
+				and dm.gtygroup = #{gtygroup}
+			</if> -->
+			<!-- 
+			<if test="null!=agencygroup and ''!=agencygroup">
+				and dm.agencygroup = #{agencygroup}
+			</if>
+			 -->
+		</where>
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- 查询有多少条学科设置记录	-->
+	<select id="getMemberListNum" resultType="int"
+		parameterType="java.util.LinkedHashMap">
+		select count(0)
+		from t_dt_member dm 
+		left join (select dmc.memberid,count(0) carnum from t_dt_member_cars dmc group by dmc.memberid) t on (t.memberid=dm.memberid)
+		<where>1=1 
+			<if test="null == agencyid or '' == agencyid">
+				<if test="null!=provinceid and ''!=provinceid"> and exists ( select 0 from  t_dt_area where id=#{provinceid} and name=dm.province)</if>
+				<if test="null!=cityid and ''!=cityid"> and exists ( select 0 from  t_dt_area where id=#{cityid} and name=dm.city)</if>
+			</if>
+			<if test="'-1' == agencyid">
+				and (dm.roletype is null or dm.roletype=1 )
+				<if test="null!=provinceid and ''!=provinceid">  and exists ( select 0 from  t_dt_area where id=#{provinceid} and name=dm.province)</if>
+				<if test="null!=cityid and ''!=cityid"> and exists ( select 0 from  t_dt_area where id=#{cityid} and name=dm.city)</if>
+			</if>
+			<if test="null != roletype and '' != roletype"> and dm.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dm.primaryid=#{primaryid}</if>
+			
+			<if test="null!=openid and ''!=openid"> and dm.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dm.name like "%"#{name}"%"</if>
+			<if test="null!=phone and ''!=phone"> and dm.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname"> and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like
+				"%"#{nickname}"%"</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dm.ifattention=#{ifattention}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dm.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dm.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dm.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dm.canceltime &lt;= #{cancelendtime}
+			</if>
+			<!-- <if test="null!=gtygroup and ''!=gtygroup">
+				and dm.gtygroup = #{gtygroup}
+			</if> -->
+			<!-- 
+			<if test="null!=agencygroup and ''!=agencygroup">
+				and dm.agencygroup = #{agencygroup}
+			</if>
+			 -->
+		</where>
+	</select>
+	
+	<!-- 固特异分组 -->
+	<!-- select groupid,groupname,grouptype -->
+	<delete id="deleteGTYGroup" parameterType="java.util.Map">
+		delete from g_gty_group where groupid=#{groupid} and groupid>=100
+	</delete>
+	<insert id="insertGTYGroup" parameterType="java.util.Map">
+		insert into g_gty_group
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != groupid ">groupid,</if>
+			<if test="null != groupname and '' != groupname">groupname,</if>
+			<if test="null != grouptype and '' != grouptype">grouptype,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != groupid">#{groupid},</if>
+			<if test="null != groupname and '' != groupname">#{groupname},</if>
+			<if test="null != grouptype and '' != grouptype">#{grouptype},</if>
+		</trim>
+	</insert>
+	<update id="updateGTYGroup" parameterType="java.util.Map">
+		update g_gty_group
+		<set>
+			<if test="null != groupid and '' != groupid">groupid=#{groupid},</if>
+			<if test="null != groupname and '' != groupname">groupname=#{groupname},</if>
+			<if test="null != grouptype and '' != grouptype">grouptype=#{grouptype},</if>
+		</set>
+		where groupid=#{groupid}
+	</update>
+	<select id="getGTYGroupList" parameterType="java.util.Map" 
+		resultType="java.util.Map">
+		select groupid,groupname,grouptype from g_gty_group
+		<where>1=1
+			<if test="null != groupid and '' != groupid"> and groupid=#{groupid}</if>
+			<if test="null != groupname and ''!= groupname"> and groupname like "%"#{groupname}"%" </if>
+			<if test="null != grouptype and '' != grouptype"> and grouptype=#{grouptype}</if>
+		</where>
+	</select>
+	<select id="getGTYGroupCount" parameterType="java.util.Map" 
+		resultType="java.lang.Integer">
+		select count(0) from g_gty_group
+		<where>1=1
+			<if test="null != groupid"> and groupid=#{groupid}</if>
+			<if test="null != groupname and ''!= groupname"> and groupname like "%"#{groupname}"%" </if>
+			<if test="null != grouptype and '' != grouptype"> and grouptype=#{grouptype}</if>
+		</where>
+	</select>
+	<select id="getGTYGroupTJList" parameterType="java.util.Map" 
+		resultType="java.util.Map">
+		select dg.groupid,max(dg.groupname) groupname,max(dg.grouptype) grouptype,
+		count(dm.memberid) count
+		from g_gty_group dg
+		left join t_dt_member dm on (dg.groupid=dm.gtygroup)
+		<where>1=1
+			<if test="null != groupid and '' != groupid"> and dg.groupid=#{groupid}</if>
+			<if test="null != groupname and ''!= groupname"> and dg.groupname like "%"#{groupname}"%" </if>
+			<if test="null != grouptype and '' != grouptype"> and dg.grouptype=#{grouptype}</if>
+		</where>
+		group by dg.groupid
+	</select>
+	
+	
+	<!-- 其他分组 -->
+	<!-- select groupid,groupname,grouptype,roletype,primaryid from g_dt_group -->
+	<delete id="deleteDTGroup" parameterType="java.util.Map">
+		delete from g_dt_group where groupid=#{groupid} and groupid>=100
+	</delete>
+	<insert id="insertDTGroup" parameterType="java.util.Map">
+		insert into g_dt_group
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != groupname and '' != groupname">groupname,</if>
+			<if test="null != grouptype and '' != grouptype">grouptype,</if>
+			<if test="null != roletype and '' != roletype">roletype,</if>
+			<if test="null != primaryid and '' != primaryid">primaryid,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != groupname and '' != groupname">#{groupname},</if>
+			<if test="null != grouptype and '' != grouptype">#{grouptype},</if>
+			<if test="null != roletype and '' != roletype">#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">#{primaryid},</if>
+		</trim>
+	</insert>
+	<update id="updateDTGroup" parameterType="java.util.Map">
+		update g_dt_group
+		<set>
+			<if test="null != groupname and '' != groupname">groupname=#{groupname},</if>
+			<if test="null != grouptype and '' != grouptype">grouptype=#{grouptype},</if>
+			<if test="null != roletype and '' != roletype">roletype=#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">primaryid=#{primaryid},</if>
+		</set>
+		where groupid=#{groupid}
+	</update>
+	<!-- 经销商分组统计 -->
+	<select id="getDTGroupAgencyTJList" parameterType="java.util.Map" 
+		resultType="java.util.Map">
+		select dg.groupid,max(dg.groupname) groupname,max(dg.grouptype) grouptype,
+		max(dg.roletype) roletype,max(dg.primaryid) primaryid,0 count
+		from g_dt_group dg
+		<where>1=1
+			<if test="null != groupid and '' != groupid"> and dg.groupid=#{groupid}</if>
+			<if test="null != groupname and ''!= groupname"> and dg.groupname like "%"#{groupname}"%" </if>
+			<if test="null != grouptype and '' != grouptype"> and dg.grouptype=#{grouptype}</if>
+			<if test="null != roletype and '' != roletype"> and dg.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dg.primaryid=#{primaryid}</if>
+		</where>
+		group by dg.groupid
+	</select>
+	<select id="getDTGroupList" parameterType="java.util.Map" 
+		resultType="java.util.Map">
+		select groupid,groupname,grouptype,roletype,primaryid
+		from g_dt_group
+		<where>1=1
+			<if test="null != groupid and '' != groupid"> and groupid=#{groupid}</if>
+			<if test="null != groupname and ''!= groupname"> and groupname like "%"#{groupname}"%" </if>
+			<if test="null != grouptype and '' != grouptype"> and grouptype=#{grouptype}</if>
+			<if test="null != roletype and '' != roletype"> and roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and primaryid=#{primaryid}</if>
+		</where>
+	</select>
+	<select id="getDTGroupListNum" parameterType="java.util.Map" 
+		resultType="java.lang.Integer">
+		select count(0) num
+		from g_dt_group
+		<where>1=1
+			<if test="null != groupid and '' != groupid"> and groupid=#{groupid}</if>
+			<if test="null != groupname and ''!= groupname"> and groupname like "%"#{groupname}"%" </if>
+			<if test="null != grouptype and '' != grouptype"> and grouptype=#{grouptype}</if>
+			<if test="null != roletype and '' != roletype"> and roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and primaryid=#{primaryid}</if>
+		</where>
+	</select>
+	
+	<!-- 获取省市信息 -->
+	<select id="getProvinceList" resultType="java.util.Map">
+		SELECT
+		id,name,code,remark,parentid,ifactive,priority
+		FROM t_dt_area
+		where parentid=0 and ifactive=1
+	</select>
+	<select id="getCityList" resultType="java.util.Map">
+		SELECT
+		id,name,code,remark,parentid,ifactive,priority
+		FROM t_dt_area
+		where parentid!=0 and ifactive=1
+	</select>
+	<select id="getCityListByProvince" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT id,name,code,remark,parentid,ifactive,priority
+		FROM t_dt_area
+		where parentid=#{parentid} and ifactive=1
+	</select>
+	
+	
+	<!-- 信息群发 -->
+	<!-- select noticesetid,messagecount,roletype from g_sy_noticeset -->
+	<delete id="deleteSYNoticeSet" parameterType="java.util.Map">
+		delete from g_sy_noticeset where noticesetid=#{noticesetid}
+	</delete>
+	<insert id="insertSYNoticeSet" parameterType="java.util.Map">
+		insert into g_sy_noticeset
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != messagecount and '' != messagecount">messagecount,</if>
+			<if test="null != roletype and '' != roletype">roletype,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != messagecount and '' != messagecount">#{messagecount},</if>
+			<if test="null != roletype and '' != roletype">#{roletype},</if>
+		</trim>
+	</insert>
+	<update id="updateSYNoticeSet" parameterType="java.util.Map">
+		update g_sy_noticeset
+		<set>
+			<if test="null != messagecount and '' != messagecount">messagecount=#{messagecount},</if>
+		</set>
+		where roletype=#{roletype}
+	</update>
+	<select id="getSYNoticeSet" parameterType="java.util.Map" resultType="java.util.Map">
+		select noticesetid,messagecount,roletype from g_sy_noticeset
+		<where> 1=1 
+			<if test="null!=noticesetid"> and noticesetid=#{noticesetid}</if>
+			<if test="null!=roletype"> and roletype=#{roletype}</if>
+		</where>
+	</select>
+	
+	<select id="getMaxSYNoticeSend" resultType="java.util.Map">
+		select max(id) id from g_sy_noticesend
+	</select>
+	<!-- select id,msgtype,content,sendtime,ifread,sendstatus,roletype,primaryid,
+	sendcount,groupid,refusereason,otherreason,createtime
+	 from g_sy_noticesend -->
+	<delete id="deleteSYNoticeSend" parameterType="java.util.Map">
+		delete from g_sy_noticesend where id=#{id}
+	</delete>
+	<insert id="insertSYNoticeSend" parameterType="java.util.Map">
+		insert into g_sy_noticesend
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != msgtype and '' != msgtype">msgtype,</if>
+			<if test="null != content and '' != content">content,</if>
+			<if test="null != sendtime and '' != sendtime">sendtime,</if>
+			<if test="null != ifread and '' != ifread">ifread,</if>
+			<if test="null != sendstatus and '' != sendstatus">sendstatus,</if>
+			<if test="null != roletype and '' != roletype">roletype,</if>
+			<if test="null != primaryid and '' != primaryid">primaryid,</if>
+			
+			<if test="null != sendcount and '' != sendcount">sendcount,</if>
+			<if test="null != groupid and '' != groupid">groupid,</if>
+			<if test="null != refusereason and '' != refusereason">refusereason,</if>
+			<if test="null != otherreason and '' != otherreason">otherreason,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != msgtype and '' != msgtype">#{msgtype},</if>
+			<if test="null != content and '' != content">#{content},</if>
+			<if test="null != sendtime and '' != sendtime">#{sendtime},</if>
+			<if test="null != ifread and '' != ifread">#{ifread},</if>
+			<if test="null != sendstatus and '' != sendstatus">#{sendstatus},</if>
+			<if test="null != roletype and '' != roletype">#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">#{primaryid},</if>
+			
+			<if test="null != sendcount and '' != sendcount">#{sendcount},</if>
+			<if test="null != groupid and '' != groupid">#{groupid},</if>
+			<if test="null != refusereason and '' != refusereason">#{refusereason},</if>
+			<if test="null != otherreason and '' != otherreason">#{otherreason},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+		</trim>
+	</insert>
+	<update id="updateSYNoticeSend" parameterType="java.util.Map">
+		update g_sy_noticesend
+		<set>
+			<if test="null != msgtype and '' != msgtype">msgtype=#{msgtype},</if>
+			<if test="null != content and '' != content">content=#{content},</if>
+			<if test="null != sendtime and '' != sendtime">sendtime=#{sendtime},</if>
+			<if test="null != ifread and '' != ifread">ifread=#{ifread},</if>
+			<if test="null != sendstatus and '' != sendstatus">sendstatus=#{sendstatus},</if>
+			<if test="null != roletype and '' != roletype">roletype=#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">primaryid=#{primaryid},</if>
+			
+			<if test="null != sendcount and '' != sendcount">sendcount=#{sendcount},</if>
+			<if test="null != groupid and '' != groupid">groupid=#{groupid},</if>
+			<if test="null != refusereason and '' != refusereason">refusereason=#{refusereason},</if>
+			<if test="null != otherreason and '' != otherreason">otherreason=#{otherreason},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != msgid and '' != msgid">msgid=#{msgid},</if>
+		</set>
+		where id=#{id}
+	</update>
+	<!-- 微信推送结果 -->
+	<update id="updateSYNoticeSendByWX" parameterType="java.util.Map">
+		update g_sy_noticesend
+		<set>
+			<if test="null != sendtime and '' != sendtime">sendtime=#{sendtime},</if>
+			<if test="null != sendstatus and '' != sendstatus">sendstatus=#{sendstatus},</if>
+			<if test="null != sendcount and '' != sendcount">sendcount=#{sendcount},</if>
+			<if test="null != totalcount and '' != totalcount">totalcount=#{totalcount},</if>
+			<if test="null != errorcount and '' != errorcount">errorcount=#{errorcount},</if>
+		</set>
+		<where>
+			<if test="null != id and '' != id"> and id=#{id}</if>
+			<if test="null != msgid and '' != msgid"> and msgid=#{msgid}</if>
+		</where>
+	</update>
+	<select id="getSYNoticeSend" parameterType="java.util.Map" resultType="java.util.Map">
+		select sn.id,sn.msgtype,dm.name msgtypename,sn.content,sn.sendtime,sn.ifread,sn.sendstatus,sn.sendcount,sn.roletype,sn.primaryid,
+		sn.sendcount,sn.groupid,sn.refusereason,sn.otherreason,sn.createtime ,sn.msgid
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		where sn.id=#{id}
+	</select>
+	<select id="getSYNoticeSendList" parameterType="java.util.Map" resultType="java.util.Map">
+		select sn.id,sn.msgtype,dm.name msgtypename,sn.content,sn.sendtime,sn.ifread,sn.sendstatus,sn.sendcount,sn.roletype,sn.primaryid,
+		sn.sendcount,sn.groupid,sn.refusereason,sn.otherreason,sn.createtime ,sn.msgid
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		<where> 
+			<if test="null != msgtype and '' != msgtype"> and sn.msgtype=#{msgtype}</if>
+			<if test="null != content and '' != content"> and sn.content=#{content}</if>
+			<if test="null != sendtime and '' != sendtime"> and sn.sendtime=#{sendtime}</if>
+			<if test="null != ifread and '' != ifread"> and sn.ifread=#{ifread}</if>
+			<if test="null != sendstatus and '' != sendstatus"> and sn.sendstatus=#{sendstatus}</if>
+			<if test="null != roletype and '' != roletype"> and sn.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and sn.primaryid=#{primaryid}</if>
+		</where>
+		order by sn.id desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getSYNoticeSendListNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(0) 
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		<where>
+			<if test="null != msgtype and '' != msgtype"> and sn.msgtype=#{msgtype}</if>
+			<if test="null != content and '' != content"> and sn.content=#{content}</if>
+			<if test="null != sendtime and '' != sendtime"> and sn.sendtime=#{sendtime}</if>
+			<if test="null != ifread and '' != ifread"> and sn.ifread=#{ifread}</if>
+			<if test="null != sendstatus and '' != sendstatus"> and sn.sendstatus=#{sendstatus}</if>
+			<if test="null != roletype and '' != roletype"> and sn.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and sn.primaryid=#{primaryid}</if>
+		</where>
+	</select>
+	
+	<select id="getSYNoticeSendAuditList" parameterType="java.util.Map" resultType="java.util.Map">
+		select case when dm.key='img' then di.mediaid 
+		when dm.key='article' then t.mediaid
+		else '' end mediaid,
+		sn.id,sn.msgtype,dm.name msgtypename,sn.content,sn.sendtime,sn.ifread,sn.sendstatus,sn.sendcount,sn.roletype,sn.primaryid,
+		sn.sendcount,sn.groupid,sn.refusereason,sn.otherreason,sn.createtime ,
+		'' agencyname,dm.key msgtypekey,
+		di.img imgpath,t.imgtextlistid articleids
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		left join g_dt_img di on (di.imgid=SUBSTR(sn.content,3) and dm.key='img')
+		left join (select dil.imgtextid,di.mediaid,CAST(GROUP_CONCAT(dil.imgtextlistid) AS CHAR CHARACTER SET utf8)'imgtextlistid'
+		from g_dt_imgtextlist dil left join g_dt_imgtext di on (dil.imgtextid=di.imgtextid)
+		group by di.imgtextid) t on (t.imgtextid=SUBSTR(sn.content,3) and dm.key='article')
+		<where> 
+			<if test="null != msgtype and '' != msgtype"> and sn.msgtype=#{msgtype}</if>
+			<if test="null != content and '' != content"> and sn.content=#{content}</if>
+			<if test="null != sendtime and '' != sendtime"> and sn.sendtime=#{sendtime}</if>
+			<if test="null != ifread and '' != ifread"> and sn.ifread=#{ifread}</if>
+			<if test="null != sendstatus and '' != sendstatus"> and sn.sendstatus=#{sendstatus}</if>
+			<if test="null != roletype and '' != roletype"> and sn.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and sn.primaryid=#{primaryid}</if>
+			<if test="null != id and '' != id"> and sn.id=#{id}</if>
+		</where>
+		order by sn.id desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getSYNoticeSendAuditListNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(0)
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		left join g_dt_img di on (di.imgid=SUBSTR(sn.content,3) and dm.key='img')
+		left join (select dil.imgtextid,di.mediaid,CAST(GROUP_CONCAT(dil.imgtextlistid) AS CHAR CHARACTER SET utf8)'imgtextlistid'
+		from g_dt_imgtextlist dil left join g_dt_imgtext di on (dil.imgtextid=di.imgtextid)
+		group by di.imgtextid) t on (t.imgtextid=SUBSTR(sn.content,3) and dm.key='article')
+		<where> 
+			<if test="null != msgtype and '' != msgtype"> and sn.msgtype=#{msgtype}</if>
+			<if test="null != content and '' != content"> and sn.content=#{content}</if>
+			<if test="null != sendtime and '' != sendtime"> and sn.sendtime=#{sendtime}</if>
+			<if test="null != ifread and '' != ifread"> and sn.ifread=#{ifread}</if>
+			<if test="null != sendstatus and '' != sendstatus"> and sn.sendstatus=#{sendstatus}</if>
+			<if test="null != roletype and '' != roletype"> and sn.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and sn.primaryid=#{primaryid}</if>
+			<if test="null != id and '' != id"> and sn.id=#{id}</if>
+		</where>
+	</select>
+	
+	
+	<select id="getSYNoticeSendAuditSearchList" parameterType="java.util.Map" resultType="java.util.Map">
+		select case when dm.key='img' then di.mediaid 
+		when dm.key='article' then t.mediaid
+		when dm.key='audio' then du.mediaid
+		else '' end mediaid,
+		sn.id,sn.msgtype,dm.name msgtypename,sn.content,sn.sendtime,sn.ifread,sn.sendstatus,sn.sendcount,sn.roletype,sn.primaryid,
+		sn.sendcount,sn.groupid,sn.refusereason,sn.otherreason,sn.createtime ,
+		'' agencyname,dm.key msgtypekey,
+		di.img imgpath,t.imgtextlistid articleids,
+		du.name audioname,du.path audiopath,du.size audiosize,du.time audiotime
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		left join g_dt_img di on (di.imgid=SUBSTR(sn.content,3) and dm.key='img')
+		left join (select dil.imgtextid,di.mediaid,CAST(GROUP_CONCAT(dil.imgtextlistid) AS CHAR CHARACTER SET utf8)'imgtextlistid'
+		from g_dt_imgtextlist dil left join g_dt_imgtext di on (dil.imgtextid=di.imgtextid)
+		group by di.imgtextid) t on (t.imgtextid=SUBSTR(sn.content,3) and dm.key='article')
+		left join g_dt_audio du on (du.id=SUBSTR(sn.content,3) and dm.key='audio')
+		<where> 
+			<if test="null != msgtype and '' != msgtype"> and sn.msgtype=#{msgtype}</if>
+			<if test="null != content and '' != content"> and (sn.content like "%"#{content}"%" or du.name like "%"#{content}"%")</if>
+			<if test="null != sendtime and '' != sendtime"> and sn.sendtime=#{sendtime}</if>
+			<if test="null != ifread and '' != ifread"> and sn.ifread=#{ifread}</if>
+			<if test="null != sendstatus and '' != sendstatus"> and sn.sendstatus=#{sendstatus}</if>
+			<if test="null != roletype and '' != roletype"> and sn.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and sn.primaryid=#{primaryid}</if>
+			<if test="null != id and '' != id"> and sn.id=#{id}</if>
+		</where>
+		order by sn.id desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getSYNoticeSendAuditSearchListNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(0)
+		from g_sy_noticesend sn
+		left join t_dt_msgtype dm on (sn.msgtype=dm.id)
+		left join g_dt_img di on (di.imgid=SUBSTR(sn.content,3) and dm.key='img')
+		left join (select dil.imgtextid,di.mediaid,CAST(GROUP_CONCAT(dil.imgtextlistid) AS CHAR CHARACTER SET utf8)'imgtextlistid'
+		from g_dt_imgtextlist dil left join g_dt_imgtext di on (dil.imgtextid=di.imgtextid)
+		group by di.imgtextid) t on (t.imgtextid=SUBSTR(sn.content,3) and dm.key='article')
+		left join g_dt_audio du on (du.id=SUBSTR(sn.content,3) and dm.key='audio')
+		<where> 
+			<if test="null != msgtype and '' != msgtype"> and sn.msgtype=#{msgtype}</if>
+			<if test="null != content and '' != content"> and (sn.content like "%"#{content}"%" or du.name like "%"#{content}"%")</if>
+			<if test="null != sendtime and '' != sendtime"> and sn.sendtime=#{sendtime}</if>
+			<if test="null != ifread and '' != ifread"> and sn.ifread=#{ifread}</if>
+			<if test="null != sendstatus and '' != sendstatus"> and sn.sendstatus=#{sendstatus}</if>
+			<if test="null != roletype and '' != roletype"> and sn.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and sn.primaryid=#{primaryid}</if>
+			<if test="null != id and '' != id"> and sn.id=#{id}</if>
+		</where>
+	</select>
+	
+	<select id="getAgencyCanSendNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select messagecount count from g_sy_noticeset where roletype=#{roletype}
+		limit 1 
+	</select>
+	
+	
+	<select id="getCanSendNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select t1.count - t2.count count
+		from (
+		select sum(messagecount) count from g_sy_noticeset 
+		<where>
+			<if test="null != roletype and '' != roletype">
+				and roletype=#{roletype} 
+			</if>
+		</where> ) t1
+		left join (
+		select count(0) count from g_sy_noticesend
+		<where>
+			<if test="null != roletype and '' != roletype">
+				and roletype=#{roletype} 
+			</if>
+			<if test="null != primaryid and '' != primaryid">
+				and primaryid=#{primaryid} 
+			</if>
+			and DATE_FORMAT(createtime,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m')
+			and sendstatus!=2
+		</where>
+		)t2 on 1=1 
+	</select>
+	
+	
+	<!-- 关注后  -->
+	<!-- select templetid,templetname,templettype,typeid from g_dt_templet -->
+	<delete id="deleteDTTemplate" parameterType="java.util.Map">
+		delete from g_dt_templet where templetid=#{templetid}
+	</delete>
+	<insert id="insertDTTemplate" parameterType="java.util.Map">
+		insert into g_dt_templet
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != templetname and '' != templetname">templetname,</if>
+			<if test="null != templettype and '' != templettype">templettype,</if>
+			<if test="null != typeid and '' != typeid">typeid,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != templetname and '' != templetname">#{templetname},</if>
+			<if test="null != templettype and '' != templettype">#{templettype},</if>
+			<if test="null != typeid and '' != typeid">#{typeid},</if>
+		</trim>
+	</insert>
+	<update id="updateDTTemplate" parameterType="java.util.Map">
+		update g_dt_templet
+		<set>
+			<if test="null != templetname and '' != templetname">templetname=#{templetname},</if>
+			<if test="null != templettype and '' != templettype">templettype=#{templettype},</if>
+			<if test="null != typeid and '' != typeid">typeid=#{typeid},</if>
+		</set>
+		where templetid=#{templetid}
+	</update>
+	<select id="getDTTemplate" resultType="java.util.Map" parameterType="java.util.Map">
+		select templetid,templetname,templettype,typeid 
+		from g_dt_templet
+		where templetid=#{templetid}
+	</select>
+	<select id="getDTTemplateList" resultType="java.util.Map" parameterType="java.util.Map">
+		select gdt.templetid,gdt.templetname,gdt.templettype,gdt.typeid,tdm.key msgtype
+		from g_dt_templet gdt 
+		left join t_dt_msgtype tdm on (gdt.templettype=tdm.id)
+		<where>
+			<if test="null != templetid and '' != templetid"> and gdt.templetid=#{templetid}</if>
+			<if test="null != typeid and '' != typeid"> and gdt.typeid=#{typeid}</if>
+		</where>
+	</select>
+	
+	<!-- 关键字表 -->	
+	<!-- select keyid,name,matetype,ruleid from g_dt_textkey -->
+	<insert id="insertDTTextKeyBatch" parameterType="java.util.Map">
+	  insert into g_dt_textkey(name,matetype,ruleid) 
+	  values 
+	  <foreach collection="textKeyList" item="item" index="index" separator=",">
+			(#{item.name},#{item.matetype},#{item.ruleid})
+	  </foreach>
+	</insert>
+	<delete id="deleteDTTextKey" parameterType="java.util.Map">
+		delete from g_dt_textkey
+		<where>
+			<if test="null != keyid and '' != keyid" > and keyid=#{keyid}</if>
+			<if test="null != ruleid and '' != ruleid" > and ruleid=#{ruleid}</if>
+		</where>
+	</delete>
+	<!-- 获取规则对应的关键字的集合 -->
+	<select id="getDTRuleTextKey" parameterType="java.util.Map" resultType="java.util.Map">
+		select keyid,name,matetype,ruleid from g_dt_textkey
+		where ruleid=#{ruleid}
+	</select>
+	<!-- 自动回复规则 -->
+	<!-- 
+	select ruleid,rulename,replytype,replycontent,createtime,replycount,ifactive 
+	from g_dt_keyrule
+	 -->
+	 <delete id="deleteDTKeyRule" parameterType="java.util.Map">
+		delete from g_dt_keyrule where ruleid=#{ruleid}
+	</delete>
+	<insert id="insertDTKeyRule" parameterType="java.util.Map">
+		insert into g_dt_keyrule
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != rulename and '' != rulename">rulename,</if>
+			<if test="null != replytype and '' != replytype">replytype,</if>
+			<if test="null != replycontent and '' != replycontent">replycontent,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+			<if test="null != replycount and '' != replycount">replycount,</if>
+			<if test="null != ifactive and '' != ifactive">ifactive,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != rulename and '' != rulename">#{rulename},</if>
+			<if test="null != replytype and '' != replytype">#{replytype},</if>
+			<if test="null != replycontent and '' != replycontent">#{replycontent},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+			<if test="null != replycount and '' != replycount">#{replycount},</if>
+			<if test="null != ifactive and '' != ifactive">#{ifactive},</if>
+		</trim>
+	</insert>
+	<update id="updateDTKeyRule" parameterType="java.util.Map">
+		update g_dt_keyrule
+		<set>
+			<if test="null != rulename and '' != rulename">rulename=#{rulename},</if>
+			<if test="null != replytype and '' != replytype">replytype=#{replytype},</if>
+			<if test="null != replycontent and '' != replycontent">replycontent=#{replycontent},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != replycount and '' != replycount">replycount=#{replycount},</if>
+			<if test="null != ifactive and '' != ifactive">ifactive=#{ifactive},</if>
+		</set>
+		where ruleid=#{ruleid}
+	</update>
+	<select id="getDTKeyRuleMaxID" resultType="java.lang.Integer">
+		select max(ruleid) from g_dt_keyrule
+	</select>
+	<select id="getDTKeyRuleDetail" parameterType="java.util.Map" resultType="java.util.Map">
+		select gdk.ruleid,gdk.rulename,gdk.replytype,gdk.replycontent,gdk.createtime,gdk.replycount,gdk.ifactive,
+		tdm.key msgtypekey,tdm.name msgtypename
+		from g_dt_keyrule gdk
+		left join t_dt_msgtype tdm on (gdk.replytype=tdm.id)
+		where gdk.ruleid=#{ruleid}
+	</select>
+	<select id="getDTKeyRuleList" parameterType="java.util.Map" resultType="java.util.Map">
+		select gdk.ruleid,gdk.rulename,gdk.replytype,gdk.replycontent,gdk.createtime,gdk.replycount,gdk.ifactive,
+		tdm.key msgtypekey,tdm.name msgtypename
+		from g_dt_keyrule gdk
+		left join t_dt_msgtype tdm on (gdk.replytype=tdm.id)
+		<where>
+			<if test="null != rulename and '' != rulename"> and gdk.rulename=#{rulename}</if>
+			<if test="null != replytype and '' != replytype"> and gdk.replytype=#{replytype}</if>
+			<if test="null != replycontent and '' != replycontent"> and gdk.replycontent=#{replycontent}</if>
+			<if test="null != createtime and '' != createtime"> and gdk.createtime=#{createtime}</if>
+			<if test="null != replycount and '' != replycount"> and gdk.replycount=#{replycount}</if>
+			<if test="null != ifactive and '' != ifactive"> and gdk.ifactive=#{ifactive}</if>
+			<if test="null != ruleid and '' != ruleid"> and gdk.ruleid=#{ruleid}</if>
+			<if test="null != replycontentlike and '' != replycontentlike">
+			 	and ((gdk.replytype=0 and gdk.replycontent=#{replycontentlike}) 
+					or 
+				(gdk.replytype=1 and #{replycontentlike} like concat("%",gdk.replycontent,"%")) )
+			</if>
+		</where>
+		order by gdk.ruleid desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDTKeyRuleListNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select  count(*) 
+		from g_dt_keyrule gdk
+		left join t_dt_msgtype tdm on (gdk.replytype=tdm.id)
+		<where>
+			<if test="null != rulename and '' != rulename"> and gdk.rulename=#{rulename}</if>
+			<if test="null != replytype and '' != replytype"> and gdk.replytype=#{replytype}</if>
+			<if test="null != replycontent and '' != replycontent"> and gdk.replycontent=#{replycontent}</if>
+			<if test="null != createtime and '' != createtime"> and gdk.createtime=#{createtime}</if>
+			<if test="null != replycount and '' != replycount"> and gdk.replycount=#{replycount}</if>
+			<if test="null != ifactive and '' != ifactive"> and gdk.ifactive=#{ifactive}</if>
+			<if test="null != ruleid and '' != ruleid"> and gdk.ruleid=#{ruleid}</if>
+			<if test="null != replycontentlike and '' != replycontentlike">
+			 	and ((gdk.replytype=0 and gdk.replycontent=#{replycontentlike}) 
+					or 
+				(gdk.replytype=1 and #{replycontentlike} like concat("%",gdk.replycontent,"%")) )
+			</if>
+		</where>
+	</select>
+	
+	<select id="getMsgByKey" parameterType="java.util.Map" resultType="java.util.Map">
+		select dkr.ruleid,dkr.rulename,dkr.replytype , dkr.replycontent , dkr.replycount , dkr.ifactive ,
+		dtk.name keyname,dtk.matetype ,dkr.replycount
+		from g_dt_textkey dtk 
+		left  join g_dt_keyrule dkr on (dtk.ruleid=dkr.ruleid)
+		where dkr.ifactive=1 
+		and ((dtk.matetype=0 and dtk.name=#{key})  or 
+			(dtk.matetype=1 and #{key} like concat("%",dtk.name,"%"))) limit 1
+	</select>
+	
+	<!-- 素材语音 -->
+	<!-- select id,name,path,size,time,mediaid,uploadwxtime from g_dt_audio ; -->
+	<delete id="deleteDTAudio" parameterType="java.util.Map">
+		delete from g_dt_audio where id=#{id}
+	</delete>
+	<insert id="insertDTAudio" parameterType="java.util.Map">
+		insert into g_dt_audio
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != name and '' != name">name,</if>
+			<if test="null != path and '' != path">path,</if>
+			<if test="null != size and '' != size">size,</if>
+			<if test="null != time and '' != time">time,</if>
+			<if test="null != roletype and '' != roletype">roletype,</if>
+			<if test="null != primaryid and '' != primaryid">primaryid,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != name and '' != name">#{name},</if>
+			<if test="null != path and '' != path">#{path},</if>
+			<if test="null != size and '' != size">#{size},</if>
+			<if test="null != time and '' != time">#{time},</if>
+			<if test="null != roletype and '' != roletype">#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">#{primaryid},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+		</trim>
+	</insert>
+	<update id="updateDTAudio" parameterType="java.util.Map">
+		update g_dt_audio
+		<set>
+			<if test="null != name and '' != name">name=#{name},</if>
+			<if test="null != path and '' != path">path=#{path},</if>
+			<if test="null != size and '' != size">size=#{size},</if>
+			<if test="null != time and '' != time">time=#{time},</if>
+			<if test="null != mediaid and '' != mediaid">mediaid=#{mediaid},</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime">uploadwxtime=#{uploadwxtime},</if>
+			<if test="null != roletype and '' != roletype">roletype=#{roletype},</if>
+			<if test="null != primaryid and '' != primaryid">primaryid=#{primaryid},</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getDTAudio" resultType="java.util.Map" parameterType="java.util.Map">
+		select id,name,path,size,time,mediaid,uploadwxtime,roletype,primaryid,createtime 
+		from g_dt_audio
+		where id=#{id}
+	</select>
+	<select id="getDTAudioList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select id,name,path,size,time,mediaid,uploadwxtime,roletype,primaryid,createtime 
+		from g_dt_audio
+		<where>
+			<if test="null != id and '' != id"> and id=#{id}</if>
+			<if test="null != name and '' != name"> and name=#{name}</if>
+			<if test="null != path and '' != path"> and path=#{path}</if>
+			<if test="null != size and '' != size"> and size=#{size}</if>
+			<if test="null != time and '' != time"> and time=#{time}</if>
+			<if test="null != mediaid and '' != mediaid"> and mediaid=#{mediaid}</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime"> and uploadwxtime=#{uploadwxtime}</if>
+			<if test="null != roletype and '' != roletype"> and roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and primaryid=#{primaryid}</if>
+		</where>
+		order by id desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDTAudioListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0) 	from g_dt_audio
+		<where> 1=1 
+			<if test="null != id and '' != id"> and id=#{id}</if>
+			<if test="null != name and '' != name"> and name=#{name}</if>
+			<if test="null != path and '' != path"> and path=#{path}</if>
+			<if test="null != size and '' != size"> and size=#{size}</if>
+			<if test="null != time and '' != time"> and time=#{time}</if>
+			<if test="null != mediaid and '' != mediaid"> and mediaid=#{mediaid}</if>
+			<if test="null != uploadwxtime and '' != uploadwxtime"> and uploadwxtime=#{uploadwxtime}</if>
+			<if test="null != roletype and '' != roletype"> and roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and primaryid=#{primaryid}</if>
+		</where>
+	</select>
+	
+	
+	<!-- 系统消息 -->
+	<!-- select id,title,content,createtime,readstatus,sendroletype,sendprimaryid,receiveroletype,receiveprimaryid
+	from g_os_message -->
+	<delete id="deleteOSMessage" parameterType="java.util.Map">
+		delete from g_os_message where id=#{id}
+	</delete>
+	<insert id="insertOSMessage" parameterType="java.util.Map">
+		insert into g_os_message
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != title and '' != title">title,</if>
+			<if test="null != content and '' != content">content,</if>
+			<if test="null != createtime and '' != createtime">createtime,</if>
+			<if test="null != readstatus and '' != readstatus">readstatus,</if>
+			<if test="null != sendroletype and '' != sendroletype">sendroletype,</if>
+			<if test="null != sendprimaryid and '' != sendprimaryid">sendprimaryid,</if>
+			<if test="null != receiveroletype and '' != receiveroletype">receiveroletype,</if>
+			<if test="null != receiveprimaryid and '' != receiveprimaryid">receiveprimaryid,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != title and '' != title">#{title},</if>
+			<if test="null != content and '' != content">#{content},</if>
+			<if test="null != createtime and '' != createtime">#{createtime},</if>
+			<if test="null != readstatus and '' != readstatus">#{readstatus},</if>
+			<if test="null != sendroletype and '' != sendroletype">#{sendroletype},</if>
+			<if test="null != sendprimaryid and '' != sendprimaryid">#{sendprimaryid},</if>
+			<if test="null != receiveroletype and '' != receiveroletype">#{receiveroletype},</if>
+			<if test="null != receiveprimaryid and '' != receiveprimaryid">#{receiveprimaryid},</if>
+		</trim>
+	</insert>
+	<update id="updateOSMessage" parameterType="java.util.Map">
+		update g_os_message
+		<set>
+			<if test="null != title and '' != title">title=#{title},</if>
+			<if test="null != content and '' != content">content=#{content},</if>
+			<if test="null != createtime and '' != createtime">createtime=#{createtime},</if>
+			<if test="null != readstatus and '' != readstatus">readstatus=#{readstatus},</if>
+			<if test="null != sendroletype and '' != sendroletype">sendroletype=#{sendroletype},</if>
+			<if test="null != sendprimaryid and '' != sendprimaryid">sendprimaryid=#{sendprimaryid},</if>
+			<if test="null != receiveroletype and '' != receiveroletype">receiveroletype=#{receiveroletype},</if>
+			<if test="null != receiveprimaryid and '' != receiveprimaryid">receiveprimaryid=#{receiveprimaryid},</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="getOSMessage" resultType="java.util.Map" parameterType="java.util.Map">
+		select id,title,content,createtime,readstatus,sendroletype,sendprimaryid,receiveroletype,receiveprimaryid
+		from g_os_message
+		where id=#{id}
+	</select>
+	<select id="getOSMessageList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select id,title,content,createtime,readstatus,sendroletype,sendprimaryid,receiveroletype,receiveprimaryid
+		from g_os_message
+		<where>
+			<if test="null != title and '' != title"> and title=#{title}</if>
+			<if test="null != content and '' != content"> and content=#{content}</if>
+			<if test="null != createtime and '' != createtime"> and createtime=#{createtime}</if>
+			<if test="null != readstatus and '' != readstatus"> and readstatus=#{readstatus}</if>
+			<if test="null != sendroletype and '' != sendroletype"> and sendroletype=#{sendroletype}</if>
+			<if test="null != sendprimaryid and '' != sendprimaryid"> and sendprimaryid=#{sendprimaryid}</if>
+			<if test="null != receiveroletype and '' != receiveroletype"> and receiveroletype=#{receiveroletype}</if>
+			<if test="null != receiveprimaryid and '' != receiveprimaryid"> and receiveprimaryid=#{receiveprimaryid}</if>
+		</where>
+		order by createtime,id desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getOSMessageListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0) from g_os_message
+		<where>
+			<if test="null != title and '' != title"> and title=#{title}</if>
+			<if test="null != content and '' != content"> and content=#{content}</if>
+			<if test="null != createtime and '' != createtime"> and createtime=#{createtime}</if>
+			<if test="null != readstatus and '' != readstatus"> and readstatus=#{readstatus}</if>
+			<if test="null != sendroletype and '' != sendroletype"> and sendroletype=#{sendroletype}</if>
+			<if test="null != sendprimaryid and '' != sendprimaryid"> and sendprimaryid=#{sendprimaryid}</if>
+			<if test="null != receiveroletype and '' != receiveroletype"> and receiveroletype=#{receiveroletype}</if>
+			<if test="null != receiveprimaryid and '' != receiveprimaryid"> and receiveprimaryid=#{receiveprimaryid}</if>
+		</where>
+	</select>
+	<!-- 特色服务 -->
+	<select id="findServiceList" parameterType="java.util.Map"  resultType="java.util.Map">
+	    select gas.id,gas.imgurl,gas.content,gas.title,gas.agencyid,gas.primaryid,gas.auditstatus,gas.updatetime,gas.refusereason,gas.otherreason from g_agency_service gas
+	</select>
+	<select id="findServiceListNum" resultType="java.lang.Integer">
+	    select count(*) from g_agency_service 
+	</select>
+	<insert id="insertService" parameterType="java.util.Map" >
+		insert into g_agency_service
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="null != imgurl and '' != imgurl">imgurl,</if>
+			<if test="null != title and '' != title">title,</if>
+			<if test="null != content and '' != content">content,</if>
+			<if test="null != primaryid and '' != primaryid">primaryid,</if>
+			<if test="null != agencyid and '' != agencyid">agencyid,</if>
+			<if test="null != updatetime and '' != updatetime">updatetime,</if>
+			<if test="null != refusereason and '' != refusereason">refusereason,</if>
+			<if test="null != otherreason and '' != otherreason">otherreason,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="null != imgurl and '' != imgurl">#{imgurl},</if>
+			<if test="null != title and '' != title">#{title},</if>
+			<if test="null != content and '' != content">#{content},</if>
+			<if test="null != primaryid and '' != primaryid">#{primaryid},</if>
+			<if test="null != agencyid and '' != agencyid">#{agencyid},</if>
+			<if test="null != updatetime and '' != updatetime">#{updatetime},</if>
+			<if test="null != refusereason and '' != refusereason">#{refusereason},</if>
+			<if test="null != otherreason and '' != otherreason">#{otherreason},</if>
+		</trim>
+	</insert>
+	<update id="updateService" parameterType="java.util.Map">
+	    update g_agency_service
+		<set>
+			<if test="null != imgurl and '' != imgurl">imgurl=#{imgurl},</if>
+			<if test="null != title and '' != title">title=#{title},</if>
+			<if test="null != content and '' != content">content=#{content},</if>
+			<if test="null != primaryid and '' != primaryid">primaryid=#{primaryid},</if>
+			<if test="null != agencyid and '' != agencyid">agencyid=#{agencyid},</if>
+			<if test="null != updatetime and '' != updatetime">updatetime=#{updatetime},</if>
+			<if test="null != refusereason and '' != refusereason">refusereason=#{refusereason},</if>
+			<if test="null != otherreason and '' != otherreason">otherreason=#{otherreason},</if>
+			<if test="null != auditstatus and '' != auditstatus">auditstatus=#{auditstatus},</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	
+	<select id="getMemberListV2" resultType="java.util.Map"
+		parameterType="java.util.LinkedHashMap">
+		select dm.roletype,dm.primaryid,'' agencyname,
+		dm.gtygroup gtygroup,dm.agencygroup ,dm.memberid,dm.openid,dm.name,dm.phone,dm.attentiontime,dm.integration,dm.ifattention,
+		CAST(dm.nickname AS CHAR CHARACTER SET utf8) nickname,
+		dm.headimg,dm.sex,dm.province,dm.city,
+		dm.email,dm.gaintime,dm.canceltime,case when ISNULL(t.carnum) then 0 else t.carnum end carnum
+		from t_dt_member dm 
+		left join (select dmc.memberid,count(0) carnum from t_dt_member_cars dmc group by dmc.memberid) t on (t.memberid=dm.memberid)
+		<where>
+			<if test="null == agencyid or '' == agencyid">
+				<if test="null != provinceid and '' != provinceid"> and gai.provinceid=#{provinceid}</if>
+				<if test="null != cityid and '' != cityid"> and gai.cityid=#{cityid}</if>
+			</if>
+			<if test="'-1' == agencyid">
+				and (dm.roletype is null or dm.roletype=1 )
+				<if test="null!=provinceid and ''!=provinceid">  and exists ( select 0 from  t_dt_area where id=#{provinceid} and name=dm.province)</if>
+				<if test="null!=cityid and ''!=cityid"> and exists ( select 0 from  t_dt_area where id=#{cityid} and name=dm.city)</if>
+			</if>
+			<if test="null != roletype and '' != roletype"> and dm.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dm.primaryid=#{primaryid}</if>
+			
+			<if test="null!=openid and ''!=openid"> and dm.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dm.name like "%"#{name}"%"</if>
+			<if test="null!=phone and ''!=phone"> and dm.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname">
+				 and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like "%"#{nickname}"%"
+			</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dm.ifattention=#{ifattention}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dm.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dm.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dm.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dm.canceltime &lt;= #{cancelendtime}
+			</if>
+			<!-- <if test="null!=gtygroup and ''!=gtygroup">
+				and dm.gtygroup = #{gtygroup}
+			</if> -->
+		</where>
+		order by dm.createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- 查询有多少条学科设置记录	-->
+	<select id="getMemberListNumV2" resultType="int"
+		parameterType="java.util.LinkedHashMap">
+		select count(0) from (
+		select dm.roletype,dm.primaryid,'' agencyname,
+		dm.gtygroup gtygroup,dm.agencygroup ,dm.memberid,dm.openid,dm.name,dm.phone,dm.attentiontime,dm.integration,dm.ifattention,
+		CAST(dm.nickname AS CHAR CHARACTER SET utf8) nickname,
+		dm.headimg,dm.sex,dm.province,dm.city,
+		dm.email,dm.gaintime,dm.canceltime,case when ISNULL(t.carnum) then 0 else t.carnum end carnum
+		from t_dt_member dm 
+		left join (select dmc.memberid,count(0) carnum from t_dt_member_cars dmc group by dmc.memberid) t on (t.memberid=dm.memberid)
+		<where>
+			<if test="null == agencyid or '' == agencyid">
+				<if test="null != provinceid and '' != provinceid"> and gai.provinceid=#{provinceid}</if>
+				<if test="null != cityid and '' != cityid"> and gai.cityid=#{cityid}</if>
+			</if>
+			<if test="'-1' == agencyid">
+				and (dm.roletype is null or dm.roletype=1 )
+				<if test="null!=provinceid and ''!=provinceid">  and exists ( select 0 from  t_dt_area where id=#{provinceid} and name=dm.province)</if>
+				<if test="null!=cityid and ''!=cityid"> and exists ( select 0 from  t_dt_area where id=#{cityid} and name=dm.city)</if>
+			</if>
+			<if test="null != roletype and '' != roletype"> and dm.roletype=#{roletype}</if>
+			<if test="null != primaryid and '' != primaryid"> and dm.primaryid=#{primaryid}</if>
+			
+			<if test="null!=openid and ''!=openid"> and dm.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dm.name like "%"#{name}"%"</if>
+			<if test="null!=phone and ''!=phone"> and dm.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname">
+				 and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like "%"#{nickname}"%"
+			</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dm.ifattention=#{ifattention}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dm.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dm.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dm.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dm.canceltime &lt;= #{cancelendtime}
+			</if>
+			<if test="null!=gtygroup and ''!=gtygroup">
+				and dm.gtygroup = #{gtygroup}
+			</if>
+		</where> ) t
+	</select>
+	
+	<select id="getImgTextList" parameterType="map" resultType="map">
+ 		select imgtextlistid,imgtextid,title,author,imgurl,linkurl,content,ifviewcontent,summary,ifforward,thumbmediaid,thumbwxtime from  g_dt_imgtextlist
+ 		<where>
+ 			<if test="imgtextid != null and imgtextid != ''">and imgtextid=#{imgtextid}</if>
+ 		</where>
+	</select>
+	<select id="getImgMap" parameterType="map" resultType="map">
+		select imgid,groupid,name,img,roletype,primaryid,mediaid,uploadwxtime from g_dt_img
+		<where>
+			<if test="imgid != null and imgid != ''">and imgid=#{imgid}</if>
+		</where>
+		limit 1 
+	</select>
+</mapper>

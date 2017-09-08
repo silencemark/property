@@ -1,0 +1,115 @@
+/*------------BootstrapIe7Fix--V1.15---Update--2014-08-18--18:11--ByGaze-------*/
+	.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12,.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12,.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12,.input-group,.row,.content{box-sizing:border-box;behavior:url(../theme/black/js/boxsizing.htc)}
+	audio,canvas,video{display:inline;zoom:1}
+	html{font-size:100%}
+	img{width:auto;height:auto;-ms-interpolation-mode:bicubic}
+	button,input{overflow:visible}
+	.container,.container-fluid{zoom:1}
+	.dl-horizontal{zoom:1}
+	input[type="radio"],input[type="checkbox"]{margin-top:0}
+	.help-block{display:inline;zoom:1}
+	.form-horizontal .form-group{zoom:1}
+	.dropdown-toggle{margin-bottom:-3px}
+	.dropdown-menu .divider{width:100%;margin:-5px 0 5px}
+	.list-group{margin-left:0}
+	ul .list-group-item{list-style:none}
+	.sr-only{clip:rect(0 0 0 0)}
+	.list-inline > li{display:inline;zoom:1}
+/*-----------------------------------------------------------------------------*/
+/*------------Layout-------------------Update--2014-07-16--09:26--ByGaze-------*/
+	.ie7 ul {margin-left:0px;margin-right:0px;}
+	.ie7 .current-tit span {height:28px;}
+	.ie7 .content {overflow-x:hidden;}
+	.ie7 .row {width:100%;zoom:1}
+	.ie7 .content-container {height:100%;zoom:1}
+	.ie7 .ui-msg-alert {width:100%;}
+	.ie7 .ui-msg-alert i {top:0;}
+	/*---------------Table---------------*/
+	.ie7 .table-nodata .placehold {margin-top:80px;margin-bottom:80px;}
+	.ie7 .table-loading .loading {margin-top:80px;margin-bottom:80px;}
+	.ie7 .loading {padding-right:0px;text-align:center;padding-left:0px;}
+	.ie7 .loading .ico-loading {top:-1px;}
+	/*---------------Nav---------------*/
+	.ie7 .main-nav {overflow-x:hidden;overflow-y:auto;}
+	.ie7 .main-nav li a {width:157px;height:24px;line-height:24px;}
+	.ie7 .main-nav i {top:2px;}
+	.ie7 .main-nav .sub-nav a {padding-top:6px;width:127px;height:17px;line-height:17px;}
+	.ie7 .sidebar-sm .main-nav li  a {width:127px;}
+	.ie7 .sidebar-sm .main-nav .sub-nav a {width:97px;}
+	/*---------------Tabs---------------*/
+	.ie7 .nav-tabs {height:100%;}
+	.ie7 .tab-content .tab-pane {padding-bottom:30px;}
+	/*---------------Modal---------------*/
+	.ie7 .modal-footer .btn {padding:2px 15px;height:28px;}
+	.ie7 .modal-footer {height:30px;overflow:hidden;}
+	.ie7 .modal-content {overflow:hidden;}
+/*-----------------------------------------------------------------------------*/
+/*------------FormAreaPages------------Update--2014-08-18--18:11--ByGaze-------*/
+	.ie7 form,
+	.ie7 .form-horizontal {padding:0;margin:0;}
+	.ie7 .btn {padding-top:2px;}
+	.ie7 .btn i {display:none;zoom:1;}
+	.ie7 .form-date,
+	.ie7 .form-time,
+	.ie7 .form-select,
+	.ie7 .form-select select,
+	.ie7 .ui-icheck-inline .ui-checkbox, 
+	.ie7 .ui-icheck-inline .ui-radio,
+	.ie7 .ui-icheck-label .icheck-input,
+	.ie7 .form-date .form-control,
+	.ie7 .form-search-sub,
+	.ie7 .form-date .input-group-addon, 
+	.ie7 .form-time .input-group-addon {float:left;}
+	.ie7 .form-control {padding-bottom:0;height:26px;}
+	.ie7 .form-group {float:left;width:100%;}
+	.ie7 .form-time {width:70px;}
+	.ie7 .input-group-addon .ico-calendar {margin-top:2px;margin-left:3px;}
+	.ie7 .datepicker-days {width:192px;}
+	.ie7 .datepicker th.datepicker-switch {width:130px;}
+	.ie7 .form-select {margin-right:5px;}
+	.ie7 .form-horizontal .form-group {}
+	.ie7 .form-group .parsley-error-list {zoom:1;}
+	/*---------------Area---------------*/
+	.ie7 .area-search .form-input {margin-right:5px;float:left;}
+	.ie7 .area-search .btn,
+	.ie7 .area-operate .btn {margin-right:5px;padding:2px 10px 2px;height:28px;}
+	.ie7 .area-search .form-input .form-control, 
+	.ie7 .area-search .form-date .form-control, 
+	.ie7 .area-search .form-time .form-control, 
+	.ie7 .area-search .form-search-sub .form-control {padding:4px 8px 0;height:22px;overflow:hidden;}
+	.ie7 .area-search .form-date .form-control {width:65px;}
+	.ie7 .area-search .form-time .form-control {width:45px;}
+	.ie7 .area-search .form-date .input-group-addon  {padding:0 3px 0 2px;}
+	/*---------------tableBtn---------------*/
+	.ie7 .form-item-inline .form-control {height:21px;}
+	.ie7 .form-item-inline .btn {float:left;}
+	/*---------------Pages---------------*/
+	.ie7 .area-table-bar {padding:0;border-left:0;border-right:0;}
+	.ie7 .area-table-bar .area-pager {line-height:23px;}
+	.ie7 .area-entry {height:23px;padding:10px;border-left:1px solid #ddd;}
+	.ie7 .area-entry span {float:left;margin-right:5px;top:4px;}
+	.ie7 .area-entry .form-control.select2-container {float:left;margin-right:5px;}
+	.ie7 .area-pager {height:23px;padding:10px 0;border-right:1px solid #ddd;}
+	.ie7 .area-pager span {float:left;margin-right:5px;top:0;}
+	.ie7 .area-pager .pagination-jump {top:2px;}
+	.ie7 .pagination {float:left;}
+	.ie7 .pagination-jump {float:left;width:100px;}
+	.ie7 .pagination-jump .form-control {float:left;padding:0 4px;height:22px;overflow:hidden;}
+	.ie7 .pagination-jump .btn {float:left;padding-left:6px;height:24px;}
+/*-----------------------------------------------------------------------------*/
+/*------------Page---------------------Update--2014-07-16--09:26--ByGaze-------*/
+	/*---------------Dashboard---------------*/
+	.ie7 .dash-cover-item .ico-help-sm {top:-1px;}
+	.ie7 .user-tooltip  {position:relative;z-index:20;}
+	.ie7 .user-tooltip .user-name {float:left;position:relative;z-index:0;}
+	/*---------------RecurSet---------------*/
+	.ie7 .area-recur-set p {float:left;width:100%;}
+	.ie7 .area-recur-set .form-horizontal .control-label {float:left;}
+	/*---------------AuditView---------------*/
+	.ie7 .p-audit-view .table .ico-card {top:0;}
+	.ie7 .p-audit-view .table .ico-recur, 
+	.ie7 .p-audit-view .table .ico-dig {top:0;cursor:pointer;}
+	/*---------------Role---------------*/
+	.ie7 .role-accredit .panel-heading label {display:inline;}
+	.ie7 .accredit .ui-icheck-label label {float:left;width:220px;}
+/*-----------------------------------------------------------------------------*/

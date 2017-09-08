@@ -1,0 +1,165 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.EvaluationMapper">
+
+	<!--查询评价列表 -->
+	<select id="getEvalList" parameterType="map" resultType="map">
+		select a.id, a.userid, a.evaluationerid,a.orderid,  a.score ,
+		a.description, a.createtime, a.updaterid,
+		a.updatetime,
+		a.status,a.isban,b.realname as bname ,c.realname as pname ,e.realname
+		as oname,ifnull(f.jobtitle,g.projecttitle) as title
+		from
+		tick_evaluation a
+		left join tick_apply_order h on h.applyorderid = a.orderid 
+		left join t_dt_member b on a.userid = b.memberid
+		left join t_dt_member c on c.memberid = a.evaluationerid
+		left join tick_order d on d.orderid = h.orderid
+		left join t_dt_member e on e.memberid = a.userid
+		left join tick_job f on f.jobid = d.jobid
+		left join tick_project g on g.projectid = d.projectid
+		<where>
+			<if test="userid !=null and userid !=''">and a.userid = #{userid}</if>
+			<if test="orderid !=null and orderid !=''">and a.orderid = #{orderid}</if>
+			<if test="evaluationerid !=null and evaluationerid !=''">and a.evaluationerid = #{evaluationerid}</if>
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="description !=null and description !=''">and a.description like "%"#{description}"%"</if>
+			<if test="starttime !=null and starttime !=''">and a.createtime &gt;= #{starttime} </if>
+			<if test="endtime !=null and endtime !=''">and a.createtime &lt;= #{endtime} </if>
+		</where>
+		ORDER BY a.createtime desc
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<!--查询评价信息总记录数 -->
+	<select id="getEvalListNum" parameterType="map" resultType="int">
+		select  count(*)
+		from
+		tick_evaluation a
+		left join tick_apply_order h on h.applyorderid = a.orderid 
+		left join t_dt_member b on a.userid = b.memberid
+		left join t_dt_member c on c.memberid = a.evaluationerid
+		left join tick_order d on d.orderid = h.orderid
+		left join t_dt_member e on e.memberid = a.userid
+		left join tick_job f on f.jobid = d.jobid
+		left join tick_project g on g.projectid = d.projectid
+		<where>
+			<if test="userid !=null and userid !=''">and a.userid = #{userid}</if>
+			<if test="evaluationerid !=null and evaluationerid !=''">and a.evaluationerid = #{evaluationerid}</if>
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="description !=null and description !=''">and a.description like "%"#{description}"%"</if>
+			<if test="starttime !=null and starttime !=''">and a.createtime &gt;= #{starttime} </if>
+			<if test="endtime !=null and endtime !=''">and a.createtime &lt;= #{endtime} </if>
+		</where>
+	</select>
+
+	<!-- 修改评价状态 -->
+	<update id="updateEvaluateStatus" parameterType="map">
+		UPDATE
+		tick_evaluation SET status = #{status},updaterid =
+		#{updaterid},updatetime = #{updatetime} WHERE id =#{id}
+	</update>
+
+	<!--查询评价信息 -->
+	<select id="getEevaluations" parameterType="map" resultType="map">
+		SELECT
+		e.id,
+		e.userid,
+		e.evaluationerid,
+		e.score,
+		e.orderid,
+		e.description,
+		e.createtime,
+		CAST(m.nickname AS char character set utf8) nickname,
+		m.realname,
+		m.headimage,
+		CAST(um.nickname AS char character set utf8) unickname,
+		um.realname urealname,
+		um.headimage uheadimage
+		FROM
+		tick_evaluation e,
+		t_dt_member m,
+		t_dt_member um
+		WHERE
+		m.memberid = e.evaluationerid
+		AND
+		um.memberid = e.userid
+		<if test="userid !=null and userid !=''">and e.userid = #{userid}</if>
+		<if test="evaluationerid !=null and evaluationerid !=''">and e.evaluationerid = #{evaluationerid}</if>
+		<if test="status !=null and status !=''">and e.status = #{status}</if>
+		ORDER BY e.createtime desc
+		<if test="startnum != null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	
+	<select id="getEevaluationsNum" parameterType="map" resultType="int">
+		SELECT
+		   count(*)
+		FROM
+		tick_evaluation e,
+		t_dt_member m,
+		t_dt_member um
+		WHERE
+		m.memberid = e.evaluationerid
+		AND
+		um.memberid = e.userid
+		<if test="userid !=null and userid !=''">and e.userid = #{userid}</if>
+		<if test="evaluationerid !=null and evaluationerid !=''">and e.evaluationerid = #{evaluationerid}</if>
+		<if test="status !=null and status !=''">and e.status = #{status}</if>
+	</select>
+
+	<!--查询评价信息 -->
+	<select id="getEevaStatistics" parameterType="map" resultType="map">
+		SELECT
+		CEIL(AVG(e.score)) avg,
+		SUM(e.score) scoreSum,
+		COUNT(e.id) count
+		FROM
+		tick_evaluation e
+		<where>
+			<if test="userid !=null and userid !=''">and e.userid = #{userid}</if>
+			<if test="evaluationerid !=null and evaluationerid !=''">and e.evaluationerid = #{evaluationerid}</if>
+		</where>
+	</select>
+   
+   <!-- 新增评价信息 -->
+   <insert id="insertEvaluate" parameterType="map">
+		INSERT INTO  tick_evaluation
+		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="id != null">id,</if>
+			<if test="userid !=null">userid,</if>
+			<if test="evaluationerid !=null">evaluationerid,</if>
+			<if test="score !=null">score,</if>
+			<if test="orderid !=null">orderid,</if>
+			<if test="description !=null">description,</if>
+			<if test="createtime !=null">createtime,</if>
+			<if test="status !=null">status,</if>
+			<if test="isban !=null">isban,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="id != null">#{id},</if>
+			<if test="userid !=null">#{userid},</if>
+			<if test="evaluationerid !=null">#{evaluationerid},</if>
+			<if test="score !=null">#{score},</if>
+			<if test="orderid !=null">#{orderid},</if>
+			<if test="description !=null">#{description},</if>
+			<if test="createtime !=null">#{createtime},</if>
+			<if test="status !=null">#{status},</if>
+			<if test="isban !=null">#{isban},</if>
+		</trim> 
+	</insert>
+   <insert id="insertKillInfo" parameterType="map">
+   		insert into tick_kill
+   		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="killid != null">killid,</if>
+			<if test="killerid !=null">killerid,</if>
+			<if test="bekillerid !=null">bekillerid,</if>
+			<if test="isban !=null">isban,</if>
+			<if test="createtime !=null">createtime,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="killid != null">#{killid},</if>
+			<if test="killerid !=null">#{killerid},</if>
+			<if test="bekillerid !=null">#{bekillerid},</if>
+			<if test="isban !=null">#{isban},</if>
+			<if test="createtime !=null">#{createtime},</if>
+		</trim> 
+   </insert>
+</mapper>

@@ -1,0 +1,462 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.weixin.backer.dao.SystemWXMapper">
+
+	<!-- 字典类型表 -->
+	<delete id="deleteDictType" parameterType="java.util.Map">
+		delete from t_dict_type where typeid=#{typeid}
+	</delete>
+	<insert id="insertDictType" parameterType="java.util.Map">
+		insert into
+		t_dict_type(cname,ename,ifactive) 
+		values(#{cname},#{ename},#{ifactive})
+	</insert>
+	<update id="updateDictType" parameterType="java.util.Map">
+		update t_dict_type set cname=#{cname},
+		ename=#{ename},ifactive=#{ifactive}
+		where typeid=#{typeid} 
+	</update>
+	<select id="getDictType" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT typeid,cname,ename,ifactive
+		from t_dict_type where typeid=#{typeid} 
+	</select>
+	<select id="getDictTypeList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT typeid,cname,ename,ifactive
+		from t_dict_type
+		<where> 1=1 
+			<if test="null!=typeid and ''!=typeid"> and typeid=#{typeid} </if>
+			<if test="null!=cname and ''!=cname"> and cname like "%"#{cname}"%" </if>
+			<if test="null!=ename and ''!=ename"> and ename like "%"#{ename}"%" </if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+		</where>
+		order by typeid desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDictTypeListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		SELECT count(0) from t_dict_type
+		<where> 1=1 
+			<if test="null!=typeid and ''!=typeid"> and typeid=#{typeid} </if>
+			<if test="null!=cname and ''!=cname"> and cname like "%"#{cname}"%" </if>
+			<if test="null!=ename and ''!=ename"> and ename like "%"#{ename}"%" </if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+		</where>
+	</select>
+	
+	<!-- 字典数据表 -->
+	<delete id="deleteDictData" parameterType="java.util.Map">
+		delete from t_dict_data where dataid=#{dataid}
+	</delete>
+	<insert id="insertDictData" parameterType="java.util.Map">
+		insert into
+		t_dict_data(typeid,datacode,cname,ename,ifactive) 
+		values(#{typeid},#{datacode},#{cname},#{ename},#{ifactive})
+	</insert>
+	<update id="updateDictData" parameterType="java.util.Map">
+		update t_dict_data set typeid=#{typeid},
+		datacode=#{datacode},cname=#{cname},ename=#{ename},ifactive=#{ifactive}
+		where dataid=#{dataid} 
+	</update>
+	<select id="getDictData" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT dataid,typeid,datacode,cname,ename,ifactive
+		from t_dict_data where dataid=#{dataid} 
+	</select>
+	<select id="getDictDataByCode" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT dataid,typeid,datacode,cname,ename,ifactive
+		from t_dict_data 
+		<where>
+			<if test="null!=dataid and ''!=dataid"> and dataid=#{dataid}</if>
+			<if test="null!=typeid and ''!=typeid"> and typeid=#{typeid}</if>
+			<if test="null!=datacode and ''!=datacode"> and datacode=#{datacode}</if>
+		</where>
+	</select>
+	<select id="getDictDataList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT dataid,typeid,datacode,cname,ename,ifactive
+		from t_dict_data
+		<where> 1=1 
+			<if test="null!=dataid and ''!=dataid"> and dataid=#{dataid} </if>
+			<if test="null!=typeid and ''!=typeid"> and typeid=#{typeid} </if>
+			<if test="null!=datacode and ''!=datacode"> and datacode like "%"#{datacode}"%" </if>
+			<if test="null!=cname and ''!=cname"> and cname like "%"#{cname}"%" </if>
+			<if test="null!=ename and ''!=ename"> and ename like "%"#{ename}"%" </if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+		</where>
+		order by dataid desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDictDataListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		SELECT count(0) from t_dict_data
+		<where> 1=1 
+			<if test="null!=dataid and ''!=dataid"> and dataid=#{dataid} </if>
+			<if test="null!=typeid and ''!=typeid"> and typeid=#{typeid} </if>
+			<if test="null!=datacode and ''!=datacode"> and datacode like "%"#{datacode}"%" </if>
+			<if test="null!=cname and ''!=cname"> and cname like "%"#{cname}"%" </if>
+			<if test="null!=ename and ''!=ename"> and ename like "%"#{ename}"%" </if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+		</where>
+	</select>
+	
+	
+	<select id="getInsertUser" resultType="java.util.Map">
+		select max(userid) userid from t_dt_user limit 1
+	</select>
+	
+	<!-- 用户表 -->
+	<insert id="insertUser" parameterType="java.util.Map">
+		insert into t_dt_user(username,password,realName,email,phone,telephone,
+		status,provinceid,headimage,sex,birthday)
+		values(#{username},#{password},#{realName},#{email},#{phone},#{telephone},
+		#{status},#{provinceid},#{headimage},#{sex},#{birthday})
+	</insert>
+	<update id="updateUser" parameterType="java.util.Map">
+		update t_dt_user
+		<set>
+			<if test="username !=null and ''!=username">username = #{username},</if>
+			<if test="password !=null and ''!=password">password = #{password},</if>
+			<if test="realName !=null and ''!=realName">realName = #{realName},</if>
+			<if test="email !=null and ''!=email">email = #{email},</if>
+			<if test="phone !=null and ''!=phone">phone = #{phone},</if>
+			<if test="telephone !=null and ''!=telephone">telephone = #{telephone},</if>
+			<if test="status !=null and ''!=status">status = #{status},</if>
+			<if test="provinceid !=null">
+				provinceid = #{provinceid},
+			</if>
+			<if test="headimage !=null">headimage = #{headimage},</if>
+			<if test="sex !=null">sex = #{sex},</if>
+			<if test="birthday !=null and ''!=birthday">birthday = #{birthday},</if>
+		</set>
+		where id =#{userid}
+	</update>
+	<delete id="deleteUser" parameterType="java.util.Map">
+		delete from t_dt_user where id =#{userid}
+	</delete>
+	<select id="getUserList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT t.userid ,t.username,t.password,t.realName,t.email,t.phone,t.telephone,
+		t.status,t.provinceid,t.headimage,t.sex,t.birthday,
+		t.roleIds,t.roleNames FROM (
+		SELECT users.id userid,users.username,users.password,users.realName,users.email,users.phone,users.telephone,
+		users.status,users.provinceid,users.headimage,users.sex,users.birthday,users.createTime,
+		GROUP_CONCAT(DISTINCT CAST(urs.roleId AS CHAR(10))) roleIds,GROUP_CONCAT(roles.name) roleNames
+		FROM t_dt_user  users
+		LEFT JOIN t_as_userrole urs ON (urs.userId = users.id)
+		LEFT JOIN t_dt_role roles ON (urs.roleId = roles.id)
+		GROUP BY users.id) t 
+		LEFT JOIN t_as_userrole urs2 ON (urs2.userId = t.userid) 
+		<where> 1=1 
+			<if test="null!=userid and ''!=userid"> and t.userid=#{userid} </if>
+			<if test="null!=username and ''!=username"> and t.username like "%"#{username}"%" </if>
+			<if test="null!=userpassword and ''!=userpassword"> and t.password=#{password} </if>
+			<if test="null!=realName and ''!=realName"> and t.realName like "%"#{realName}"%" </if>
+			<if test="null!=email and ''!=email"> and t.email like "%"#{email}"%" </if>
+			<if test="null!=phone and ''!=phone"> and t.phone like "%"#{phone}"%" </if>
+			<if test="null!=telephone and ''!=telephone"> and t.telephone like "%"#{telephone}"%" </if>
+			<if test="null!=status and ''!=status"> and t.status=#{status} </if>
+			<if test="null!=sex and ''!=sex"> and t.sex=#{sex} </if>
+			<if test="null!=birthday and ''!=birthday"> and t.birthday=#{birthday} </if>
+			<if test="null!=roleid and ''!=roleid"> and urs2.roleId=#{roleid} </if>
+		</where>
+		group by t.userid
+		order by t.userid desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getUserListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		SELECT count(0) FROM (
+		SELECT users.id userid,users.username,users.password,users.realName,users.email,users.phone,users.telephone,
+		users.status,users.provinceid,users.headimage,users.sex,users.birthday,users.createTime,
+		GROUP_CONCAT(roles.id) roleIds,GROUP_CONCAT(roles.name) roleNames
+		FROM t_dt_user  users
+		LEFT JOIN t_as_userrole urs ON (urs.userId = users.id)
+		LEFT JOIN t_dt_role roles ON (urs.roleId = roles.id)
+		GROUP BY users.id) t 
+		LEFT JOIN t_as_userrole urs2 ON (urs2.userId = t.userid) 
+		<where> 1=1 
+			<if test="null!=userid and ''!=userid"> and t.userid=#{userid} </if>
+			<if test="null!=username and ''!=username"> and t.username like "%"#{username}"%" </if>
+			<if test="null!=userpassword and ''!=userpassword"> and t.password=#{password} </if>
+			<if test="null!=realName and ''!=realName"> and t.realName like "%"#{realName}"%" </if>
+			<if test="null!=email and ''!=email"> and t.email like "%"#{email}"%" </if>
+			<if test="null!=phone and ''!=phone"> and t.phone like "%"#{phone}"%" </if>
+			<if test="null!=telephone and ''!=telephone"> and t.telephone like "%"#{telephone}"%" </if>
+			<if test="null!=status and ''!=status"> and t.status=#{status} </if>
+			<if test="null!=sex and ''!=sex"> and t.sex=#{sex} </if>
+			<if test="null!=birthday and ''!=birthday"> and t.birthday=#{birthday} </if>
+			<if test="null!=roleid and ''!=roleid"> and urs2.roleId=#{roleid} </if>
+		</where>
+	</select>
+	
+	
+	<!-- role 角色 -->
+	<insert id="insertRole" parameterType="java.util.Map">
+		insert into t_dt_role(name,status,remark)
+		values(#{name},#{status},#{remark})
+	</insert>
+	<update id="updateRole" parameterType="java.util.Map">
+		update t_dt_role
+		<set>
+			<if test="name !=null and ''!=name">name = #{name},</if>
+			<if test="status !=null and ''!=status">status = #{status},</if>
+			<if test="remark !=null and ''!=remark">remark = #{remark},</if>
+		</set>
+		where id =#{id}
+	</update>
+	<delete id="deleteRole" parameterType="java.util.Map">
+		delete from t_dt_role where id =#{id}
+	</delete>
+	<select id="getRoleList" parameterType="java.util.Map"  resultType="java.util.Map">
+		select r.id,r.name,r.status,r.remark ,GROUP_CONCAT(distinct CAST(f.id  AS char(10))) funIds
+		from  t_dt_role r
+		left join t_as_rolefunction rf on r.id=rf.roleId
+		left join t_dt_function f on rf.funId=f.id
+		<where> 1=1 
+			<if test="null!=name and ''!=name"> and r.name like "%"#{name}"%" </if>
+			<if test="null!=status and ''!=status"> and r.status=#{status}</if>
+			<if test="null!=remark and ''!=remark"> and r.remark like "%"#{remark}"%" </if>
+		</where>
+		GROUP BY r.id 
+		order by r.id desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getRoleListNum" parameterType="java.util.Map"  resultType="java.lang.Integer">
+		select count(0) from  t_dt_role
+		<where> 1=1 
+			<if test="null!=name and ''!=name"> and name like "%"#{name}"%" </if>
+			<if test="null!=status and ''!=status"> and status=#{status}</if>
+			<if test="null!=remark and ''!=remark"> and remark like "%"#{remark}"%" </if>
+		</where>
+	</select>
+		
+	<!-- function 功能 -->
+	<insert id="insertFunction" parameterType="java.util.Map">
+		insert into t_dt_function(parentid,name,linkurl,status,priority)
+		values(#{parentid},#{name},#{linkurl},#{status},#{priority})
+	</insert>
+	<update id="updateFunction" parameterType="java.util.Map">
+		update t_dt_function
+		<set>
+			<if test="parentid !=null and ''!=parentid">parentid = #{parentid},</if>
+			<if test="name !=null and ''!=name">name = #{name},</if>
+			<if test="linkurl !=null and ''!=linkurl">linkurl = #{linkurl},</if>
+			 
+			<if test="status !=null and ''!=status">status = #{status},</if>
+			<if test="priority !=null and ''!=priority">priority = #{priority},</if>
+		</set>
+		where id =#{id}
+	</update>
+	<delete id="deleteFunction" parameterType="java.util.Map" >
+		delete from t_dt_function where id =#{id}
+	</delete>
+	<select id="getFunctionList" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+		select  df.id,df.parentid,dfp.name parentName,df.name,df.linkurl,df.status,df.priority,df.createTime
+		from t_dt_function df 
+		left join t_dt_function dfp ON (dfp.parentid=0 AND dfp.id=df.parentid)
+		<where> 1=1 
+			<if test="id !=null and ''!=id"> and df.id = #{id} </if>
+			<if test="parentid !=null and ''!=parentid"> and df.parentid = #{parentid} </if>
+			<if test="name !=null and ''!=name"> and df.name like "%"#{name}"%"  </if>
+			<if test="parentName !=null and ''!=parentName"> and dfp.name like "%"#{parentName}"%" </if>
+			
+			<if test="linkurl !=null and ''!=linkurl"> and df.linkurl  like "%"#{linkurl}"%" </if> 
+			<if test="status !=null and ''!=status"> and df.status=#{status}</if>
+			<if test="priority !=null and ''!=priority"> and df.priority=#{priority}</if>
+		</where>
+		order by df.parentid asc,df.priority asc 
+	</select>
+	<select id="getFunctionListNum" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(0)
+		from t_dt_function df 
+		left join t_dt_function dfp ON (dfp.parentid=0 AND dfp.id=df.parentid)
+		<where> 1=1 
+			<if test="id !=null and ''!=id"> and df.id = #{id} </if>
+			<if test="parentid !=null and ''!=parentid"> and df.parentid = #{parentid} </if>
+			<if test="name !=null and ''!=name"> and df.name like "%"#{name}"%"  </if>
+			<if test="parentName !=null and ''!=parentName"> and dfp.name like "%"#{parentName}"%" </if>
+			<if test="linkurl !=null and ''!=linkurl"> and df.linkurl  like "%"#{linkurl}"%" </if> 
+			<if test="status !=null and ''!=status"> and df.status=#{status}</if>
+			<if test="priority !=null and ''!=priority"> and df.priority=#{priority}</if>
+		</where>
+	</select>
+	
+	
+	
+	<!-- 用户角色 t_as_userrole -->
+	  <insert id="saveUserRole" parameterType="java.util.Map">
+	  insert into t_as_userrole(userId,roleId)
+	  values 
+	  <foreach collection="userRoleList" item="item" index="index" separator=",">
+			(#{item.userId},#{item.roleId})
+	  </foreach>
+	  </insert>
+	  <delete id="deleteUserRole" parameterType="java.util.Map">
+	  delete from t_as_userrole 
+	  <where> 1=1 
+	  	<if test="null!=userId and ''!=userId"> and userId=#{userId} </if>
+	  	<if test="null!=roleId and ''!=roleId"> and roleId=#{roleId} </if>
+	  </where>
+	  </delete>
+	  
+	  <!-- 角色功能 t_as_rolefunction -->
+	  <insert id="saveRoleFunction" parameterType="java.util.Map">
+	  insert into t_as_rolefunction(roleId,funId)
+	  values 
+	  <foreach collection="roleFunList" item="item" index="index" separator=",">
+			(#{item.roleId},#{item.funId})
+	  </foreach>
+	  </insert>
+	  <delete id="deleteRoleFunction" parameterType="java.util.Map">
+	  delete from t_as_rolefunction 
+	  <where> 1=1 
+	  	<if test="null!=funId and ''!=funId"> and funId=#{funId} </if>
+	  	<if test="null!=roleId and ''!=roleId"> and roleId=#{roleId} </if>
+	  </where>
+	  </delete>
+	  
+	  
+	  <!-- 素材管理 -->
+	<delete id="deleteMLBanner" parameterType="java.util.Map">
+		delete from t_ml_banner where id=#{id}
+	</delete>
+	<insert id="insertMLBanner" parameterType="java.util.Map">
+		insert into t_ml_banner(img,place,placecode,ifactive,linkurl) 
+		values(#{img},#{place},#{placecode},#{ifactive},#{linkurl})
+	</insert>
+	<update id="updateMLBanner" parameterType="java.util.Map">
+		update t_ml_banner set img=#{img},place=#{place},
+		placecode=#{placecode},ifactive=#{ifactive},linkurl=#{linkurl} 
+		where id=#{id} 
+	</update>
+	<select id="getMLBanner" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT id,img,place,placecode,ifactive,linkurl
+		from t_ml_banner where id=#{id} 
+	</select>
+	<select id="getMLBannerList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT id,img,place,placecode,ifactive,linkurl
+		from t_ml_banner
+		<where> 1=1 
+			<if test="null!=id and ''!=id"> and id=#{id} </if>
+			<if test="null!=img and ''!=img"> and img=#{img}</if>
+			<if test="null!=place and ''!=place"> and place like "%"#{place}"%"</if>
+			<if test="null!=placecode and ''!=placecode"> and placecode like "%"#{placecode}"%"</if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+			<if test="null!=linkurl and ''!=linkurl"> and linkurl like "%"#{linkurl}"%"</if>
+		</where>
+		order by id desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getMLBannerListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		SELECT count(0) from t_ml_banner
+		<where> 1=1 
+			<if test="null!=id and ''!=id"> and id=#{id} </if>
+			<if test="null!=img and ''!=img"> and img=#{img}</if>
+			<if test="null!=place and ''!=place"> and place like "%"#{place}"%"</if>
+			<if test="null!=placecode and ''!=placecode"> and placecode like "%"#{placecode}"%"</if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+			<if test="null!=linkurl and ''!=linkurl"> and linkurl like "%"#{linkurl}"%"</if>
+		</where>
+	</select>
+	
+	<!-- 菜单管理 -->
+	<delete id="deleteDTMenu" parameterType="java.util.Map">
+		delete from t_dt_menu where menuid=#{menuid}
+	</delete>
+	<insert id="insertDTMenu" parameterType="java.util.Map">
+		insert into t_dt_menu
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		    <if test="null != menuid and '' != menuname">menuid,</if>
+			<if test="null != menuname and '' != menuname">menuname,</if>
+			<if test="null != parentid and '' != parentid">parentid,</if>
+			<if test="null != linkurl and '' != linkurl">linkurl,</if>
+			<if test="null != ifactive and '' != ifactive">ifactive,</if>
+			<if test="null != msgtype and '' != msgtype">msgtype,</if>
+			<if test="null != priority and '' != priority">priority,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		    <if test="null != menuid and '' != menuname">#{menuid},</if>
+			<if test="null != menuname and '' != menuname">#{menuname},</if>
+			<if test="null != parentid and '' != parentid">#{parentid},</if>
+			<if test="null != linkurl and '' != linkurl">#{linkurl},</if>
+			<if test="null != ifactive and '' != ifactive">#{ifactive},</if>
+			<if test="null != msgtype and '' != msgtype">#{msgtype},</if>
+			<if test="null != priority and '' != priority">#{priority},</if>
+		</trim>
+	</insert>
+	<update id="updateDTMenu" parameterType="java.util.Map">
+		update t_dt_menu 
+		<set>
+			<if test="menuname != null and ''!= menuname">menuname = #{menuname},</if>
+			<if test="parentid != null and ''!= parentid">parentid = #{parentid},</if>
+			<if test="linkurl != null and ''!= linkurl">linkurl = #{linkurl},</if>
+			<if test="ifactive != null and ''!= ifactive">ifactive = #{ifactive},</if>
+			<if test="msgtype != null and ''!= msgtype">msgtype = #{msgtype},</if>
+			<if test="priority != null and ''!= priority">priority = #{priority},</if>
+		</set>
+		where menuid=#{menuid}
+	</update>
+	<select id="getDTMenu" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT dm.menuid,dm.menuname,dm.parentid,dm.linkurl,dm.ifactive,dm.msgtype,dm.priority
+		from t_dt_menu dm where dm.menuid=#{menuid}
+	</select>
+	<select id="getDTMenuList" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+		select  dm.menuid,dm.menuname,dm.parentid,dm.linkurl,dm.ifactive,dm.msgtype,msg.name msgtypename,
+		msg.key msgtypekey,dm.priority,dmp.menuname parentName,msg.key msgKey
+		from t_dt_menu dm
+		left join t_dt_menu dmp ON (dmp.parentid=0 AND dmp.menuid=dm.parentid)
+		left join t_dt_msgtype msg on (msg.id=dm.msgtype)
+		<where> 1=1 
+			<if test="menuid !=null and ''!=menuid"> and dm.menuid = #{menuid} </if>
+			<if test="parentid !=null and ''!=parentid"> and dm.parentid = #{parentid} </if>
+			<if test="menuname !=null and ''!=menuname"> and dm.menuname like "%"#{menuname}"%"  </if>
+			<if test="linkurl !=null and ''!=linkurl"> and dm.linkurl  like "%"#{linkurl}"%" </if>
+			
+			<if test="ifactive !=null and ''!=ifactive"> and dm.ifactive=#{ifactive}</if>
+			<if test="priority !=null and ''!=priority"> and dm.priority=#{priority}</if>
+			<if test="msgtype !=null and ''!=msgtype"> and dm.msgtype=#{msgtype}</if>
+			<if test="parentName !=null and ''!=parentName"> and dmp.name like "%"#{parentName}"%" </if>
+		</where>
+		order by dm.parentid asc,dm.priority asc 
+	</select>
+	<select id="getTopDTMenuList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT dm.menuid,dm.menuname,dm.parentid,dm.linkurl,dm.ifactive,dm.msgtype,dm.priority
+		from t_dt_menu dm where dm.parentid=0
+		order by dm.priority asc,dm.menuid desc 
+	</select>
+	
+	
+	<!-- 有效时间的设定 -->
+	<select id="getInteValidtime" resultType="java.util.Map">
+		select id,date,typeid from t_inte_validatetime limit 1
+	</select>
+	<select id="updateInteValidtime" parameterType="java.util.Map">
+		update t_inte_validatetime set typeid=#{typeid}
+		where id=#{id}
+	</select>
+	
+	<!-- 获取设置的积分的有效期 -->
+	<select id="getInteValidtimeXX" resultType="java.util.Map">
+		select iv.*,dd.datacode,dd.cname,dd.ifactive 
+		from t_inte_validatetime iv
+		left join t_dict_data dd on (iv.typeid=dd.dataid) 
+	</select>
+	
+	
+	<select id="getMsgtypeList" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+		mt.id,mt.name,mt.key,mt.remark,mt.ifactive,mt.type
+		from t_dt_msgtype mt
+		<where>  mt.ifactive=1
+			<if test="type!=null and type!=''">
+				and mt.type = #{type}
+			</if>
+			<if test="key!=null and key!=''">
+				and mt.key = #{key}
+			</if>
+		</where> 
+	</select>
+
+</mapper>

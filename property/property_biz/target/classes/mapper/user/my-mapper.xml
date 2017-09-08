@@ -1,0 +1,462 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.MyMapper">
+
+	<!-- 滴嗒叫人会员列表 -->
+	<select id="getTickUserList" parameterType="map" resultType="map">
+		SELECT
+		m.username,
+		m.realname,
+		m.email,
+		m.address,
+		m.idcard,
+		m.businesscards,
+		m.phone,
+		m.telephone,
+		m.provinceid,
+		m.cityid,
+		m.createtime,
+		m.headimage,
+		m.backgroundimage,
+		m.sex,
+		m.birthday,
+		m.openid,
+		m.status,
+		m.weixinnumber,
+		m.qqnumber,
+		CAST(m.nickname AS char character set utf8) nickname,
+		m.ifattention,
+		m.gtygroup,
+		m.authentication,
+		m.auditstatus,
+		m.authenticationfailurereasons,
+		m.lasttime,
+		m.unionid,
+		m.ifshield,
+		m.ifdelete,
+		e.*
+		FROM
+		t_dt_member m,
+		tick_user_extend e
+		WHERE
+		e.userid =
+		m.memberid and m.ifdelete=0
+		<if test="memberid != null and memberid != ''">and m.memberid = #{memberid}</if>
+		<if test="username != null and username != ''">and m.username = #{username}</if>
+		<if test="phone != null and phone != ''">and m.phone = #{phone}</if>
+		<if test="provinceid != null and provinceid != ''">and m.provinceid = #{provinceid}</if>
+		<if test="cityid != null and cityid != ''">and m.cityid = #{cityid}</if>
+		<if test="weixinnumber != null and weixinnumber != ''">and m.weixinnumber = #{weixinnumber}</if>
+		<if test="qqnumber != null and qqnumber != ''">and m.qqnumber = #{qqnumber}</if>
+		<if test="idcard != null and idcard != ''">and m.memberid = #{idcard}</if>
+	</select>
+
+
+	<!-- 交易列表 查询会员收入与支出时，使用memberid参与，单独查询会员收入或支出时使用income_userid、pay_userid -->
+	<select id="getTradeSum" parameterType="map" resultType="map">
+		SELECT
+		SUM(t.amount) as amount
+		FROM
+		tick_trade_record t
+		WHERE 1=1
+
+		<if test="memberid != null and memberid != ''">
+			and
+			(
+			t.pay_userid = #{memberid}
+			OR
+			t.income_userid =
+			#{memberid}
+			)
+		</if>
+		<if test="incomepay != null and incomepay != ''">and m.incomepay = #{incomepay}</if>
+		<if test="paymethod != null and paymethod != ''">and m.paymethod = #{paymethod}</if>
+		<if test="paypurposetype != null and paypurposetype != ''">and m.paypurposetype = #{paypurposetype}</if>
+		<if test="income_userid != null and income_userid != ''">and m.income_userid = #{income_userid}</if>
+		<if test="pay_userid != null and pay_userid != ''">and m.pay_userid = #{pay_userid}</if>
+		<if test="status != null and status != ''">and m.status = #{status}</if>
+	</select>
+
+	<!-- 交易记录列表 查询会员收入与支出时，使用memberid参与，单独查询会员收入或支出时使用income_userid、pay_userid -->
+	<select id="getTradeRecord" parameterType="map" resultType="map">
+		SELECT
+		t.*,o.orderno
+		FROM
+		tick_trade_record t
+        left join tick_apply_order o on t.tradeorderid = o.applyorderid
+		WHERE 1=1
+		<if test="memberid != null and memberid != ''">
+			and
+			(
+			t.pay_userid = #{memberid}
+			OR
+			t.income_userid =
+			#{memberid}
+			)
+		</if>
+		<if test="incomepay != null and incomepay != ''">and t.incomepay = #{incomepay}</if>
+		<if test="paymethod != null and paymethod != ''">and t.paymethod = #{paymethod}</if>
+		<if test="paypurposetype != null and paypurposetype != ''">and t.paypurposetype = #{paypurposetype}</if>
+		<if test="income_userid != null and income_userid != ''">and t.income_userid = #{income_userid}</if>
+		<if test="pay_userid != null and pay_userid != ''">and t.pay_userid = #{pay_userid}</if>
+		<if test="status != null and status != ''">and t.status = #{status}</if>
+		order by t.createtime desc
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+
+	<!--交易记录列表 总记录数 -->
+	<select id="getTradeRecordNum" parameterType="map" resultType="int">
+		SELECT
+		count(*)
+		FROM
+		tick_trade_record t
+		WHERE 1=1
+		<if test="memberid != null and memberid != ''">
+			and
+			(
+			t.pay_userid = #{memberid}
+			OR
+			t.income_userid =
+			#{memberid}
+			)
+		</if>
+		<if test="incomepay != null and incomepay != ''">and t.incomepay = #{incomepay}</if>
+		<if test="paymethod != null and paymethod != ''">and t.paymethod = #{paymethod}</if>
+		<if test="paypurposetype != null and paypurposetype != ''">and t.paypurposetype = #{paypurposetype}</if>
+		<if test="income_userid != null and income_userid != ''">and t.income_userid = #{income_userid}</if>
+		<if test="pay_userid != null and pay_userid != ''">and t.pay_userid = #{pay_userid}</if>
+		<if test="status != null and status != ''">and t.status = #{status}</if>
+	</select>
+
+
+
+	<!-- 交易滴嗒币记录列表 -->
+	<select id="getcoinRecord" parameterType="map" resultType="map">
+		SELECT
+		*
+		FROM
+		tick_coin_record t
+		WHERE
+		1 = 1
+		<if test="memberid != null and memberid != ''">
+			AND (
+			t.pay_userid = #{memberid}
+			OR t.income_userid =
+			#{memberid}
+			)
+		</if>
+		<if test="pay_userid != null and pay_userid != ''">AND t.pay_userid = #{pay_userid}</if>
+		<if test="income_userid != null and income_userid != ''">AND t.income_userid = #{income_userid}</if>
+		<if test="recordid != null and recordid != ''">AND t.recordid = #{recordid}</if>
+		<if test="paytime_start != null and paytime_start != ''">AND t.paytime &gt;= STR_TO_DATE(#{paytime_start},'%Y-%m-%d
+			%T')</if>
+		<if test="paytime_end != null and paytime_end != ''">AND t.paytime &lt;= STR_TO_DATE(#{paytime_end},'%Y-%m-%d
+			%T')</if>
+		order by paytime desc
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<!-- 交易总记录数 -->
+	<select id="getcoinRecordNum" parameterType="map" resultType="int">
+		SELECT
+		count(*)
+		FROM
+		tick_coin_record t
+		WHERE
+		1 = 1
+		<if test="memberid != null and memberid != ''">
+			AND (
+			t.pay_userid = #{memberid}
+			OR t.income_userid =
+			#{memberid}
+			)
+		</if>
+		<if test="pay_userid != null and pay_userid != ''">AND t.pay_userid = #{pay_userid}</if>
+		<if test="income_userid != null and income_userid != ''">AND t.income_userid = #{income_userid}</if>
+		<if test="recordid != null and recordid != ''">AND t.recordid = #{recordid}</if>
+		<if test="paytime_start != null and paytime_start != ''">AND t.paytime &gt;= STR_TO_DATE(#{paytime_start},'%Y-%m-%d
+			%T')</if>
+		<if test="paytime_end != null and paytime_end != ''">AND t.paytime &lt;= STR_TO_DATE(#{paytime_end},'%Y-%m-%d
+			%T')</if>
+	</select>
+
+
+	<!-- 查询会员信息及会员所属区域 -->
+	<select id="getMembersForArea" parameterType="map" resultType="map">
+		SELECT
+		m.username,
+		m.realname,
+		m.email,
+		m.address,
+		m.idcard,
+		m.businesscards,
+		m.phone,
+		m.telephone,
+		m.provinceid,
+		m.cityid,
+		m.createtime,
+		m.headimage,
+		m.backgroundimage,
+		m.sex,
+		m.birthday,
+		m.openid,
+		m.status,
+		m.weixinnumber,
+		m.qqnumber,
+		CAST(m.nickname AS char character set utf8) nickname,
+		m.ifattention,
+		m.gtygroup,
+		m.authentication,
+		m.auditstatus,
+		m.authenticationfailurereasons,
+		m.lasttime,
+		m.unionid,
+		m.ifshield,
+		m.ifdelete,
+		p.cname AS pname,
+		c.cname AS cname
+		FROM
+		t_dt_member AS m
+		INNER
+		JOIN t_dt_area AS p ON m.provinceid = p.areaid
+		INNER JOIN t_dt_area AS
+		c ON m.cityid = c.areaid
+		where 1=1
+		<if test="memberid != null and memberid != ''">and m.memberid = #{memberid}</if>
+		<if test="username != null and username != ''">and m.username = #{username}</if>
+		<if test="phone != null and phone != ''">and m.phone = #{phone}</if>
+		<if test="provinceid != null and provinceid != ''">and m.provinceid = #{provinceid}</if>
+		<if test="cityid != null and cityid != ''">and m.cityid = #{cityid}</if>
+		<if test="idcard != null and idcard != ''">and m.idcard = #{idcard}</if>
+	</select>
+
+	<!-- 基于会员ID查询会员关注用户信息 -->
+	<select id="getAttentionMembers" parameterType="map" resultType="map">
+		SELECT
+		YEAR (curdate()) -
+		IF (
+		length(m.idcard) = 18,
+		substring(m.idcard,
+		7, 4),
+		IF (
+		length(m.idcard) = 15,
+		concat(
+		'19',
+		substring(m.idcard, 7, 2)
+		),
+		NULL
+		)
+		) AS age,
+		m.memberid,
+		m.username,
+		m.realname,
+		m.email,
+		m.address,
+		m.idcard,
+		m.phone,
+		m.telephone,
+		m.provinceid,
+		m.cityid,
+		m.createtime,
+		m.headimage,
+		m.sex,
+		m.weixinnumber,
+		m.qqnumber,
+		CAST(m.nickname AS char character set utf8) nickname,
+		m.lasttime,
+		e.*,
+		ceil(e.evaluationavg) as avg,
+		d.cname
+		FROM t_dt_member
+		m,tick_user_extend e,t_dict_data d
+		where m.memberid =
+		e.userid and
+		d.dataid = e.jobtype
+		and m.memberid IN
+		(SELECT a.userid FROM
+		tick_attention a WHERE a.attentionerid = #{memberid})
+		<if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+
+	<!-- 基于会员ID查询会员关注用户总记录数 -->
+	<select id="getAttentionMembersNum" parameterType="map"
+		resultType="int">
+		SELECT
+		count(*)
+		FROM t_dt_member
+		m,tick_user_extend e,t_dict_data d
+		where m.memberid =
+		e.userid and
+		d.dataid = e.jobtype
+		and m.memberid IN
+		(SELECT a.userid FROM
+		tick_attention a WHERE a.attentionerid = #{memberid})
+	</select>
+
+
+
+	<!-- 获取会员详细信息 -->
+	<select id="getMemberDetail" parameterType="map" resultType="map">
+	    SELECT
+		YEAR (curdate()) -
+		IF (
+		length(m.idcard) = 18,
+		substring(m.idcard,
+		7, 4),
+
+		IF (
+		length(m.idcard) = 15,
+		concat(
+		'19',
+		substring(m.idcard, 7, 2)
+		),
+		NULL
+		)
+		) AS age,
+		m.memberid,
+		m.username,
+		m.realname,
+		m.email,
+		m.address,
+		m.idcard,
+		m.phone,
+		m.telephone,
+		m.provinceid,
+		m.cityid,
+		m.createtime,
+		m.headimage,
+		m.sex,
+		m.weixinnumber,
+		m.qqnumber,
+		CAST(m.nickname AS char character set utf8) nickname,
+		m.lasttime,
+		e.*, ceil(e.evaluationavg) AS avg,
+		d.cname,
+		p.cname pcname,
+		c.cname
+		ccname,
+		concat(
+		ifnull(p.cname, ''),
+		ifnull(c.cname, '')
+		) area,
+		ar1.cname as dprovincename,
+		ar2.cname as dcityname,
+		e.iscompletion
+		FROM
+		t_dt_member m
+		LEFT JOIN tick_user_extend e ON m.memberid = e.userid
+		LEFT JOIN t_dict_data d ON d.dataid = e.jobtype
+		LEFT JOIN t_dt_area p
+		ON p.areaid = m.provinceid
+		LEFT JOIN t_dt_area c ON c.areaid = m.cityid
+		left join t_dt_area ar1 on ar1.areaid = e.provinceid
+		left join t_dt_area ar2 on ar2.areaid = e.cityid
+		WHERE
+		1 = 1
+		<if test="memberid != null and memberid != ''">and m.memberid = #{memberid}</if>
+		<if test="username != null and username != ''">and m.username = #{username}</if>
+		<if test="phone != null and phone != ''">and m.phone = #{phone}</if>
+		<if test="provinceid != null and provinceid != ''">and m.provinceid = #{provinceid}</if>
+		<if test="cityid != null and cityid != ''">and m.cityid = #{cityid}</if>
+		<if test="idcard != null and idcard != ''">and m.idcard = #{idcard}</if>
+	</select>
+
+	<!-- 获取会员详细信息 -->
+	<select id="getAttention" parameterType="map" resultType="map">
+		SELECT
+		*
+		FROM
+		tick_attention a
+		WHERE 1=1
+		<if test="memberid != null and memberid != ''">and a.attentionerid = #{memberid}</if>
+		<if test="userid != null and userid != ''">and a.userid = #{userid}</if>
+	</select>
+
+	<!-- 保存关注信息 -->
+	<insert id="insertAttention" parameterType="map">
+		INSERT INTO tick_attention
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			<if test="attentionid != null">attentionid,</if>
+			<if test="attentionerid !=null">attentionerid,</if>
+			<if test="userid !=null">userid,</if>
+			<if test="createtime !=null">createtime</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="attentionid != null">#{attentionid},</if>
+			<if test="attentionerid !=null">#{attentionerid},</if>
+			<if test="userid !=null">#{userid},</if>
+			<if test="createtime !=null">#{createtime}</if>
+		</trim>
+	</insert>
+
+	<!-- 查询申请订单及关联的发布订单信息 -->
+	<select id="getApplyOrderAndOrder" parameterType="map"
+		resultType="map">
+		SELECT
+		ao.applyorderid,
+		ao.orderid,
+		ao.applicantid,
+		ao.publisherid,
+		ao.`status`,
+		ao.quotation,
+		ao.quotationdescription,
+		ao.createrid,
+		ao.createtime,
+		ao.updaterid,
+		ao.updatetime,
+		ao.ifattention,
+		ao.delflag,
+		ao.longitude,
+		ao.latitude,
+		ao.delflag,
+		o.jobid,
+		o.projectid,
+		o.`status`
+		orderstatus,
+		o.failuretime,
+		o.createtime ordercreatetime,
+		o.updaterid
+		orderupdaterid,
+		o.delflag orderdelflag,
+		ifnull(ao.ifpay,0) as ifpay
+		FROM tick_apply_order ao,tick_order o
+		WHERE
+		ao.orderid = o.orderid
+		<if test="applyorderid != null and applyorderid != ''">and ao.applyorderid = #{applyorderid}</if>
+		<if test="userid != null and userid != ''">and ao.applicantid = #{userid}</if>
+	</select>
+	<!-- 修改字典类型记录 -->
+	<update id="updateApplyOrderStatus" parameterType="map">
+		UPDATE
+		tick_apply_order ao
+		SET ao.`status` = #{status}
+		WHERE
+		ao.applyorderid =
+		#{applyorderid}
+	</update>
+
+	<select id="getSurplusAppNum" parameterType="map" resultType="int">
+		SELECT
+		(SELECT
+		IFNULL(job.recruitmentnum,1) as num
+		FROM
+		tick_order o
+		LEFT JOIN tick_job job ON job.jobid = o.jobid
+		LEFT JOIN tick_project project ON project.projectid = o.projectid
+		WHERE o.orderid = #{orderid})-
+		(
+		SELECT
+		count(ao.applyorderid)
+		FROM
+		tick_apply_order ao
+		WHERE
+		ao.`status` IN (3)
+		AND ao.orderid = #{orderid}) as surplusnum
+	</select>
+
+    <!-- 取消关注  -->
+    <delete id="cancelAttention" parameterType="map">
+    
+      delete from tick_attention where attentionid = #{attentionid}
+      
+    </delete>
+
+</mapper>

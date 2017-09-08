@@ -1,0 +1,77 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.TradeMapper">
+	<!-- 查询供应商信息 -->
+	<select id="gettradelist" parameterType="map" resultType="map">
+		select tr.tradeid, tr.incomepay, tr.amount, tr.paymethod, tr.paypurposetype, tr.pay_userid, tr.income_userid, tr.`status`, tr.createtime,
+        tr.tradeorderid,mem.realname,ifnull(app.orderno,tr.orderno) as orderno,ag.agencyname
+		from tick_trade_record tr
+		left join t_dt_member mem on tr.pay_userid=mem.memberid
+		left join tick_apply_order app on app.applyorderid = tr.tradeorderid
+		left join tick_user_extend ex on ex.userid = mem.memberid
+		left join t_dt_agency ag on ag.userid = ex.source
+ 		<where>
+			<if test="agencyid != null and agencyid != ''">and ex.sourcepid  LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(tr.createtime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(tr.createtime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(tr.createtime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(tr.createtime,'%Y-%m-%d') &lt;= #{v_query_end}</if>
+			
+ 			<if test="null != tradeid and '' != tradeid">and tr.tradeid=#{tradeid}</if>
+ 			<if test="null != incomepay and '' != incomepay">and tr.incomepay=#{incomepay}</if>
+ 			<if test="null != paymethod and '' != paymethod">and tr.paymethod=#{paymethod}</if>
+ 			<if test="null != realname and '' != realname">and mem.realname like "%"#{realname}"%"</if>
+ 			<if test="null != starttime and '' != starttime">and tr.createtime &gt;= #{starttime}</if>
+ 			<if test="null != endtime and '' != endtime">and tr.createtime &lt;= #{endtime}</if>
+ 			<if test="null != agencyname and '' != agencyname">and ag.agencyname like "%"#{agencyname}"%"</if>
+ 			<if test="sourcepid !=null and sourcepid !=''">and  ex.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+ 		</where>
+ 		ORDER BY tr.createtime desc
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<select id="gettradenum" parameterType="map" resultType="int">
+		select count(*)
+		from tick_trade_record tr
+		left join t_dt_member mem on tr.pay_userid=mem.memberid
+		left join tick_apply_order app on app.applyorderid = tr.tradeorderid
+		left join tick_user_extend ex on ex.userid = mem.memberid
+		left join t_dt_agency ag on ag.userid = ex.source
+ 		<where>
+ 			<if test="salerid != null and salerid != ''">and ex.source=#{salerid}</if>
+			<if test="agencyid != null and agencyid != ''">and ex.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(tr.createtime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(tr.createtime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(tr.createtime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(tr.createtime,'%Y-%m-%d') &lt;= #{v_query_end}</if>
+			
+ 			<if test="null != tradeid and '' != tradeid">and tr.tradeid=#{tradeid}</if>
+ 			<if test="null != incomepay and '' != incomepay">and tr.incomepay=#{incomepay}</if>
+ 			<if test="null != paymethod and '' != paymethod">and tr.paymethod=#{paymethod}</if>
+ 			<if test="null != realname and '' != realname">and mem.realname like "%"#{realname}"%"</if>
+ 			<if test="null != starttime and '' != starttime">and tr.createtime &gt;= #{starttime}</if>
+ 			<if test="null != endtime and '' != endtime">and tr.createtime &lt;= #{endtime}</if>
+ 			<if test="null != agencyname and '' != agencyname">and ag.agencyname like "%"#{agencyname}"%"</if>
+ 			<if test="sourcepid !=null and sourcepid !=''">and ex.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+ 		</where>
+	</select>
+	
+	  <!-- 用户购买保险记录 -->
+	  <insert id="insertInsurance" parameterType="map">
+		INSERT INTO tick_insurance_record
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			<if test="insuranceid != null">insuranceid,</if>
+			<if test="orderid !=null">orderid,</if>
+			<if test="memberid !=null">memberid,</if>
+			<if test="status !=null">status,</if>
+			<if test="createtime !=null">createtime,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="insuranceid != null">#{insuranceid},</if>
+			<if test="orderid !=null">#{orderid},</if>
+			<if test="memberid !=null">#{memberid},</if>
+			<if test="status !=null">#{status},</if>
+			<if test="createtime !=null">#{createtime},</if>
+		</trim>
+	</insert>
+	
+	
+</mapper>

@@ -1,0 +1,76 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.ComplaintMapper">
+  
+  <!--查询建议举报信息列表  -->
+  <select id="getComplaintList" parameterType="map" resultType="map">
+     SELECT a.feedbackid, a.title, a.content, a.contact, a.`type`, a.userid, a.createtime, a.`status`,ifnull(CAST(b.nickname AS char character set utf8),b.username)as sname,b.realname  FROM t_dt_feedback a
+     LEFT JOIN t_dt_member b on a.userid = b.memberid
+     <where>
+       <if test="content !=null and content !=''">and a.content LIKE "%"#{content}"%"</if>
+       <if test="title !=null and title !=''">and a.title LIKE "%"#{title}"%"</if>
+       <if test="feedbackid !=null and feedbackid !=''">and a.feedbackid = #{feedbackid}</if>
+       <if test="status !=null and status !=''">and  a.status = #{status}</if>
+       <if test="createtime !=null and createtime !=''">and  a.createtime = #{createtime}</if>
+       <if test="contact !=null and contact !=''">and  a.contact = #{contact}</if>
+       <if test="type !=null and type !=''">and  a.type = #{type}</if>
+     </where>
+     ORDER BY a.createtime desc
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+  </select>
+  <!--查询建议举报信息总记录数  -->
+  <select id="getComplaintListNum" parameterType="map" resultType="int">
+     SELECT count(*) FROM t_dt_feedback a
+    LEFT JOIN t_dt_member b on a.userid = b.memberid
+     <where>
+       <if test="content !=null and content !=''">and a.content LIKE "%"#{content}"%"</if>
+       <if test="title !=null and title !=''">and a.title LIKE "%"#{title}"%"</if>
+       <if test="feedbackid !=null and feedbackid !=''">and a.feedbackid = #{feedbackid}</if>
+       <if test="status !=null and status !=''">and  a.status = #{status}</if>
+       <if test="createtime !=null and createtime !=''">and  a.createtime = #{createtime}</if>
+       <if test="contact !=null and contact !=''">and  a.contact = #{contact}</if>
+       <if test="type !=null and type !=''">and  a.type = #{type}</if>
+     </where>
+  </select>
+ 
+  <!--新增字典类型记录  -->
+  <insert id="insertComplaint" parameterType="map">
+		INSERT INTO  t_dt_feedback
+		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="feedbackid != null and feedbackid != ''">feedbackid,</if>
+			<if test="title !=null and title != ''">title,</if>
+			<if test="content !=null and content != ''">content,</if>
+			<if test="contact !=null and contact != ''">contact,</if>
+			<if test="type !=null and type != ''">type,</if>
+			<if test="userid !=null and userid != ''">userid,</if>
+			<if test="createtime !=null and createtime != ''">createtime,</if>
+			<if test="status !=null and status != ''">status,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="feedbackid != null and feedbackid != ''">#{feedbackid},</if>
+			<if test="title !=null and title != ''">#{title},</if>
+			<if test="content !=null and content != ''">#{content},</if>
+			<if test="contact !=null and contact != ''">#{contact},</if>
+			<if test="type !=null and type != ''">#{type},</if>
+			<if test="userid !=null and userid != ''">#{userid},</if>
+			<if test="createtime !=null and createtime != ''">#{createtime},</if>
+			<if test="status !=null and status != ''">#{status},</if>
+		</trim> 
+	</insert>
+	<!-- 修改字典类型记录 -->
+	<update id="updateComplaint" parameterType="map">
+	  UPDATE `t_dt_feedback` 
+	  <set>
+			<if test="title !=null">title = #{title},</if>
+			<if test="content !=null">content = #{content},</if>
+			<if test="contact !=null">contact = #{contact},</if>
+			<if test="type !=null">type =  #{type},</if>
+			<if test="status !=null">status = #{status},</if>
+	  </set>
+	  <where>
+	     feedbackid =#{feedbackid}
+	  </where>
+	</update>
+	
+	 
+	
+</mapper>

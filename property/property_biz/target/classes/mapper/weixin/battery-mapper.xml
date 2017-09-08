@@ -1,0 +1,802 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.weixin.backer.dao.BatteryMapper">
+	
+	<!-- 学科相关 -->
+	<delete id="deleteMember" parameterType="java.util.Map">
+		delete from
+		t_dt_member
+		where memberid=#{memberid}
+	</delete>
+	
+	<update id="updateMemberFirstInteChange" parameterType="java.util.Map">
+		update t_dt_member set firstInteChange=#{firstInteChange}
+		where openid=#{openid} and ifattention=1
+	</update>
+	<select id="getMember" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT email,
+		memberid,openid,name,phone,province,city,attentiontime,integration,ifattention,CAST(nickname
+		AS CHAR CHARACTER SET utf8) nickname,headimg,gaintime,firstInteChange
+		from t_dt_member where
+		openid=#{openid} and ifattention=1
+	</select>
+	<select id="getOpenidByNickname" resultType="java.lang.String" parameterType="java.util.Map">
+		SELECT openid
+		from t_dt_member where
+		CAST(nickname AS CHAR CHARACTER SET utf8)=#{nickname} 
+		limit 1
+	</select>
+	<insert id="insertMember" parameterType="java.util.Map">
+		insert into
+		t_dt_member(openid,name,phone,city,attentiontime,integration,ifattention,nickname,headimg,email,gaintime) values
+		(#{openid},#{name},#{phone},#{city},#{attentiontime},#{integration},#{ifattention},#{nickname},#{headimg},#{email},#{gaintime})
+	</insert>
+	<update id="updateNickName" parameterType="java.util.Map">
+		update t_dt_member set
+		nickname=#{nickname},gaintime=#{gaintime}
+		where openid=#{openid}
+	</update>
+	
+	<delete id="deleteMemberMark" parameterType="java.util.Map">
+		delete from t_dt_member_mark where memberid=#{memberid}
+	</delete>
+	<insert id="insertMemberMark" parameterType="java.util.Map">
+		insert into t_dt_member_mark(memberid,markid) 
+		values
+		<foreach collection="markList" item="item" index="index" separator=",">
+			(#{memberid},#{item.markid})
+	  	</foreach>
+	</insert>
+	
+	<select id="getMemberOpenList" resultType="java.util.Map">
+		<!-- 
+		select openid from
+		t_dt_member where nickname is null and ifattention=1
+		 -->
+		 select openid from
+		t_dt_member where gaintime is null 
+	</select>
+
+	<update id="attentionMember" parameterType="java.util.Map">
+		update t_dt_member
+		set
+		ifattention=1 where
+		openid=#{openid}
+	</update>
+	<update id="resetMemberSource" parameterType="java.util.Map">
+		update t_dt_member set source=null 
+		where openid=#{openid}
+	</update>
+	<update id="updateMemberSource" parameterType="java.util.Map">
+		update t_dt_member set source=#{source} 
+		where openid=#{openid}
+	</update>
+	<update id="updateMember" parameterType="java.util.Map">
+		update t_dt_member
+		<set>
+			<if test="name != null and ''!=name">name = #{name},</if>
+			<if test="phone != null and ''!=phone">phone = #{phone},</if>
+			<if test="province != null and ''!=province">province = #{province},</if>
+			<if test="city != null and ''!=city">city = #{city},</if>
+			<if test="email != null and ''!=email">email = #{email},</if>
+			<if test="gaintime != null and ''!=gaintime">gaintime = #{gaintime},</if>
+		</set>
+		where openid=#{openid}
+	</update>
+	<update id="cancalMember" parameterType="java.util.Map">
+		update t_dt_member set
+		ifattention=0,canceltime=#{canceltime} where
+		openid=#{openid}
+	</update>
+	<select id="getMemberList" resultType="java.util.Map"
+		parameterType="java.util.LinkedHashMap">
+		SELECT
+		dt.memberid,dt.openid,dt.name,dt.phone,dt.attentiontime,dt.integration,dt.sex,dt.ifattention,CAST(dt.nickname
+		AS CHAR CHARACTER SET utf8) nickname,dt.headimg,
+		dt.province,dt.city,province.name provinceName,city.name
+		cityName,dt.email,dt.gaintime,dt.canceltime,source,cast(mi.markid as CHAR(1000)) markid,mi.markname,COUNT(car.id) as cnum,
+		'' agencyname
+		from t_dt_member dt
+		left join t_dt_area province on province.id=dt.province
+		LEFT JOIN t_dt_member_cars car ON (dt.memberid=car.memberid)
+		left join t_dt_area city on (city.id=dt.city)
+		left join (select dmm.memberid,GROUP_CONCAT(distinct(mi.markid)) markid, GROUP_CONCAT(distinct(mi.markname)) markname
+		from t_dt_member_mark dmm
+		left join t_mark_info mi on (mi.markid=dmm.markid)
+		where mi.ifactive=1
+		group by dmm.memberid) mi on (mi.memberid=dt.memberid) GROUP BY dt.memberid
+		<where>
+			<if test="null!=markid and ''!=markid"> and exists(select 1 from t_dt_member_mark dmm where dmm.memberid=dt.memberid and dmm.markid=#{markid}) </if>
+			<if test="null!=openid and ''!=openid"> and dt.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dt.name like "%"#{name}"%"</if>
+			<if test="null!=province and ''!=province"> and dt.province=#{province}</if>
+			<if test="null!=city and ''!=city"> and dt.city=#{city}</if>
+			<if test="null!=phone and ''!=phone"> and dt.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname"> and CAST(dt.nickname AS CHAR CHARACTER SET utf8) like
+				"%"#{nickname}"%"</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dt.ifattention=#{ifattention}</if>
+			<if test="null!=source and ''!=source"> and dt.source=#{source}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dt.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dt.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dt.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dt.canceltime &lt;= #{cancelendtime}
+			</if>
+		</where>
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- 查询有多少条学科设置记录	-->
+	<select id="getMemberListNum" resultType="int"
+		parameterType="java.util.LinkedHashMap">
+		SELECT count(0) from t_dt_member dt
+		left join t_dt_area province on
+		province.id=dt.province
+		left join t_dt_area city on (city.id=dt.city)
+		left join t_mark_info mi on (mi.markid=dt.mark)
+		left join (select dmm.memberid,dmm.markid, GROUP_CONCAT(distinct(mi.markname)) markname
+		from t_dt_member_mark dmm
+		left join t_mark_info mi on (mi.markid=dmm.markid)
+		where mi.ifactive=1
+		group by dmm.memberid) mi on (mi.memberid=dt.memberid)
+		<where>
+			<if test="null!=markid and ''!=markid"> and exists(select 1 from t_dt_member_mark dmm where dmm.memberid=dt.memberid and dmm.markid=#{markid}) </if>
+			<if test="null!=openid and ''!=openid"> and dt.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dt.name like "%"#{name}"%"</if>
+			<if test="null!=province and ''!=province"> and dt.province=#{province}</if>
+			<if test="null!=city and ''!=city"> and dt.city=#{city}</if>
+			<if test="null!=phone and ''!=phone"> and dt.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname"> and CAST(dt.nickname AS CHAR CHARACTER SET utf8) like
+				"%"#{nickname}"%"</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dt.ifattention=#{ifattention}</if>
+			<if test="null!=source and ''!=source"> and dt.source=#{source}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dt.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dt.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dt.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dt.canceltime &lt;= #{cancelendtime}
+			</if>
+		</where>
+	</select>
+	
+	<select id="checkSourceBattHistory" parameterType="java.util.Map" resultType="java.util.Map">
+		select batttime  gaintime from t_batt_history where openid=#{openid} and batttime &gt;= #{gaintime} order by batttime asc limit 1
+	</select>
+	<select id="checkSourceInteGain" parameterType="java.util.Map" resultType="java.util.Map">
+		select ig.gaintime gaintime from t_inte_gain ig left join t_dt_member dm on (dm.memberid=ig.memberid) 
+		where dm.openid=#{openid} and ig.gaintime &gt;= #{gaintime} order by ig.gaintime asc limit 1
+	</select>
+
+	<!-- 充电banner管理 -->
+	<select id="getMlBanner" resultType="java.util.Map">
+		SELECT id,img FROM
+		t_ml_banner order by id limit 1;
+	</select>
+	<select id="getMlBannerList" resultType="java.util.Map">
+		SELECT id,img FROM
+		t_ml_banner;
+	</select>
+	<update id="updateMlBanner" parameterType="java.util.Map">
+		update t_ml_banner set
+		img=#{img} where id=#{id}
+	</update>
+	<insert id="insertMlBanner" parameterType="java.util.Map">
+		insert into
+		t_ml_banner(img) values(#{img})
+	</insert>
+
+	<select id="getMemberByOpenid" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT
+		memberid,openid,name,phone,city,attentiontime,integration,ifattention,CAST(nickname
+		AS CHAR CHARACTER SET utf8) nickname,headimg,gaintime,source
+		from t_dt_member where
+		openid=#{openid}
+	</select>
+
+	<select id="getMemberNum" resultType="java.lang.Integer">
+		SELECT COUNT(0) num FROM
+		t_dt_member
+	</select>
+	<select id="getBattHistoryNum" resultType="java.lang.Integer">
+		SELECT COUNT(0) num
+		FROM t_batt_history
+	</select>
+
+	<select id="getBattHistoryList" resultType="java.util.Map"
+		parameterType="java.util.LinkedHashMap">
+		SELECT
+		dm.name memberName,dm.phone memberPhone,CAST(dm.nickname AS CHAR CHARACTER SET utf8) memberNickName,
+		t1.battid,t1.batttime,t1.battcode,t1.openid,t1.tripid,t1.carinfo
+		from t_batt_history t1 left join t_dt_member dm on t1.openid=dm.openid
+		<where> 1=1
+			<if test="null!=carinfo and ''!=carinfo"> and t1.carinfo  like "%"#{carinfo}"%"  </if>
+			<if test="null!=memberName and ''!=memberName"> and dm.name like "%"#{memberName}"%" </if>
+			<if test="null!=memberPhone and ''!=memberPhone"> and dm.phone like "%"#{memberPhone}"%" </if>
+			<if test="null!=memberNickName and ''!=memberNickName"> and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like "%"#{memberNickName}"%"  </if>
+			<if test="null!=startDate and ''!=startDate">
+				and t1.batttime &gt;= #{startDate}
+			</if>
+			<if test="null!=endDate and ''!=endDate">
+				and t1.batttime &lt;= #{endDate}
+			</if>
+		</where>
+		order by t1.batttime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getBattHistoryListNum" resultType="int"
+		parameterType="java.util.LinkedHashMap">
+		SELECT count(0)
+		from t_batt_history t1 left join t_dt_member dm on t1.openid=dm.openid
+		<where> 1=1
+			<if test="null!=carinfo and ''!=carinfo"> and t1.carinfo  like "%"#{carinfo}"%"  </if>
+			<if test="null!=memberName and ''!=memberName"> and dm.name like "%"#{memberName}"%" </if>
+			<if test="null!=memberPhone and ''!=memberPhone"> and dm.phone like "%"#{memberPhone}"%" </if>
+			<if test="null!=memberNickName and ''!=memberNickName"> and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like "%"#{memberNickName}"%"  </if>
+			<if test="null!=startDate and ''!=startDate">
+				and t1.batttime &gt;= #{startDate}
+			</if>
+			<if test="null!=endDate and ''!=endDate">
+				and t1.batttime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<insert id="insertBattHistory" parameterType="java.util.Map">
+		insert into
+		t_batt_history(batttime,battcode,openid,tripid,carinfo)values(#{batttime},#{battcode},#{openid},#{tripid},#{carinfo})
+	</insert>
+
+	<!-- 深夜的士 -->
+	<select id="getShenye" resultType="java.util.Map" parameterType="java.util.Map">
+		select shenyeid,name,phone,story,img,createtime from t_ac_shenye where
+		shenyeid=#{shenyeid};
+	</select>
+	<select id="getShenyeList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT
+		shenye.shenyeid,shenye.name,shenye.phone,shenye.story,shenye.img,shenye.createtime,shenye.openid,CAST(mb.nickname
+		AS CHAR CHARACTER SET utf8) nickname
+		FROM t_ac_shenye shenye
+		LEFT JOIN t_dt_member mb ON mb.openid=shenye.openid
+		<where>
+			1=1
+			<if test="null!=memberName and ''!=memberName"> and shenye.name like "%"#{memberName}"%" </if>
+			<if test="null!=memberPhone and ''!=memberPhone"> and shenye.phone like "%"#{memberPhone}"%" </if>
+			<if test="null!=memberNickName and ''!=memberNickName"> and CAST(mb.nickname AS CHAR CHARACTER SET utf8) like "%"#{memberNickName}"%"  </if>
+			<if test="null!=startDate and ''!=startDate">
+				and shenye.createtime &gt;= #{startDate}
+			</if>
+			<if test="null!=endDate and ''!=endDate">
+				and shenye.createtime &lt;= #{endDate}
+			</if>
+		</where>
+		order by shenye.createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getShenyeListNum" resultType="int" parameterType="java.util.Map">
+		select count(0) as count from
+		t_ac_shenye
+		<where>
+			1=1
+			<if test="null!=memberName and ''!=memberName"> and shenye.name like "%"#{memberName}"%" </if>
+			<if test="null!=memberPhone and ''!=memberPhone"> and shenye.phone like "%"#{memberPhone}"%" </if>
+			<if test="null!=memberNickName and ''!=memberNickName"> and CAST(mb.nickname AS CHAR CHARACTER SET utf8) like "%"#{memberNickName}"%"  </if>
+			<if test="null!=startDate and ''!=startDate">
+				and createtime &gt;= #{startDate}
+			</if>
+			<if test="null!=endDate and ''!=endDate">
+				and createtime &lt;= #{endDate}
+			</if>
+		</where>
+	</select>
+	<insert id="insertShenye" parameterType="java.util.Map">
+		insert into
+		t_ac_shenye(name,phone,story,img,createtime,openid)values
+		(#{name},#{phone},#{story},#{img},now(),#{openid})
+	</insert>
+	<update id="updateShenye" parameterType="java.util.Map">
+		update t_ac_shenye set
+		name=#{name},phone=#{phone},story=#{story},img=#{img} where
+		shenyeid=#{shenyeid}
+	</update>
+
+	<!-- 大宁音乐节 -->
+	<select id="getDaning" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT openid,daningid,name,phone,changci,createtime from t_ac_daning
+		where DATE_FORMAT(createtime,'%Y-%m-%d')=#{currdate} and
+		openid=#{openid} and ifsuccess=1
+	</select>
+	<select id="getDaningList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT openid,daningid,name,phone,changci,createtime from t_ac_daning
+		where ifsuccess=1 order
+		by createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getDaningListNum" resultType="int" parameterType="java.util.Map">
+		select count(0) as count from
+		t_ac_daning where ifsuccess=1
+	</select>
+	<insert id="insertDaning" parameterType="java.util.Map">
+		insert into
+		t_ac_daning(name,phone,changci,createtime,ifsuccess,openid)values
+		(#{name},#{phone},#{changci},#{createtime},#{ifsuccess},#{openid})
+	</insert>
+	<select id="getDaningNumByDay" resultType="int" parameterType="java.util.Map">
+		select daningid from
+		t_ac_daning where changci=#{changci} and
+		DATE_FORMAT(createtime,'%Y-%m-%d')=#{currdate}
+		and ifsuccess=1
+	</select>
+	<!-- 开关 -->
+	<select id="getACSwitch" resultType="int" parameterType="java.util.Map">
+		select
+		count(0) from t_ac_switch where actype=#{actype} and ifactive=1
+	</select>
+
+
+	<!-- 抢CD -->
+	<select id="getCD" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT openid,cdid,name,phone,changci,createtime,ifsuccess from
+		t_ac_cd
+		where
+		openid=#{openid} and changci=#{changci} limit 1
+	</select>
+	<select id="getCDList" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT openid,cdid,name,phone,changci,createtime from t_ac_cd
+		where
+		ifsuccess=1 order
+		by createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getCDListNum" resultType="int" parameterType="java.util.Map">
+		select
+		count(0) as count from
+		t_ac_cd where ifsuccess=1
+	</select>
+	<insert id="insertCD" parameterType="java.util.Map">
+		insert into
+		t_ac_cd(name,phone,changci,createtime,ifsuccess,openid)values
+		(#{name},#{phone},#{changci},#{createtime},#{ifsuccess},#{openid})
+	</insert>
+	<select id="getCDNumByDay" resultType="int" parameterType="java.util.Map">
+		select cdid from
+		t_ac_cd where changci=#{changci}
+		and ifsuccess=1
+	</select>
+
+
+	<!-- t_dt_textkey 关键字响应内容 -->
+	<insert id="insertTextKey" parameterType="java.util.Map">
+		insert into
+		t_dt_textkey(t_dt_textkey.key,t_dt_textkey.title,t_dt_textkey.imgurl,t_dt_textkey.linkurl,t_dt_textkey.content,t_dt_textkey.msgtype,t_dt_textkey.ifactive,t_dt_textkey.matchrule,t_dt_textkey.respmsgtype)
+		values
+		(#{key},#{title},#{imgurl},#{linkurl},#{content},#{msgtype},#{ifactive},#{matchrule},#{respmsgtype})
+	</insert>
+	<update id="updateTextKey" parameterType="java.util.Map">
+		update t_dt_textkey set
+		t_dt_textkey.key=#{key},t_dt_textkey.title=#{title},t_dt_textkey.imgurl=#{imgurl},
+		t_dt_textkey.linkurl=#{linkurl},t_dt_textkey.content=#{content},t_dt_textkey.msgtype=#{msgtype},t_dt_textkey.ifactive=#{ifactive},
+		t_dt_textkey.matchrule=#{matchrule},t_dt_textkey.respmsgtype=#{respmsgtype}
+		where t_dt_textkey.id=#{id}
+	</update>
+	<delete id="deleteTextKey" parameterType="java.util.Map">
+		delete from
+		t_dt_textkey where t_dt_textkey.id=#{id}
+	</delete>
+	<select id="getWeiXinKeyList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select
+		tk.id,tk.key,tk.title,tk.imgurl,tk.linkurl,tk.content,tk.msgtype ,tk.respmsgtype,
+		mt.name msgtypeName,tk.ifactive,tk.matchrule
+		from t_dt_textkey tk
+		left join t_dt_msgtype mt ON (tk.msgtype=mt.id)
+		where 1=1
+		<if test="id!='' and id!=null">
+			and tk.id = #{id}
+		</if>
+		<if test="key!='' and key!=null">
+			and ((tk.key like "%"#{key}"%" and tk.matchrule=0) || (#{key} like  concat("%",tk.key,"%") and tk.matchrule=1))
+		</if>
+		<if test="title!='' and title!=null">
+			and tk.title like "%"#{title}"%"
+		</if>
+		<if test="imgurl!='' and imgurl!=null">
+			and tk.imgurl = #{imgurl}
+		</if>
+		<if test="linkurl!=null and linkurl!=''">
+			and tk.linkurl like "%"#{linkurl}"%"
+		</if>
+		<if test="content!=null and content!=''">
+			and tk.content like "%"#{content}"%"
+		</if>
+		<if test="msgtype!=null and msgtype!=''">
+			and tk.msgtype = #{msgtype}
+		</if>
+		<if test="respmsgtype!=null and respmsgtype!=''">
+			and tk.respmsgtype = #{respmsgtype}
+		</if>
+		<if test="msgtypeKey!=null and msgtypeKey!=''">
+			and mt.key = #{msgtypeKey}
+		</if>
+		<if test="ifactive!=null and ifactive!=''">
+			and tk.ifactive = #{ifactive}
+		</if>
+		<if test="matchrule!=null and matchrule!=''">
+			and tk.matchrule = #{matchrule}
+		</if>
+		order by tk.id desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	
+	<select id="getTextKeyList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select
+		tk.id,tk.key,tk.title,tk.imgurl,tk.linkurl,tk.content,tk.msgtype ,tk.respmsgtype,
+		mt.name msgtypeName,tk.ifactive,tk.matchrule,mt2.name respmsgtypeName
+		from t_dt_textkey tk
+		left join t_dt_msgtype mt ON (tk.msgtype=mt.id)
+		left join t_dt_msgtype mt2 ON (tk.respmsgtype=mt2.id)
+		where 1=1
+		<if test="id!='' and id!=null">
+			and tk.id = #{id}
+		</if>
+		<if test="key!='' and key!=null">
+			and tk.key like "%"#{key}"%"
+		</if>
+		<if test="title!='' and title!=null">
+			and tk.title like "%"#{title}"%"
+		</if>
+		<if test="imgurl!='' and imgurl!=null">
+			and tk.imgurl = #{imgurl}
+		</if>
+		<if test="linkurl!=null and linkurl!=''">
+			and tk.linkurl like "%"#{linkurl}"%"
+		</if>
+		<if test="content!=null and content!=''">
+			and tk.content like "%"#{content}"%"
+		</if>
+		<if test="msgtype!=null and msgtype!=''">
+			and tk.msgtype = #{msgtype}
+		</if>
+		<if test="respmsgtype!=null and respmsgtype!=''">
+			and tk.respmsgtype = #{respmsgtype}
+		</if>
+		<if test="msgtypeKey!=null and msgtypeKey!=''">
+			and mt.key = #{msgtypeKey}
+		</if>
+		<if test="ifactive!=null and ifactive!=''">
+			and tk.ifactive = #{ifactive}
+		</if>
+		<if test="matchrule!=null and matchrule!=''">
+			and tk.matchrule = #{matchrule}
+		</if>
+		order by tk.id desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getTextKeyListNum" resultType="int" parameterType="java.util.Map">
+		select count(0) from t_dt_textkey tk
+		left join t_dt_msgtype mt ON (tk.msgtype=mt.id)
+		<where>
+			1=1
+			<if test="id!='' and id!=null">
+				and tk.id = #{id}
+			</if>
+			<if test="key!='' and key!=null">
+				and tk.key like "%"#{key}"%"
+			</if>
+			<if test="title!='' and title!=null">
+				and tk.title like "%"#{title}"%"
+			</if>
+			<if test="imgurl!='' and imgurl!=null">
+				and tk.imgurl = #{imgurl}
+			</if>
+			<if test="linkurl!=null and linkurl!=''">
+				and tk.linkurl = #{linkurl}
+			</if>
+			<if test="content!=null and content!=''">
+				and tk.content = #{content}
+			</if>
+			<if test="msgtype!=null and msgtype!=''">
+				and tk.msgtype = #{msgtype}
+			</if>
+			<if test="msgtypeKey!=null and msgtypeKey!=''">
+				and mt.key = #{msgtypeKey}
+			</if>
+			<if test="ifactive!=null and ifactive!=''">
+				and tk.ifactive = #{ifactive}
+			</if>
+			<if test="matchrule!=null and matchrule!=''">
+				and tk.matchrule = #{matchrule}
+			</if>
+		</where>
+	</select>
+
+	<!-- 获取省市信息 -->
+	<select id="getProvinceList" resultType="java.util.Map">
+		SELECT
+		id,name,code,remark,parentid,ifactive,priority
+		FROM t_dt_area
+		where parentid=0 and ifactive=1
+	</select>
+	<select id="getCityList" resultType="java.util.Map">
+		SELECT
+		id,name,code,remark,parentid,ifactive,priority
+		FROM t_dt_area
+		where parentid!=0 and ifactive=1
+	</select>
+	<select id="getCityListByProvince" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT id,name,code,remark,parentid,ifactive,priority
+		FROM t_dt_area
+		where parentid=#{parentid} and ifactive=1
+	</select>
+
+	<insert id="insertXingzuo" parameterType="java.util.Map">
+		insert into
+		t_te_xingzuo(xfield,yfield,openid,nickname)
+		values(#{xfield},#{yfield},#{openid},#{nickname})
+	</insert>
+	
+	
+	<!-- Hello Message -->
+	<select id="insertHelloMessage" parameterType="java.util.Map">
+		insert into t_dt_hello_message(content) values(#{content})
+	</select>
+	<delete id="deleteHelloMessage" parameterType="java.util.Map">
+		delete from t_dt_hello_message where id=#{id}
+	</delete>
+	<update id="updateHelloMessage" parameterType="java.util.Map">
+		update t_dt_hello_message set content=#{content}
+		where id=#{id}
+	</update>
+	<select id="getHelloMessage" parameterType="java.util.Map" resultType="java.util.Map">
+		select id,content from t_dt_hello_message limit 1
+	</select>
+	
+	<!-- message -->
+	<select id="insertMessage" parameterType="java.util.Map">
+		insert into t_dt_message(openid,message) values(#{openid},#{message})
+	</select>
+	<delete id="deleteMessage" parameterType="java.util.Map">
+		delete from t_dt_message where id=#{id}
+	</delete>
+	<update id="updateMessage" parameterType="java.util.Map">
+		update t_dt_message set openid=#{openid},message=#{message}
+		where id=#{id}
+	</update>
+	<select id="getMessageList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select message.id,message.openid,message.message,message.sendtime,dm.name memberName,dm.phone memberPhone,CAST(dm.nickname AS CHAR CHARACTER SET utf8) memberNickName
+		from t_dt_message message
+		left join t_dt_member  dm on (message.openid=dm.openid) 
+		<where> 1=1 
+			<if test="null!=id and ''!=id"> and message.id=#{id} </if>
+			<if test="null!=openid and ''!=openid"> and message.openid=#{openid} </if>
+			<if test="null!=message and ''!=message"> and message.message like "%"#{message}"%" </if>
+			<if test="null!=sendstarttime and ''!=sendstarttime">
+				and message.sendtime &gt;= #{sendstarttime}
+			</if>
+			<if test="null!=sendendtime and ''!=sendendtime">
+				and message.sendtime &lt;= #{sendendtime}
+			</if>
+			<if test="null!=memberName and ''!=memberName"> 
+				and dm.name like "%"#{memberName}"%" 
+			</if>
+			<if test="null!=memberPhone and ''!=memberPhone"> 
+				and dm.phone like "%"#{memberPhone}"%" 
+			</if>
+			<if test="null!=memberNickName and ''!=memberNickName"> 
+				and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like "%"#{memberNickName}"%" 
+			</if>
+		</where>
+		order by message.id desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getMessageListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		select count(0)
+		from t_dt_message message
+		left join t_dt_member  dm on (message.openid=dm.openid) 
+		<where> 1=1 
+			<if test="null!=id and ''!=id"> and message.id=#{id} </if>
+			<if test="null!=openid and ''!=openid"> and message.openid=#{openid} </if>
+			<if test="null!=message and ''!=message"> and message.message like "%"#{message}"%" </if>
+			<if test="null!=sendstarttime and ''!=sendstarttime">
+				and message.sendtime &gt;= #{sendstarttime}
+			</if>
+			<if test="null!=sendendtime and ''!=sendendtime">
+				and message.sendtime &lt;= #{sendendtime}
+			</if>
+			<if test="null!=memberName and ''!=memberName"> 
+				and dm.name like "%"#{memberName}"%" 
+			</if>
+			<if test="null!=memberPhone and ''!=memberPhone"> 
+				and dm.phone like "%"#{memberPhone}"%" 
+			</if>
+			<if test="null!=memberNickName and ''!=memberNickName"> 
+				and CAST(dm.nickname AS CHAR CHARACTER SET utf8) like "%"#{memberNickName}"%" 
+			</if>
+		</where>
+	</select>
+	
+
+
+	<!-- 粉丝标签管理 -->
+	<!-- markid,markname,ifactive -->
+	<delete id="deleteMark" parameterType="java.util.Map">
+		delete from t_mark_info where markid=#{markid}
+	</delete>
+	<insert id="insertMark" parameterType="java.util.Map">
+		insert into t_mark_info(markname,ifactive) 
+		values(#{markname},#{ifactive})
+	</insert>
+	<update id="updateMark" parameterType="java.util.Map">
+		update t_mark_info set markname=#{markname},ifactive=#{ifactive}
+		where markid=#{markid} 
+	</update>
+	<select id="getMark" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT markid,markname,ifactive
+		from t_mark_info where markid=#{markid} 
+	</select>
+	<select id="getMarkList" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		SELECT  markid,markname,ifactive
+		from t_mark_info
+		<where> 1=1 
+			<if test="null!=markid and ''!=markid"> and markid=#{markid} </if>
+			<if test="null!=markname and ''!=markname"> and markname like "%"#{markname}"%" </if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+		</where>
+		order by markid desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<select id="getMarkListNum" resultType="java.lang.Integer"
+		parameterType="java.util.Map">
+		SELECT count(0) from t_mark_info
+		<where> 1=1 
+			<if test="null!=markid and ''!=markid"> and markid=#{markid} </if>
+			<if test="null!=markname and ''!=markname"> and markname like "%"#{markname}"%" </if>
+			<if test="null!=ifactive and ''!=ifactive"> and ifactive=#{ifactive} </if>
+		</where>
+	</select>
+	
+	
+	
+	
+	<select id="getMemberFenSiList" resultType="java.util.Map"
+		parameterType="java.util.LinkedHashMap">
+		SELECT dt.memberid,dt.openid,dt.name,dt.phone,dt.attentiontime,dt.integration,dt.sex,dt.ifattention,
+		CAST(dt.nickname AS CHAR CHARACTER SET utf8) nickname,dt.headimg,
+		dt.province,dt.city,province.name provinceName,city.name
+		cityName,dt.email,dt.gaintime,dt.canceltime,COUNT(car.id) as cnum,
+		'' agencyname
+		from t_dt_member dt
+		left join t_dt_area province on province.id=dt.province
+		LEFT JOIN t_dt_member_cars car ON (dt.memberid=car.memberid)
+		left join t_dt_area city on (city.id=dt.city)
+		<where>
+			<if test="null!=openid and ''!=openid"> and dt.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dt.name like "%"#{name}"%"</if>
+			<if test="null!=phone and ''!=phone"> and dt.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname">
+				 and CAST(dt.nickname AS CHAR CHARACTER SET utf8) like "%"#{nickname}"%"
+			</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dt.ifattention=#{ifattention}</if>
+			<if test="null!=source and ''!=source"> and dt.source=#{source}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dt.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dt.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dt.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dt.canceltime &lt;= #{cancelendtime}
+			</if>
+			<if test="null == agencyid or '' == agencyid">
+				<if test="null != provinceid and '' != provinceid">
+					and agency.provinceid=#{provinceid} 
+				</if>
+				<if test="null != cityid and '' != cityid">
+					and agency.cityid=#{cityid} 
+				</if>
+			</if>
+		</where>
+		GROUP BY dt.memberid
+		order by dt.createtime desc 
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!-- 查询有多少条学科设置记录	-->
+	<select id="getMemberFenSiListNum" resultType="int"
+		parameterType="java.util.LinkedHashMap">
+		select count(0) from (
+		SELECT dt.memberid,dt.openid,dt.name,dt.phone,dt.attentiontime,dt.integration,dt.sex,dt.ifattention,
+		CAST(dt.nickname AS CHAR CHARACTER SET utf8) nickname,dt.headimg,
+		dt.province,dt.city,province.name provinceName,city.name
+		cityName,dt.email,dt.gaintime,dt.canceltime,COUNT(car.id) as cnum,
+		'' agencyname
+		from t_dt_member dt
+		left join t_dt_area province on province.id=dt.province
+		LEFT JOIN t_dt_member_cars car ON (dt.memberid=car.memberid)
+		left join t_dt_area city on (city.id=dt.city)
+		<where>
+			<if test="null!=openid and ''!=openid"> and dt.openid=#{openid}</if>
+			<if test="null!=name and ''!=name"> and dt.name like "%"#{name}"%"</if>
+			<if test="null!=phone and ''!=phone"> and dt.phone=#{phone}</if>
+			<if test="null!=nickname and ''!=nickname">
+				 and CAST(dt.nickname AS CHAR CHARACTER SET utf8) like "%"#{nickname}"%"
+			</if>
+			<if test="null!=ifattention and ''!=ifattention"> and dt.ifattention=#{ifattention}</if>
+			<if test="null!=source and ''!=source"> and dt.source=#{source}</if>
+			<if test="null!=gainstarttime and ''!=gainstarttime">
+				and dt.gaintime &gt;= #{gainstarttime}
+			</if>
+			<if test="null!=gainendtime and ''!=gainendtime">
+				and dt.gaintime &lt;= #{gainendtime}
+			</if>
+			<if test="null!=cancelstarttime and ''!=cancelstarttime">
+				and dt.canceltime &gt;= #{cancelstarttime}
+			</if>
+			<if test="null!=cancelendtime and ''!=cancelendtime">
+				and dt.canceltime &lt;= #{cancelendtime}
+			</if>
+			<if test="null != agencyid and '' != agencyid">
+			<!-- 经销商不等于空，省份和城市的查询条件无效 -->
+				and agency.agencyid=#{agencyid}
+			</if>
+			<if test="null == agencyid or '' == agencyid">
+				<if test="null != provinceid and '' != provinceid">
+					and agency.provinceid=#{provinceid} 
+				</if>
+				<if test="null != cityid and '' != cityid">
+					and agency.cityid=#{cityid} 
+				</if>
+			</if>
+		</where>
+		GROUP BY dt.memberid
+		order by dt.createtime desc ) t
+	</select>
+	
+		<select id="getweixinAllKey" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select tk.id,tk.key,tk.title,tk.imgurl,tk.linkurl,tk.content,tk.msgtype ,tk.respmsgtype,
+		mt.name msgtypeName,tk.ifactive,tk.matchrule
+		from t_dt_textkey tk
+		left join t_dt_msgtype mt ON (tk.msgtype=mt.id)
+		where 1=1 
+		<if test="key!='' and key!=null">
+			and  tk.key like "%"#{key}"%"
+		</if>
+		<if test="msgtypeKey!=null and msgtypeKey!=''">
+			and mt.key = #{msgtypeKey}
+		</if>
+		<if test="ifactive!=null and ifactive!=''">
+			and tk.ifactive = #{ifactive}
+		</if>
+	</select>
+	
+	<select id="getAreaLike" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select tda.areaid,tda.parentid,tda.datacode,tda.cname,tda.ename,tda.ifactive,tda1.cname as provincename
+		from t_dt_area tda
+		left join t_dt_area tda1 on tda.parentid=tda1.areaid
+		where tda.cname like concat("%",#{cityname},"%")
+		limit 1
+	</select>
+	
+	
+	
+</mapper>

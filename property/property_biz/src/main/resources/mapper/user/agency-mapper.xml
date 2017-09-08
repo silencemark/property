@@ -1,0 +1,197 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.AgencyMapper">
+	<!-- 查询代理商列表-->
+	<select id="getAgencyList" parameterType="map" resultType="map">
+		select  ag.agencyid, ag.agencyname, ag.agencytype, ag.commissionrate, ag.userid, ag.parentid, 
+        ag.address, ag.phonenum, ag.contacter, ag.provinceid, ag.cityid, ag.districtid, ag.createtime,ag.roletype,
+		us.username ,a1.cname as provincename,a2.cname as cityname,a3.cname as districtname,cy.agencyname as parentname,
+		us.password
+		from  t_dt_agency ag
+		left join t_dt_user us on us.userid = ag.userid
+		left join t_dt_area a1 on a1.areaid = ag.provinceid
+		left join t_dt_area a2 on a2.areaid = ag.cityid
+		left join t_dt_area a3 on a3.areaid = ag.districtid
+		left join t_dt_agency cy on cy.agencyid = ag.parentid
+ 		<where>
+ 		    ag.delflag = 0
+ 			<if test="null != parentid">and ag.parentid=#{parentid}</if>
+ 			<if test="null != parentuserid">and cy.userid=#{parentuserid}</if>
+ 			<if test="null != ownagencyid and '' != ownagencyid">and ag.agencyid not in (#{ownagencyid})</if>
+ 			<if test="null != agencyid and '' != agencyid">and ag.agencyid=#{agencyid}</if>
+ 			<if test="null != userid and '' != userid">and ag.userid=#{userid}</if>
+ 			<if test="null != agencyname and '' != agencyname">and ag.agencyname like "%"#{agencyname}"%"</if>
+ 			<if test="null != username and '' != username">and us.username like "%"#{username}"%"</if>
+ 			<if test="null != roletype and '' != roletype">and ag.roletype = #{roletype}</if>
+ 		</where>
+ 		ORDER BY ag.createtime desc
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<!-- 查询代理商总记录数 -->
+	<select id="getAgencyListNum" parameterType="map" resultType="int">
+		select  count(*)
+		from  t_dt_agency ag
+		left join t_dt_user us on us.userid = ag.userid
+		left join t_dt_area a1 on a1.areaid = ag.provinceid
+		left join t_dt_area a2 on a2.areaid = ag.cityid
+		left join t_dt_area a3 on a3.areaid = ag.districtid
+		left join t_dt_agency cy on cy.agencyid = ag.parentid
+ 		<where>
+ 		    ag.delflag = 0
+ 			<if test="null != parentid">and ag.parentid=#{parentid}</if>
+ 			<if test="null != agencyid and '' != agencyid">and ag.agencyid=#{agencyid}</if>
+ 			<if test="null != userid and '' != userid">and ag.userid=#{userid}</if>
+ 			<if test="null != agencyname and '' != agencyname">and ag.agencyname like "%"#{agencyname}"%"</if>
+ 			<if test="null != username and '' != username">and us.username like "%"#{username}"%"</if>
+ 			<if test="null != roletype and '' != roletype">and ag.roletype = #{roletype}</if>
+ 		</where>
+	</select>
+	
+	  <!--新增代理商  -->
+  <insert id="insertAgency" parameterType="map">
+		INSERT INTO  t_dt_agency
+		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="agencyid != null">agencyid,</if>
+			<if test="agencyname !=null">agencyname,</if>
+			<if test="agencytype !=null">agencytype,</if>
+			<if test="commissionrate !=null">commissionrate,</if>
+			<if test="userid !=null">userid,</if>
+			<if test="parentid !=null">parentid,</if>
+			<if test="address !=null">address,</if>
+			<if test="phonenum !=null">phonenum,</if>
+			<if test="contacter !=null">contacter,</if>
+			<if test="provinceid !=null">provinceid,</if>
+			<if test="cityid !=null">cityid,</if>
+			<if test="districtid !=null">districtid,</if>
+			<if test="createtime !=null">createtime,</if>
+			<if test="createrid !=null">createrid,</if>
+			<if test="updaterid !=null">updaterid,</if>
+			<if test="updatetime !=null">updatetime,</if>
+			<if test="delflag !=null">delflag,</if>
+			<if test="roletype !=null">roletype,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+		<if test="agencyid != null">#{agencyid},</if>
+			<if test="agencyname !=null">#{agencyname},</if>
+			<if test="agencytype !=null">#{agencytype},</if>
+			<if test="commissionrate !=null">#{commissionrate},</if>
+			<if test="userid !=null">#{userid},</if>
+			<if test="parentid !=null">#{parentid},</if>
+			<if test="address !=null">#{address},</if>
+			<if test="phonenum !=null">#{phonenum},</if>
+			<if test="contacter !=null">#{contacter},</if>
+			<if test="provinceid !=null">#{provinceid},</if>
+			<if test="cityid !=null">#{cityid},</if>
+			<if test="districtid !=null">#{districtid},</if>
+			<if test="createtime !=null">#{createtime},</if>
+			<if test="createrid !=null">#{createrid},</if>
+			<if test="updaterid !=null">#{updaterid},</if>
+			<if test="updatetime !=null">#{updatetime},</if>
+			<if test="delflag !=null">#{delflag},</if>
+			<if test="roletype !=null">#{roletype},</if>
+		</trim> 
+	</insert>
+	<!-- 修改代理商信息 -->
+	<update id="updateAgency" parameterType="map">
+	  UPDATE `t_dt_agency` 
+	  <set>
+		    <if test="agencyname !=null">agencyname = #{agencyname},</if>
+			<if test="agencytype !=null">agencytype = #{agencytype},</if>
+			<if test="commissionrate !=null">commissionrate = #{commissionrate},</if>
+			<if test="userid !=null">userid =  #{userid},</if>
+			<if test="parentid !=null">parentid  =  #{parentid},</if>
+			<if test="address !=null">address = #{address},</if>
+			<if test="phonenum !=null">phonenum = #{phonenum},</if>
+			<if test="contacter !=null">contacter = #{contacter},</if>
+			<if test="provinceid !=null">provinceid = #{provinceid},</if>
+			<if test="cityid !=null">cityid = #{cityid},</if>
+			<if test="districtid !=null">districtid = #{districtid},</if>
+			<if test="updaterid !=null">updaterid = #{updaterid},</if>
+			<if test="updatetime !=null">updatetime = #{updatetime},</if>
+			<if test="delflag !=null">delflag = #{delflag},</if>	 
+			<if test="roletype !=null">roletype = #{roletype},</if>	 
+	  </set>
+	  <where>
+	     agencyid =#{agencyid}
+	  </where>
+	</update>
+	<!-- 根据当前代理商id查询下面所有的子代理商 -->
+	
+	<!--
+	drop procedure if exists pro_getChildrenAgency;
+	create procedure pro_getChildrenAgency(in idd varchar(32))
+	begin
+	declare lev int;
+	set lev=1;
+	drop table if exists tmp1;
+	    CREATE TABLE tmp1(agencyid VARCHAR(32),agencyname varchar(50),parentid varchar(32) ,levv INT);
+	     INSERT tmp1 SELECT agencyid,agencyname,parentid,lev-1 FROM t_dt_agency WHERE agencyid=idd;   
+   INSERT tmp1 SELECT agencyid,agencyname,parentid,1 FROM t_dt_agency WHERE parentid=idd;
+	while  row_count()>0
+	do
+	     set lev=lev+1;
+	     INSERT tmp1 SELECT t.agencyid,t.`agencyname`,t.`parentid`,lev from t_dt_agency t join tmp1 a on t.parentid=a.agencyid AND levv=lev-1;
+	end while ;
+	     
+	     SELECT * FROM tmp1 ORDER BY levv asc;
+	end;
+	
+	call pro_getChildrenAgency('1')
+	  -->
+	<select id="getChildrenAgency" parameterType="map" resultType="map" statementType="CALLABLE">
+	   {call pro_getChildrenAgency(
+	      #{agencyid}
+	     )
+        }
+	
+	</select>
+	
+	<!-- 新增代理商资质信息 -->
+	  <insert id="insertAgencyImg" parameterType="map">
+	   <foreach collection="agencyImgArray" item="item" separator=";">
+		INSERT INTO t_agency_img
+		<trim prefix="(" suffixOverrides="," suffix=")">
+			<if test="item.agimgid != null">agimgid,</if>
+			<if test="item.agencyid !=null">agencyid,</if>
+			<if test="item.imgid !=null">imgid,</if>
+			<if test="item.type !=null">type,</if>
+			<if test="item.createrid !=null">createrid,</if>
+			<if test="item.createtime !=null">createtime,</if>
+			<if test="item.updaterid != null">updaterid,</if>
+			<if test="item.updatetime != null">updatetime,</if>
+			<if test="item.delflag != null">delflag,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="item.agimgid != null">#{item.agimgid},</if>
+			<if test="item.agencyid !=null">#{item.agencyid},</if>
+			<if test="item.imgid !=null">#{item.imgid},</if>
+			<if test="item.type !=null">#{item.type},</if>
+			<if test="item.createrid !=null">#{item.createrid},</if>
+			<if test="item.createtime !=null">#{item.createtime},</if>
+			<if test="item.updaterid != null">#{item.updaterid},</if>
+			<if test="item.updatetime != null">#{item.updatetime},</if>
+			<if test="item.delflag != null">#{item.delflag},</if>
+		</trim>
+	  </foreach> 
+	</insert>
+	
+	<!-- 查询代理商资质图片 列表-->
+	<select id="getAgencyImgList" parameterType="map" resultType="map">
+	   select a.agimgid,b.url from t_agency_img  a left join t_img  b on a.imgid =b.imgid
+	   <where>
+	     <if test="agimgid != null and agimgid != ''">and a.agimgid = #{agimgid}</if>
+	     <if test="agencyid != null and agencyid != ''">and a.agencyid = #{agencyid}</if>
+	   </where>
+	</select>
+	
+	<!-- 删除代理商资质图片 -->
+	<delete id="deleteAgencyImg" parameterType="map">
+	   delete from t_agency_img 
+	   <where>
+	      <if test="agimgid != null and agimgid != ''">and agimgid = #{agimgid}</if>
+	      <if test="agencyid != null and agencyid != ''">and agencyid = #{agencyid}</if>
+	   </where>
+	</delete>
+	
+	
+	
+</mapper>

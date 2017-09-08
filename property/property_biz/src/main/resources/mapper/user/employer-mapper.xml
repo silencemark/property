@@ -1,0 +1,390 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.EmployerMapper">
+
+	<!-- 发布招工 -->
+	<insert id="insertJob" parameterType="map">
+		insert into tick_job
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="jobid != null and jobid != ''">jobid,</if>
+			<if test="projectname != null and projectname != ''">projectname,</if>
+			<if test="jobtitle != null and jobtitle != ''">jobtitle,</if>
+			<if test="jobtype != null and jobtype != ''">jobtype,</if>
+			<if test="salary != null and salary != ''">salary,</if>
+			<if test="workplace != null and workplace != ''">workplace,</if>
+			<if test="starttime != null and starttime != ''">starttime,</if>
+			<if test="endtime != null and endtime != ''">endtime,</if>
+			<if test="settlementmethod != null and settlementmethod != ''">settlementmethod,</if>
+			<if test="recruitmentnum != null and recruitmentnum != ''">recruitmentnum,</if>
+			<if test="jobrequirements != null and jobrequirements != ''">jobrequirements,</if>
+			<if test="contacter != null and contacter != ''">contacter,</if>
+			<if test="telephone != null and telephone != ''">telephone,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="longitude != null and longitude != ''">longitude,</if>
+			<if test="latitude != null and latitude != ''">latitude,</if>
+			<if test="projectarea != null and projectarea != ''">projectarea,</if>
+			<if test="projectprovince != null and projectprovince != ''">projectprovince,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="jobid != null and jobid != ''">#{jobid},</if>
+			<if test="projectname != null and projectname != ''">#{projectname},</if>
+			<if test="jobtitle != null and jobtitle != ''">#{jobtitle},</if>
+			<if test="jobtype != null and jobtype != ''">#{jobtype},</if>
+			<if test="salary != null and salary != ''">#{salary},</if>
+			<if test="workplace != null and workplace != ''">#{workplace},</if>
+			<if test="starttime != null and starttime != ''">#{starttime},</if>
+			<if test="endtime != null and endtime != ''">#{endtime},</if>
+			<if test="settlementmethod != null and settlementmethod != ''">#{settlementmethod},</if>
+			<if test="recruitmentnum != null and recruitmentnum != ''">#{recruitmentnum},</if>
+			<if test="jobrequirements != null and jobrequirements != ''">#{jobrequirements},</if>
+			<if test="contacter != null and contacter != ''">#{contacter},</if>
+			<if test="telephone != null and telephone != ''">#{telephone},</if>
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="longitude != null and longitude != ''">#{longitude},</if>
+			<if test="latitude != null and latitude != ''">#{latitude},</if>
+			<if test="projectarea != null and projectarea != ''">#{projectarea},</if>
+			<if test="projectprovince != null and projectprovince != ''">#{projectprovince},</if>
+		</trim>
+	</insert>
+	
+	<!-- 发布项目 -->
+	<insert id="insertProject" parameterType="map">
+		insert into tick_project
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="projectid != null and projectid != ''">projectid,</if>
+			<if test="projecttitle != null and projecttitle != ''">projecttitle,</if>
+			<if test="ownedindustry != null and ownedindustry != ''">ownedindustry,</if>
+			<if test="ifdiscuss != null">ifdiscuss,</if>
+			<if test="projectamount != null and projectamount != ''">projectamount,</if>
+			<if test="starttime != null and starttime != ''">starttime,</if>
+			<if test="endtime != null and endtime != ''">endtime,</if>
+			<if test="settlementmethod != null and settlementmethod != ''">settlementmethod,</if>
+			<if test="projectarea != null and projectarea != ''">projectarea,</if>
+			<if test="address != null and address != ''">address,</if>
+			<if test="projectdescription != null and projectdescription != ''">projectdescription,</if>
+			<if test="contacter != null and contacter != ''">contacter,</if>
+			<if test="telephone != null and telephone != ''">telephone,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="longitude != null and longitude != ''">longitude,</if>
+			<if test="latitude != null and latitude != ''">latitude,</if>
+			<if test="projectprovince != null and projectprovince != ''">projectprovince,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="projectid != null and projectid != ''">#{projectid},</if>
+			<if test="projecttitle != null and projecttitle != ''">#{projecttitle},</if>
+			<if test="ownedindustry != null and ownedindustry != ''">#{ownedindustry},</if>
+			<if test="ifdiscuss != null">#{ifdiscuss},</if>
+			<if test="projectamount != null and projectamount != ''">#{projectamount},</if>
+			<if test="starttime != null and starttime != ''">#{starttime},</if>
+			<if test="endtime != null and endtime != ''">#{endtime},</if>
+			<if test="settlementmethod != null and settlementmethod != ''">#{settlementmethod},</if>
+			<if test="projectarea != null and projectarea != ''">#{projectarea},</if>
+			<if test="address != null and address != ''">#{address},</if>
+			<if test="projectdescription != null and projectdescription != ''">#{projectdescription},</if>
+			<if test="contacter != null and contacter != ''">#{contacter},</if>
+			<if test="telephone != null and telephone != ''">#{telephone},</if>
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="longitude != null and longitude != ''">#{longitude},</if>
+			<if test="latitude != null and latitude != ''">#{latitude},</if>
+			<if test="projectprovince != null and projectprovince != ''">#{projectprovince},</if>
+		</trim>
+	</insert>
+	
+	<!-- 新增订单 -->
+	<insert id="insertOrder" parameterType="map">
+		insert into tick_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			orderid,
+			createtime,
+			delflag,
+			<if test="jobid != null and jobid != ''">jobid,</if>
+			<if test="projectid != null and projectid != ''">projectid,</if>
+			<if test="publisherid != null and publisherid != ''">publisherid,</if>
+			<if test="publisherid != null and publisherid != ''">createrid,</if>
+			<if test="failuretime != null and failuretime != ''">failuretime,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="longitude != null and longitude != ''">longitude,</if>
+			<if test="latitude != null and latitude != ''">latitude,</if>
+			<if test="orderno != null and orderno != ''">orderno,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			REPLACE(UUID(),'-',''),
+			now(),
+			0,
+			<if test="jobid != null and jobid != ''">#{jobid},</if>
+			<if test="projectid != null and projectid != ''">#{projectid},</if>
+			<if test="publisherid != null and publisherid != ''">#{publisherid},</if>
+			<if test="publisherid != null and publisherid != ''">#{createrid},</if>
+			<if test="failuretime != null and failuretime != ''">#{failuretime},</if> 
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="longitude != null and longitude != ''">#{longitude},</if>
+			<if test="latitude != null and latitude != ''">#{latitude},</if>
+			<if test="orderno != null and orderno != ''">#{orderno},</if>
+		</trim>
+	</insert>
+	<insert id="insertImg" parameterType="map">
+		insert into t_img
+		<trim  prefix="(" suffix=")" suffixOverrides=",">
+			<if test="imgid != null and imgid != ''">imgid,</if>
+			<if test="name != null and name != ''">name,</if>
+			<if test="url != null and url != ''">url,</if>
+			<if test="suffix != null and suffix != ''">suffix,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="updaterid != null and updaterid != ''">updaterid,</if>
+			<if test="updatetime != null and updatetime != ''">updatetime,</if>
+			<if test="delflag != null and delflag != ''">delflag,</if>
+		</trim>
+		<trim  prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="imgid != null and imgid != ''">#{imgid},</if>
+			<if test="name != null and name != ''">#{name},</if>
+			<if test="url != null and url != ''">#{url},</if>
+			<if test="suffix != null and suffix != ''">#{suffix},</if>
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="updaterid != null and updaterid != ''">#{updaterid},</if>
+			<if test="updatetime != null and updatetime != ''">#{updatetime},</if>
+			<if test="delflag != null and delflag != ''">#{delflag},</if>
+		</trim>
+	</insert>
+	<insert id="insertProjectImg" parameterType="map">
+		insert into tick_project_img
+		<trim  prefix="(" suffix=")" suffixOverrides=",">
+			<if test="projectimgid != null and projectimgid != ''">projectimgid,</if>
+			<if test="projectid != null and projectid != ''">projectid,</if>
+			<if test="imgid != null and imgid != ''">imgid,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="updaterid != null and updaterid != ''">updaterid,</if>
+			<if test="updatetime != null and updatetime != ''">updatetime,</if>
+			<if test="delflag != null and delflag != ''">delflag,</if>
+		</trim>
+		<trim  prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="projectimgid != null and projectimgid != ''">#{projectimgid},</if>
+			<if test="projectid != null and projectid != ''">#{projectid},</if>
+			<if test="imgid != null and imgid != ''">#{imgid},</if>
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="updaterid != null and updaterid != ''">#{updaterid},</if>
+			<if test="updatetime != null and updatetime != ''">#{updatetime},</if>
+			<if test="delflag != null and delflag != ''">#{delflag},</if>
+		</trim>
+	</insert>
+	<select id="getTopTenproject" resultType="map" parameterType="map">
+		select * from tick_job_project
+		<where>
+			<if test="createrid != null and createrid != ''">and memberid=#{createrid}</if>
+		</where>
+		order by createtime desc 
+		limit 0,10
+	</select>
+	<select id="getprojectjob" parameterType="map" resultType="map">
+		select * from tick_job_project
+		<where>
+			<if test="memberid != null and memberid != ''">and memberid=#{memberid}</if>
+			<if test="projectname != null and projectname != ''">and projectname=#{projectname}</if>
+		</where>
+		limit 1
+	</select>
+	<insert id="insertprojectjob" parameterType="map">
+		insert into tick_job_project(jobprojectid,projectname,memberid,createtime)
+		values(#{jobprojectid},#{projectname},#{memberid},#{createtime})
+	</insert>
+	<select id="getProjectInfo" parameterType="map" resultType="map">
+		select tp.projectid,tp.projecttitle,tp.ownedindustry,tdd.cname as ownedindustryname,tp.ifdiscuss,tp.projectamount,tp.starttime,tp.endtime,
+		tp.settlementmethod,tp.projectarea,tp.address,tp.projectdescription,tp.contacter,tp.telephone,tp.createrid,tp.createtime,tp.updaterid,tp.updatetime,tp.delflag,
+		tue.companyname,torder.orderid,tp.longitude,tp.latitude,CAST(tdm.nickname AS char character set utf8) nickname,tp.projectprovince,torder.noticenum,tdm.realname
+		from tick_project tp
+		left join tick_user_extend tue on tp.createrid=tue.userid
+		left join tick_order torder on tp.projectid=torder.projectid
+		left join t_dt_member tdm on tdm.memberid=tp.createrid
+		left join t_dict_data tdd on tp.ownedindustry=tdd.dataid
+		<where>
+			<if test="projectid != null and projectid != ''">and tp.projectid=#{projectid}</if>
+		</where>
+		limit 1
+	</select>
+	<select id="getMemberListByinfo" parameterType="map" resultType="map">
+		select tdm.memberid,tdm.username,tdm.password,tdm.realname,tdm.email,tdm.address,tdm.idcard,tdm.businesscards,tdm.phone,tdm.telephone,tdm.provinceid,tdm.cityid,tdm.createtime,tdm.headimage,tdm.backgroundimage,
+		tdm.sex,tdm.birthday,tdm.openid,tdm.status,tdm.weixinnumber,tdm.qqnumber,CAST(tdm.nickname AS char character set utf8) nickname,tdm.ifattention,tdm.gtygroup,tdm.authentication,tdm.auditstatus,tdm.authenticationfailurereasons,tdm.lasttime,
+		tdm.unionid,tdm.ifshield,tue.channelid
+		from t_dt_member tdm
+		left join tick_user_extend tue on tdm.memberid =tue.userid
+		left join t_dict_data tdd on tue.jobtype=tdd.dataid
+		left join t_dt_area tda on tdm.cityid=tda.areaid
+		<where>
+			<if test="parentid !=null and parentid != ''">and tdd.parentid=#{parentid}</if>
+			<if test="jobtype != null and jobtype != ''">and tue.jobtype=#{jobtype}</if>
+			<if test="projectprovince !=null and projectprovince != ''">and tue.provinceid=#{projectprovince}</if>
+			<if test="projectarea !=null and projectarea != ''">and tue.cityid=#{projectarea}</if>
+			<if test="areaparentid !=null and areaparentid != ''">and tda.parentid=#{areaparentid}</if>
+			and tdm.status=1
+		</where>
+	</select>
+	<select id="getDictData" parameterType="map" resultType="map">
+	    select dataid,typeid,cname,parentid from t_dict_data 
+	    <where>
+	        <if test="dataid != null and dataid != ''">and dataid=#{dataid}</if>
+	        and ifactive=1
+	    </where>
+	</select>
+	<insert id="insertprojectMessage" parameterType="map">
+		insert into tick_notice_business
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="businessid != null and businessid != ''">businessid,</if>
+			<if test="orderid != null and orderid != ''">orderid,</if>
+			<if test="title != null and title != ''">title,</if>
+			<if test="content != null and content != ''">content,</if>
+			<if test="memberid != null and memberid != ''">memberid,</if>
+			<if test="isread != null and isread != ''">isread,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="type != null and type != ''">type,</if>
+			<if test="url != null and url != ''">url,</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=","> 
+			<if test="businessid != null and businessid != ''">#{businessid},</if>
+			<if test="orderid != null and orderid != ''">#{orderid},</if>
+			<if test="title != null and title != ''">#{title},</if>
+			<if test="content != null and content != ''">#{content},</if>
+			<if test="memberid != null and memberid != ''">#{memberid},</if>
+			<if test="isread != null and isread != ''">#{isread},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="type != null and type != ''">#{type},</if>
+			<if test="url != null and url != ''">#{url},</if>
+		</trim>
+	</insert>
+	<select id="getApplyOrder" parameterType="map" resultType="map">
+		select tao.applyorderid,tao.orderid,tao.applicantid,tao.publisherid,tao.status,tao.quotation,tao.quotationdescription,tao.createrid,tao.createtime,tao.updaterid,tao.updatetime,tao.ifattention,tao.delflag,
+		tue.extendid,tue.userid,tue.idcardnum,tue.idcardimgurl,tue.personalintroduction,tue.companyname,tue.companyimgurl,tue.companyintroduction,tue.tickcoin,tue.points,ceil(tue.evaluationavg) as evaluationavg,tue.individualstatus,tue.enterprisestatus,tue.qrcodeurl,
+		tue.jobtype,tue.createrid,tue.updaterid,tue.updatetime,tdm.username,tdm.authentication,tdm.address,tdm.realname,tdm.phone,tdm.telephone,tdm.headimage,CAST(tdm.nickname AS char character set utf8) nickname,
+		tao.longitude,tao.latitude,tdm.sex,tp.address,tj.workplace,tdd.cname as jobtypename,tue.perfectdegree
+		from tick_apply_order tao
+		left join tick_user_extend tue on tao.createrid=tue.userid
+		left join t_dict_data tdd on tue.jobtype=tdd.dataid
+		left join t_dt_member tdm on tao.createrid=tdm.memberid
+		left join tick_order torder on tao.orderid=torder.orderid
+		left join tick_job tj on torder.jobid = tj.jobid
+		left join tick_project tp on torder.projectid=tp.projectid
+		<where>
+			<if test="orderid != null and orderid != ''">and tao.orderid=#{orderid}</if>
+		</where>
+	</select>
+	<select id="getnoticenum" parameterType="map" resultType="int">
+		select count(0) from tick_notice_business
+		<where>
+			<if test="orderid != null and orderid != ''">and orderid=#{orderid}</if>
+		</where>
+	</select>
+	<select id="getApplyProjectDetail" parameterType="map" resultType="map">
+		select tp.projecttitle,tp.starttime,tp.endtime,tp.projectdescription,tp.contacter,tp.telephone,tp.address,tp.projectarea,
+		tue.companyname,tao.status,tao.quotation,tao.quotationdescription,tdd.cname as jobtypename,tda.cname as cityname,tda1.cname as provincename,torder.orderno,tao.applyorderid,torder.orderid
+		from tick_apply_order tao 
+		left join  tick_order torder on torder.orderid=tao.orderid
+		left join tick_project tp on torder.projectid=tp.projectid
+		left join tick_user_extend tue on tao.publisherid=tue.userid
+		left join t_dict_data tdd on tp.ownedindustry=tdd.dataid
+		left join t_dt_area tda on tp.projectarea=tda.areaid
+		left join t_dt_area tda1 on tp.projectprovince=tda1.areaid
+		<where>
+			<if test="applyorderid != null and applyorderid != ''">and tao.applyorderid=#{applyorderid}</if>
+		</where>
+	</select>
+	<select id="getApplyJobDetail" parameterType="map" resultType="map">
+		select tdd.cname as jobtype,tj.jobtitle,tj.salary,tj.workplace,tj.starttime,tj.endtime,tdd1.cname as settlementmethod,tj.recruitmentnum,tj.jobrequirements,tj.contacter,tj.telephone,tj.createrid,tj.createtime,
+		tue.companyname,tao.status,tao.quotation,tao.quotationdescription,tda.cname as cityname,tda1.cname as provincename,torder.orderno,tao.applyorderid,torder.orderid,tao.ifpay
+		from tick_apply_order tao 
+		left join  tick_order torder on torder.orderid=tao.orderid
+		left join tick_job tj on torder.jobid=tj.jobid
+		left join t_dict_data tdd on tj.jobtype=tdd.dataid
+		left join tick_user_extend tue on tao.publisherid=tue.userid
+		left join t_dict_data tdd1 on tj.settlementmethod=tdd1.dataid
+		left join t_dt_area tda on tj.projectarea=tda.areaid
+		left join t_dt_area tda1 on tj.projectprovince=tda1.areaid
+		<where>
+			<if test="applyorderid != null and applyorderid != ''">and applyorderid=#{applyorderid}</if>
+		</where>
+	</select>
+	<select id="getOutTimeOrder" resultType="map">
+		SELECT order_.orderid,order_.jobid,order_.projectid,order_.status,member.realname,member.memberid,member.headimage,
+		IFNULL(project.starttime,job.starttime) starttime,IFNULL(project.endtime,job.endtime) endtime,
+		IFNULL(project.address,job.workplace) address,IFNULL(project.projecttitle,job.jobtitle) title,
+		IFNULL(job.recruitmentnum,0) sumcount,order_.jobid,order_.projectid
+		FROM tick_order order_
+		LEFT JOIN tick_job job ON order_.jobid = job.jobid
+		LEFT JOIN tick_project project ON order_.projectid = project.projectid
+		LEFT JOIN t_dt_member member ON order_.publisherid = member.memberid
+		where IFNULL(project.starttime,job.starttime) &lt; now()
+		and order_.delflag = 0 and order_.status != 2
+	</select>
+	<update id="updateorderInfo" parameterType="map">
+		update tick_order
+		<set>
+			<if test="status != null">status=#{status},</if>
+			<if test="noticenum != null">noticenum=#{noticenum},</if>
+		</set>
+		where orderid=#{orderid}
+	</update>
+	<select id="getOrderInfo" parameterType="map" resultType="map">
+		SELECT order_.orderid,order_.jobid,order_.projectid,order_.status,member.realname,member.headimage,
+		IFNULL(project.starttime,job.starttime) starttime,IFNULL(project.endtime,job.endtime) endtime,
+		IFNULL(project.address,job.workplace) address,IFNULL(project.projecttitle,job.jobtitle) title,
+		IFNULL(job.recruitmentnum,0) sumcount,order_.jobid,order_.projectid,order_.noticenum,order_.orderno
+		FROM tick_order order_
+		LEFT JOIN tick_job job ON order_.jobid = job.jobid
+		LEFT JOIN tick_project project ON order_.projectid = project.projectid
+		LEFT JOIN t_dt_member member ON order_.publisherid = member.memberid
+		<where>
+			<if test="orderid != null and orderid !=''">and order_.orderid=#{orderid}</if>
+		</where>
+		limit 1
+	</select>
+	<insert id="insertShareRecore" parameterType="map">
+		insert into tick_share_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sharerecordid != null and sharerecordid != ''">sharerecordid,</if>
+			<if test="createrid != null and createrid != ''">createrid,</if>
+			<if test="pagename != null and pagename != ''">pagename,</if>
+			<if test="sharesourceid != null and sharesourceid != ''">sharesourceid,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="sharerecordid != null and sharerecordid != ''">#{sharerecordid},</if>
+			<if test="createrid != null and createrid != ''">#{createrid},</if>
+			<if test="pagename != null and pagename != ''">#{pagename},</if>
+			<if test="sharesourceid != null and sharesourceid != ''">#{sharesourceid},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+		</trim>
+	</insert>
+	<select id="getProjectPicture" parameterType="map" resultType="map">
+		select ti.url from tick_project_img tpi
+		left join t_img ti on tpi.imgid=ti.imgid
+		where tpi.projectid=#{projectid}
+	</select>
+	<update id="updateApplyOrder" parameterType="map">
+		update tick_apply_order set status =11 where orderid=#{orderid} and status=1
+	</update>
+	<update id="updateApplyOrderinfo" parameterType="map">
+		update tick_apply_order 
+		<set>
+		    <if test="status != null">status=#{status},</if>
+		</set>
+		<where>
+		    <if test="applyorderid != null">and applyorderid=#{applyorderid}</if>
+		</where>
+	</update>
+	<select id="getOrderNo" resultType="int">
+		select count(0) from tick_order where to_days(createtime)=to_days(now())
+	</select>
+	<select id="getKillList" parameterType="map" resultType="map">
+		select killid,killerid,bekillerid,isban,createtime from tick_kill
+		<where>
+			<if test="killid != null and killid != ''">and killid=#{killid}</if>
+			<if test="killerid != null and killerid != ''">and killerid=#{killerid}</if>
+			<if test="bekillerid != null and bekillerid != ''">and bekillerid=#{bekillerid}</if>
+			<if test="isban != null">and isban=#{isban}</if>
+		</where>
+	</select>
+</mapper>

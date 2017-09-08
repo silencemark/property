@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>xingyi</display-name>
+  <servlet>
+    <servlet-name>springDispatcherServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:local/springMvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  <filter>
+    <filter-name>charsetFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>charsetFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+	<listener>  
+	        <listener-class>  
+	            org.springframework.web.context.request.RequestContextListener  
+	        </listener-class>  
+	</listener>  
+  
+	<servlet>
+		<description>cdservlet</description>
+		<display-name>cdservlet</display-name>
+		<servlet-name>cdservlet</servlet-name>
+		<servlet-class>com.lr.labor.weixin.servlet.CDServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>cdservlet</servlet-name>
+		<url-pattern>/cdservlet</url-pattern>
+	</servlet-mapping>
+
+
+  <welcome-file-list>
+  	<welcome-file>/index.jsp</welcome-file>
+  </welcome-file-list>
+  
+<!--   <error-page>
+  	<exception-type>java.lang.Exception</exception-type>
+  	<location>/error.jsp</location>
+  </error-page> -->
+  
+ <!--  <error-page>
+        <error-code>500</error-code>
+        <location>/error.jsp</location>
+  </error-page>
+  <error-page>
+        <error-code>404</error-code>
+        <location>/404.jsp</location>
+  </error-page>  --> 
+   
+<!-- 计时器 -->
+<!--   <listener>
+		<listener-class>
+			com.hk.backer.controllerwx.TaskExecution
+		</listener-class>
+	</listener> -->
+	
+	
+	<!-- <filter>
+        <filter-name>xssFilter</filter-name>
+        <filter-class>com.hk.backer.interceptor.XssFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>xssFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping> -->
+	 
+	
+  <!-- 全局异常配置 start -->
+<!-- 	<bean id="exceptionResolver"
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.Exception">/error/500</prop>
+				<prop key="java.lang.Throwable">/error/404</prop>
+				<prop key="java.lang.RuntimeException">showError</prop>
+				<prop key="java.sql.SQLException">showDBError</prop>
+			</props>
+		</property>
+		<property name="statusCodes">
+			<props>
+				<prop key="/error/500">500</prop>
+				<prop key="/error/404">404</prop>
+				<prop key="/error/403">403</prop>
+				<prop key="/error/0">0</prop>
+			</props>
+		</property>
+		设置日志输出级别，不定义则默认不输出警告等错误日志信息
+		<property name="warnLogCategory" value="WARN" />
+		默认错误页面，当找不到上面mappings中指定的异常对应视图时，使用本默认配置
+		<property name="defaultErrorView" value="/error/500" />
+		默认HTTP状态码
+		<property name="defaultStatusCode" value="500" />
+	</bean> -->
+  
+</web-app>

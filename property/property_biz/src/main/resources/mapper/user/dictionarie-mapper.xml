@@ -1,0 +1,138 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.DictionarieMapper">
+  
+  <!--查询字典类型  -->
+  <select id="getDictTypeList" parameterType="map" resultType="map">
+    SELECT   a.datatypeid, a.name, a.`comment`, a.createrid, a.createtime, a.updaterid, a.updatetime, a.`status` ,b.realname as crname,c.realname as upname  FROM `t_dict_data_type` a
+    LEFT JOIN t_dt_user b ON a.createrid = b.userid
+    LEFT JOIN t_dt_user c ON a.updaterid = c.userid
+     <where>
+       <if test="name !=null and name !=''">and a.name LIKE "%"#{name}"%"</if>
+       <if test="datatypeid !=null and datatypeid !=''">and a.datatypeid = #{datatypeid}</if>
+       <if test="status !=null and status !=''">and  a.status = #{status}</if>
+     </where>
+     ORDER BY a.createtime desc
+     <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+  </select>
+  <!--查询字典类型总记录数  -->
+  <select id="getDictTypeListNum" parameterType="map" resultType="int">
+      SELECT  COUNT(1) FROM `t_dict_data_type`
+      <where>
+       <if test="name !=null and name !=''">and name LIKE "%"#{name}"%"</if>
+       <if test="datatypeid !=null and datatypeid !=''">and datatypeid = #{datatypeid}</if>
+       <if test="status !=null and status !=''">and  status = #{status}</if>
+     </where>
+  </select>
+ 
+  <!--新增字典类型记录  -->
+  <insert id="insertDicType" parameterType="map">
+		INSERT INTO  t_dict_data_type
+		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="datatypeid != null">datatypeid,</if>
+			<if test="name !=null">name,</if>
+			<if test="comment !=null">comment,</if>
+			<if test="createrid !=null">createrid,</if>
+			<if test="createtime !=null">createtime,</if>
+			<if test="updaterid !=null">updaterid,</if>
+			<if test="updatetime !=null">updatetime,</if>
+			<if test="status !=null">status,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="datatypeid != null">#{datatypeid},</if>
+			<if test="name !=null">#{name},</if>
+			<if test="comment !=null">#{comment},</if>
+			<if test="createrid !=null">#{createrid},</if>
+			<if test="createtime !=null">#{createtime},</if>
+			<if test="updaterid !=null">#{updaterid},</if>
+			<if test="updatetime !=null">#{updatetime},</if>
+			<if test="status !=null">#{status},</if>
+		</trim> 
+	</insert>
+	<!-- 修改字典类型记录 -->
+	<update id="updateDicType" parameterType="map">
+	  UPDATE `t_dict_data_type` 
+	  <set>
+			<if test="name !=null">name =  #{name},</if>
+			<if test="comment !=null">comment = #{comment},</if>
+			<if test="updaterid !=null">updaterid =  #{updaterid},</if>
+			<if test="updatetime !=null">updatetime = #{updatetime},</if>
+			<if test="status !=null">status = #{status},</if>
+	  </set>
+	  <where>
+	     datatypeid =#{datatypeid}
+	  </where>
+	</update>
+	
+	<!-- 根据字典类别查询字典详情 -->
+	<select id="getDicList" parameterType="map" resultType="map">
+	   SELECT  a.dataid, a.typeid, a.datacode, a.cname, a.ename, a.remark, a.priority, a.ifactive,b.name,b.`comment`,b.datatypeid FROM  t_dict_data a 
+       LEFT JOIN t_dict_data_type b ON a.typeid =b.datatypeid
+       <where>
+          <if test="cname !=null and cname !=''">and a.cname LIKE "%"#{cname}"%"</if>
+          <if test="datatypeid !=null and datatypeid !=''">and b.datatypeid = #{datatypeid}</if>
+          <if test="ifactive !=null and ifactive !=''">and  a.ifactive = #{ifactive}</if>
+          <if test="typeid !=null and typeid !=''">and a.typeid = #{typeid}</if>
+          <if test="parentid !=null and parentid !=''">and a.parentid = #{parentid}</if>
+          <if test="st !=null and st !=''">and a.parentid is null</if>
+       </where>
+       order by a.priority asc
+	  <if test="startnum!=null">LIMIT #{startnum},#{rownum}</if>
+	</select>
+	<!--得到字典详情记录总记录数  -->
+	<select id="getDicListNum" parameterType="map" resultType="int">
+	   SELECT  COUNT(1) FROM  t_dict_data a 
+       LEFT JOIN t_dict_data_type b ON a.typeid =b.datatypeid
+       <where>
+          <if test="cname !=null and cname !=''">and a.cname LIKE "%"#{cname}"%"</if>
+          <if test="datatypeid !=null and datatypeid !=''">and b.datatypeid = #{datatypeid}</if>
+          <if test="ifactive !=null and ifactive !=''">and  a.ifactive = #{ifactive}</if>
+          <if test="typeid !=null and typeid !=''">and a.typeid = #{typeid}</if>
+          <if test="parentid !=null and parentid !=''">and a.parentid = #{parentid}</if>
+          <if test="st !=null and st !=''">and a.parentid is null</if>
+       </where>
+	</select>
+	<!--新增字典  -->
+	<insert id="insertDic" parameterType="map">
+		INSERT INTO  t_dict_data
+		<trim prefix="(" suffixOverrides="," suffix=")"> 
+			<if test="dataid != null">dataid,</if>
+			<if test="typeid !=null">typeid,</if>
+			<if test="datacode !=null">datacode,</if>
+			<if test="cname !=null">cname,</if>
+			<if test="ename !=null">ename,</if>
+			<if test="remark !=null">remark,</if>
+			<if test="priority !=null">priority,</if>
+			<if test="ifactive !=null">ifactive,</if>
+			<if test="parentid !=null and parentid != ''">parentid,</if>
+		</trim>
+		<trim prefix="values ( " suffixOverrides="," suffix=")">
+			<if test="dataid != null">#{dataid},</if>
+			<if test="typeid !=null">#{typeid},</if>
+			<if test="datacode !=null">#{datacode},</if>
+			<if test="cname !=null">#{cname},</if>
+			<if test="ename !=null">#{ename},</if>
+			<if test="remark !=null">#{remark},</if>
+			<if test="priority !=null">#{priority},</if>
+			<if test="ifactive !=null">#{ifactive},</if>
+			<if test="parentid !=null and parentid != ''">#{parentid},</if>
+		</trim> 
+	</insert>
+	<!-- 修改字典 -->
+	<update id="updateDic" parameterType="map">
+	  UPDATE `t_dict_data` 
+	  <set>
+			<if test="typeid !=null">typeid = #{typeid},</if>
+			<if test="datacode !=null">datacode = #{datacode},</if>
+			<if test="cname !=null">cname = #{cname},</if>
+			<if test="ename !=null">ename = #{ename},</if>
+			<if test="remark !=null">remark = #{remark},</if>
+			<if test="priority !=null">priority = #{priority},</if>
+			<if test="ifactive !=null">ifactive = #{ifactive},</if>
+	  </set>
+	  <where>
+	     	dataid = #{dataid}
+	  </where>
+	</update>
+	
+	
+</mapper>

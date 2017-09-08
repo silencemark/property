@@ -1,0 +1,541 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lr.backer.dao.OrderMapper">
+
+	<!-- 得到 发布订单 列表 -->
+	<select id="getReleaseOrderList" parameterType="map" resultType="map">
+		SELECT * FROM (SELECT
+		order_.orderid,order_.status,member.realname,member.headimage,order_.delflag,
+		IFNULL(project.starttime,job.starttime)
+		starttime,IFNULL(project.endtime,job.endtime) endtime,CAST(member.nickname AS char character set utf8) nickname,
+		IFNULL(project.address,job.workplace)
+		address,IFNULL(project.projecttitle,job.jobtitle) title,
+		IFNULL(job.salary,project.projectamount)
+		amount,project.projecttitle,order_.createtime,job.jobid isjob,
+		ifnull(data1.cname,data2.cname) jobname,order_.projectid,order_.jobid,
+		order_.publisherid,order_.failuretime,job.recruitmentnum,order_.orderno,ex.source,ex.sourcepid,
+		case 
+		  when ex.individualstatus =1 or ex.enterprisestatus = 1 then 1
+		  else 0
+		end  as  instatus,
+		(select count(*) from tick_apply_order app where app.orderid = order_.orderid) as peoplenum
+		FROM tick_order order_
+		LEFT JOIN tick_job job ON order_.jobid =
+		job.jobid
+		LEFT JOIN tick_project project ON order_.projectid =
+		project.projectid
+		LEFT JOIN t_dt_member member ON order_.publisherid =
+		member.memberid
+		LEFT JOIN t_dict_data data1 ON
+		data1.dataid = job.jobtype
+		LEFT JOIN t_dict_data data2 ON data2.dataid
+		= project.ownedindustry
+		LEFT JOIN tick_user_extend ex on ex.userid = member.memberid
+		)as a
+		<where>
+			a.delflag = 0
+			<if test="agencyid != null and agencyid != ''">and a.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(a.createtime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{v_query_end}</if>   
+			
+			<if test="title !=null and tiitle !=''">and a.title LIKE "%"#{title}"%"</if>
+			<if test="projectname !=null and projectname !=''">and a.projecttitle LIKE "%"#{projectname}"%"</if>
+			<if test="orderid !=null and orderid !=''">and a.orderid = #{orderid}</if>
+			<if test="status !=null and status == 1">and a.status = #{status}</if>
+			<if test="status != null and status == 2"> and (a.status = #{status} or a.starttime &lt; now())</if>
+			<if test="publisherid !=null and publisherid !=''">and a.publisherid = #{publisherid}</if>
+			<if test="status !=null and status == 1">and a.failuretime &gt; NOW()</if>
+			<if test="status_or !=null and status_or != ''">and a.status = #{status_or}</if>
+			<if test="status_or !=null and status_or != ''">and a.status = #{status_or}</if>
+			<if test="sourcepid !=null and sourcepid !=''">and a.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+			<if test="null != starttime and '' != starttime">and a.createtime &gt;= #{starttime}</if>
+ 			<if test="null != endtime and '' != endtime">and a.createtime &lt;= #{endtime}</if>
+		</where>
+		order by a.status,a.createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+
+
+	<!-- 得到 发布订单 数量 -->
+	<select id="getReleaseOrderCount" parameterType="map"
+		resultType="int">
+		SELECT COUNT(1) FROM (SELECT
+		order_.orderid,order_.status,member.realname,member.headimage,order_.delflag,
+		IFNULL(project.starttime,job.starttime)
+		starttime,IFNULL(project.endtime,job.endtime) endtime,job.recruitmentnum,
+		IFNULL(project.address,job.workplace)
+		address,IFNULL(project.projecttitle,job.jobtitle) title,CAST(member.nickname AS char character set utf8) nickname,
+		IFNULL(job.salary,project.projectamount)
+		amount,job.projectname,order_.createtime,job.jobid isjob,
+		ifnull(data1.cname,data2.cname) jobname,order_.publisherid,order_.orderno,ex.source,ex.sourcepid,
+		case 
+		  when ex.individualstatus =1 or ex.enterprisestatus = 1 then 1
+		  else 0
+		end  as  instatus,
+		(select count(*) from tick_apply_order app where app.orderid = order_.orderid) as peoplenum
+		,order_.failuretime
+		FROM tick_order order_
+		LEFT JOIN
+		tick_job job ON order_.jobid = job.jobid
+		LEFT JOIN tick_project project
+		ON order_.projectid = project.projectid
+		LEFT JOIN t_dt_member member ON
+		order_.publisherid = member.memberid
+		LEFT JOIN t_dict_data data1 ON
+		data1.dataid = job.jobtype
+		LEFT JOIN t_dict_data data2 ON data2.dataid
+		= project.ownedindustry
+		LEFT JOIN tick_user_extend ex on ex.userid = member.memberid
+		)as a
+		<where>
+			a.delflag = 0
+			<if test="agencyid != null and agencyid != ''">and a.sourcepid LIKE a.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(a.createtime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{v_query_end}</if>  
+			
+			<if test="title !=null and tiitle !=''">and a.title LIKE "%"#{title}"%"</if>
+			<if test="projectname !=null and projectname !=''">and a.projectname LIKE "%"#{projectname}"%"</if>
+			<if test="orderid !=null and orderid !=''">and a.orderid = #{orderid}</if>
+			<if test="status !=null and status == 1">and a.status = #{status}</if>
+			<if test="status != null and status == 2"> and (a.status = #{status} or a.starttime &lt; now())</if>
+			<if test="publisherid !=null and publisherid !=''">and a.publisherid = #{publisherid}</if>
+			<if test="status !=null and status == 1">and a.failuretime &gt; NOW()</if>
+			<if test="sourcepid !=null and sourcepid !=''">and a.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+			<if test="null != starttime and '' != starttime">and a.createtime &gt;= #{starttime}</if>
+ 			<if test="null != endtime and '' != endtime">and a.createtime &lt;= #{endtime}</if>
+		</where>
+	</select>
+
+	<!-- 得到 抢单 列表 -->
+	<select id="getRushOrderList" parameterType="map" resultType="map">
+		SELECT * FROM(
+		SELECT
+		member.headimage,member.realname,
+		IFNULL(project.ownedindustry,job.jobtype) jobtype,
+		IFNULL(project.starttime,job.starttime) starttime,
+		IFNULL(project.endtime,job.endtime) endtime,
+		IFNULL(job.recruitmentnum,0) sumcount,ev.score,
+		IFNULL(job.contacter,project.contacter) as contacter,
+		IFNULL(job.telephone,project.telephone) as telephone,
+		ROUND(extend_w.evaluationavg,0)
+		evaluationavg,
+		extend_w.source,extend_w.sourcepid,apply.ifpay,
+		apply.applicantid,job.recruitmentnum,job.salary,
+		IFNULL(project.projecttitle,job.jobtitle) title,
+		IFNULL(job.salary,apply.quotation) amount,CAST(member.nickname AS char character set utf8) nickname,member1.phone as appphone,
+		IFNULL(data1.cname,data2.cname)
+		jobname,extend_e.companyname,apply.applyorderid,apply.orderid,apply.status,order_.`status` as orderstatus,
+		member1.realname releasename,member.realname as pname,member.phone
+		releasephone,apply.createtime,job.jobid isjob,CAST(member1.nickname AS char character set utf8)  appnickname,
+		apply.orderno as applyno ,order_.orderno as sendno,
+		case 
+		  when extend_e.individualstatus =1 or extend_e.enterprisestatus = 1 then 1
+		  else 0
+		end  as  instatus,apply.publisherid
+		,order_.failuretime
+		FROM tick_apply_order
+		apply
+		LEFT JOIN t_dt_member member1 ON member1.memberid =
+		apply.applicantid
+		LEFT
+		JOIN tick_order order_ ON apply.orderid =
+		order_.orderid
+		LEFT JOIN
+		tick_job job ON order_.jobid = job.jobid
+		LEFT
+		JOIN tick_project project
+		ON order_.projectid = project.projectid
+		LEFT
+		JOIN tick_user_extend
+		extend_w ON apply.applicantid = extend_w.userid
+		LEFT JOIN t_dt_member
+		member ON member.memberid = apply.publisherid
+		LEFT JOIN t_dict_data
+		data1 ON data1.dataid = job.jobtype
+		LEFT JOIN
+		t_dict_data data2 ON
+		data2.dataid = project.ownedindustry
+		LEFT JOIN
+		tick_user_extend
+		extend_e ON order_.publisherid = extend_e.userid
+		left join tick_evaluation ev on ev.evaluationerid = apply.applicantid and ev.orderid = apply.applyorderid  
+		WHERE
+		apply.delflag = 0 AND order_.delflag = 0
+		 
+		) as a
+		<where>
+		
+		    <if test="applicantid !=null and applicantid !=''">and a.applicantid = #{applicantid}</if>
+			<if test="agencyid != null and agencyid != ''">and a.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(a.createtime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{v_query_end}</if>   
+			<if test="title !=null and title !=''">and a.title LIKE "%"#{title}"%"</if>
+<!-- 			<if test="type !=null and type==1">and (a.orderstatus = 1 and a.failuretime &gt; now()) </if> -->
+			<if test="statusList !=null and statusList.size() >0 ">and   (a.status in (
+			   <foreach collection="statusList" item="item"  separator=","> 
+			     #{item}
+			   </foreach>
+			   ) 
+			     <if test="type !=null and type==2"> or  a.failuretime &lt; now() or a.orderstatus = 2  </if>
+			   )
+			</if> 
+			<if test="sourcepid !=null and sourcepid !=''">and a.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+	 		<if test="null != starttime and '' != starttime">and a.createtime &gt;= #{starttime}</if>
+ 			<if test="null != endtime and '' != endtime">and a.createtime &lt;= #{endtime}</if>
+		</where>
+		order by a.createtime desc
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+		 
+	</select>
+
+	<!-- 得到 抢单 数量 -->
+	<select id="getRushOrderCount" parameterType="map" resultType="int">
+		SELECT count(*) FROM(
+		SELECT
+		member.headimage,member.realname,
+		IFNULL(project.ownedindustry,job.jobtype) jobtype,
+		IFNULL(project.starttime,job.starttime) starttime,
+		IFNULL(project.endtime,job.endtime) endtime,ev.score,
+		IFNULL(job.recruitmentnum,0) sumcount,
+		IFNULL(job.contacter,project.contacter) as contacter,
+		IFNULL(job.telephone,project.telephone) as telephone,
+		ROUND(extend_w.evaluationavg,0)
+		evaluationavg,apply.ifpay,
+		extend_w.source,extend_w.sourcepid,
+		apply.applicantid,job.recruitmentnum,job.salary,
+		IFNULL(project.projecttitle,job.jobtitle) title,
+		IFNULL(job.salary,apply.quotation) amount,CAST(member.nickname AS char character set utf8) nickname,
+		IFNULL(data1.cname,data2.cname)
+		jobname,extend_e.companyname,apply.applyorderid,apply.orderid,apply.status,
+		member1.realname releasename,member.phone
+		releasephone,apply.createtime,job.jobid isjob,
+		apply.orderno as applyno ,order_.orderno as sendno,
+		case 
+		  when extend_e.individualstatus =1 or extend_e.enterprisestatus = 1 then 1
+		  else 0
+		end  as  instatus,apply.publisherid
+		,order_.failuretime,order_.status as orderstatus
+		FROM tick_apply_order
+		apply
+		LEFT JOIN t_dt_member member1 ON member1.memberid =
+		apply.applicantid
+		LEFT
+		JOIN tick_order order_ ON apply.orderid =
+		order_.orderid
+		LEFT JOIN
+		tick_job job ON order_.jobid = job.jobid
+		LEFT
+		JOIN tick_project project
+		ON order_.projectid = project.projectid
+		LEFT
+		JOIN tick_user_extend
+		extend_w ON apply.applicantid = extend_w.userid
+		LEFT JOIN t_dt_member
+		member ON member.memberid = order_.publisherid
+		LEFT JOIN t_dict_data
+		data1 ON data1.dataid = job.jobtype
+		LEFT JOIN
+		t_dict_data data2 ON
+		data2.dataid = project.ownedindustry
+		LEFT JOIN
+		tick_user_extend
+		extend_e ON order_.publisherid = extend_e.userid
+		left join tick_evaluation ev on ev.evaluationerid = apply.applicantid and ev.orderid = apply.applyorderid 
+		WHERE
+		apply.delflag = 0 AND order_.delflag = 0
+	 
+		) as a
+		<where>
+		    <if test="applicantid !=null and applicantid !=''">and a.applicantid = #{applicantid}</if>
+			<if test="agencyid != null and agencyid != ''">and a.sourcepid LIKE concat("%",#{agencyid},"%")</if> 
+			<if test="status !=null and status !=''">and a.status = #{status}</if>
+			<if test="v_query !=null and v_query !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') = #{v_query}</if>  
+			<if test="v_query_ym !=null and v_query_ym !=''">and DATE_FORMAT(a.createtime,'%Y-%m') = #{v_query_ym}</if>  
+			<if test="v_query_start !=null and v_query_start !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt; #{v_query_start}</if>  
+			<if test="v_query_end !=null and v_query_end !=''">and DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{v_query_end}</if>   
+			<if test="title !=null and title !=''">and a.title LIKE "%"#{title}"%"</if>
+			<if test="type !=null and type==1">and (a.orderstatus = 1 and a.failuretime &gt; now()) </if>
+			<if test="statusList !=null and statusList.size() >0 ">and   (a.status in (
+			   <foreach collection="statusList" item="item"  separator=","> 
+			     #{item}
+			   </foreach>
+			   ) 
+			     <if test="type !=null and type==2"> or  a.failuretime &lt; now() or a.orderstatus = 2  </if>
+			   )
+			</if> 
+			<if test="sourcepid !=null and sourcepid !=''">and a.sourcepid LIKE concat("%",#{sourcepid},"%")</if>
+	 		<if test="null != starttime and '' != starttime">and a.createtime &gt;= #{starttime}</if>
+ 			<if test="null != endtime and '' != endtime">and a.createtime &lt;= #{endtime}</if>
+		</where>
+	</select>
+
+   <!-- 修改申请订单状态  (取消订单 以及是否支付状态)-->
+    <update id="updateApplyOrderStatus" parameterType="map">
+       update tick_apply_order 
+       <set>
+         <if test="status !=null and status !=''">status = #{status},</if>
+         <if test="ifpay !=null and ifpay !=''">ifpay = #{ifpay},</if>
+       </set>
+       where applyorderid =#{applyorderid}
+    </update>
+
+
+	<!-- 根据招工id查询招工详情 -->
+	<select id="getJobDetailById" parameterType="map" resultType="map">
+		SELECT job.jobid, job.projectname, job.jobtitle, job.jobtype, job.salary, job.workplace,
+		job.starttime,
+		job.endtime, job.settlementmethod, job.recruitmentnum, job.jobrequirements,
+		job.contacter,
+		job.telephone, job.createrid, job.createtime, job.updaterid, job.updatetime,
+		job.delflag,data1.cname,tda.cname as cityname,tda1.cname as provincename,torder.orderid,tdd1.cname as settlementmethodname,torder.orderno
+		FROM tick_job job
+		LEFT JOIN t_dict_data data1 ON data1.dataid = job.jobtype
+		left join tick_order torder on job.jobid=torder.jobid
+		left join t_dt_area tda on job.projectarea=tda.areaid
+		left join t_dt_area tda1 on job.projectprovince=tda1.areaid
+		left join t_dict_data tdd1 on job.settlementmethod=tdd1.dataid
+		WHERE job.jobid =#{jobid}
+		limit 1
+	</select>
+
+	<!-- 根据项目id查询项目详情 -->
+	<select id="getProjectDetailById" parameterType="map"
+		resultType="map">
+		SELECT project.projectid,project.projecttitle, project.ownedindustry, project.ifdiscuss,
+		project.projectamount,
+		project.starttime,
+		project.endtime, project.settlementmethod,project.projectarea,
+		project.address, project.projectdescription,
+		project.contacter,
+		project.telephone, project.createrid,
+		project.createtime, project.updaterid, project.updatetime, project.delflag,data2.cname,torder.orderid,tda.cname as cityname,tda1.cname as provincename,torder.orderno
+		FROM
+		tick_project project
+		LEFT JOIN t_dict_data data2 ON data2.dataid =
+		project.ownedindustry
+		left join tick_order torder on project.projectid=torder.projectid
+		left join t_dt_area tda on project.projectarea=tda.areaid
+		left join t_dt_area tda1 on project.projectprovince=tda1.areaid
+		WHERE project.projectid = #{projectid}
+	</select>
+
+	<!--手机端  根据项目订单id查有多少人接单 -->
+	<select id="getApplyOrderById" parameterType="map" resultType="map">
+		select tao.applyorderid,tao.orderid,tao.applicantid,tao.publisherid,tao.status,tao.quotation,tao.quotationdescription,tao.createrid,tao.createtime,tao.updaterid,tao.updatetime,tao.ifattention,tao.delflag,
+		tue.extendid,tue.userid,tue.idcardnum,tue.idcardimgurl,tue.personalintroduction,tue.companyname,tue.companyimgurl,tue.companyintroduction,tue.tickcoin,tue.points,ceil(tue.evaluationavg) as evaluationavg,tue.individualstatus,tue.enterprisestatus,tue.qrcodeurl,
+		tue.jobtype,tue.createrid,tue.updaterid,tue.updatetime,tdm.username,tdm.authentication,tdm.address,tdm.realname,tdm.phone,tdm.telephone,tdm.headimage,CAST(tdm.nickname AS char character set utf8) nickname,
+		tao.longitude,tao.latitude,tdm.sex,tp.address,tj.workplace,tdd.cname as jobtypename,tue.perfectdegree,
+		case 
+		  when tue.individualstatus =1 or tue.enterprisestatus = 1 then 1
+		  else 0
+		end  as  instatus,d.score,tao.ifpay,torder.`status` as status_order
+		from tick_apply_order tao
+		left join tick_user_extend tue on tao.applicantid=tue.userid
+		left join t_dict_data tdd on tue.jobtype=tdd.dataid
+		left join t_dt_member tdm on tao.applicantid=tdm.memberid
+		left join tick_order torder on tao.orderid=torder.orderid
+		left join tick_job tj on torder.jobid = tj.jobid
+		left join tick_project tp on torder.projectid=tp.projectid
+		left join tick_evaluation d on d.orderid = tao.applyorderid  and d.evaluationerid = tao.publisherid and d.`status` = 0
+		WHERE tao.orderid = #{orderid} and tao.delflag = 0
+		order by tao.createtime desc
+<!-- 	SELECT a.applyorderid, a.orderid, a.applicantid, a.publisherid,a.quotationdescription,
+		a.`status`,a.createtime, a.quotation, a.delflag,b.realname,b.phone,b.headimage,
+		c.companyname,ceil(c.evaluationavg) as evalueavg,b.nickname,d.score,
+			case 
+		  when c.individualstatus =1 or c.enterprisestatus = 1 then 1
+		  else 0
+		end  as  instatus
+		FROM tick_apply_order a
+		LEFT JOIN t_dt_member b on a.applicantid =b.memberid
+		LEFT JOIN tick_user_extend c on c.userid = b.memberid
+		left join tick_evaluation d on d.orderid = a.applyorderid  and d.evaluationerid = a.publisherid and d.`status` = 0
+		WHERE a.orderid =#{orderid} and a.delflag = 0 -->
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+	</select>
+	<!--手机端 根据项目订单id查有多少人接单总数量 -->
+	<select id="getApplyOrderByIdNum" parameterType="map"
+		resultType="int">
+		SELECT count(1)
+		FROM tick_apply_order a
+		LEFT JOIN t_dt_member
+		b on a.applicantid = b.memberid
+		WHERE a.orderid =#{orderid} and a.delflag = 0
+	</select>
+   
+   <!-- 后台查询 雇主订单有多少人抢单 -->
+   <select id="getApplyPeopleList" parameterType="map" resultType="map">
+      SELECT a.applyorderid, a.orderid, a.applicantid, a.publisherid,a.quotationdescription,
+		a.`status`,a.createtime, a.quotation, a.delflag,b.realname,b.phone, CAST(b.nickname AS char character set utf8) nickname
+		FROM tick_apply_order a
+		LEFT JOIN t_dt_member b on a.applicantid =b.memberid
+	    <where>
+	      <if test="orderid !=null and orderid != ''">and a.orderid = #{orderid}</if>
+	      <if test="delflag !=null and delflag != ''">and a.delflag = #{delflag}</if>
+	      <if test="status !=null and status != ''">and a.status = #{status}</if>
+	      <if test="realname !=null and realname != ''">and b.realname like "%"#{realname}"%"</if>
+	      <if test="nickname !=null and nickname != ''">and nickname like "%"#{nickname}"%"</if>
+	    </where>
+		<if test="startnum !=null">limit #{startnum},#{rownum}</if>
+   </select>
+   
+   <!-- 后台查询 雇主订单有多少人抢单总人数 -->
+   <select id="getApplyPeopleListNum" parameterType="map" resultType="int">
+      SELECT count(*)
+		FROM tick_apply_order a
+		LEFT JOIN t_dt_member b on a.applicantid =b.memberid
+	    <where>
+	      <if test="orderid !=null and orderid != ''">and a.orderid = #{orderid}</if>
+	      <if test="delflag !=null and delflag != ''">and a.delflag = #{delflag}</if>
+	      <if test="status !=null and status != ''">and a.status = #{status}</if>
+	      <if test="realname !=null and realname != ''">and b.realname like "%"#{realname}"%"</if>
+	      <if test="nickname !=null and nickname != ''">and nickname like "%"#{nickname}"%"</if>
+	    </where>
+   </select>
+
+	<!--根据项目id查询项目图片 -->
+	<select id="getProjectImgs" parameterType="map" resultType="map">
+		SELECT a.projectimgid, a.projectid, a.imgid, a.delflag
+		,b.name,b.url,b.suffix,b.delflag FROM tick_project_img a
+		LEFT JOIN
+		t_img b ON a.imgid = b.imgid
+		WHERE a.projectid = #{projectid} and
+		b.delflag = 0 and a.delflag = 0
+	</select>
+
+	<!--获取 发布订单数-->
+	<select id="getOrderCount" parameterType="map" resultType="map">
+		SELECT
+		COUNT(o.orderid) count
+		FROM
+		tick_order o
+		WHERE 1=1
+		<if test="publisherid !=null and publisherid !=''">and o.publisherid = #{publisherid}</if>
+		<if test="publisherid_det !=null and publisherid_det !=''">and o.publisherid = #{publisherid_det}</if>
+		<if test="status !=null and status !=''">and o.status = #{status}</if>
+	</select>
+
+	<!--获取 抢单数-->
+	<select id="getApplyOrderCount" parameterType="map" resultType="map">
+		SELECT
+		COUNT(ao.applyorderid) count
+		FROM
+		tick_apply_order ao
+		WHERE 1=1
+		<if test="applicantid !=null and applicantid !=''">and ao.applicantid = #{applicantid}</if>
+		<if test="status !=null and status !=''">and ao.status = #{status}</if>
+		<if test="status_det !=null and status_det !=''">and ao.status = #{status_det}</if>
+		<if test="publisherid !=null and publisherid !=''">and ao.publisherid = #{publisherid}</if>
+		<if test="ifattention !=null and ifattention !=''">and ao.ifattention = #{ifattention}</if>
+	</select>
+	
+	<update id="updateOrderStatus" parameterType="map">
+		update tick_order
+		<set>
+			<if test="status != null">status=#{status},</if>
+			<if test="ifpay != null">ifpay=#{ifpay},</if>
+		</set>
+		where orderid=#{orderid}
+	</update>
+	<select id="getAttention" parameterType="map" resultType="map">
+		select * from tick_attention
+		<where>
+			<if test="attentionerid != null and attentionerid != ''">and attentionerid=#{attentionerid}</if>
+			<if test="userid != null and userid != ''">and userid=#{userid}</if>
+		</where>
+	</select>
+	<update id="updateuserextend" parameterType="map">
+		update tick_user_extend
+		<set>
+			<if test="addtickcoin != null">tickcoin=ifnull(tickcoin,0)+#{addtickcoin}</if>
+			<if test="reducetickcoin != null">tickcoin=ifnull(tickcoin,0)-#{reducetickcoin}</if>
+		</set>
+		<where>
+			<if test="userid != null and userid != ''">and userid=#{userid}</if>
+			<if test="extendid != null and extendid != ''">and extendid=#{extendid}</if>
+		</where>
+	</update>
+	<insert id="insertCoinRecord" parameterType="map">
+		insert into tick_coin_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="recordid != null and recordid != ''">recordid,</if>
+			<if test="title != null and title != ''">title,</if>
+			<if test="description != null and description != ''">description,</if>
+			<if test="amount != null and amount != ''">amount,</if>
+			<if test="pay_userid != null and pay_userid != ''">pay_userid,</if>
+			<if test="income_userid != null and income_userid != ''">income_userid,</if>
+			<if test="paytime != null and paytime != ''">paytime,</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="recordid != null and recordid != ''">#{recordid},</if>
+			<if test="title != null and title != ''">#{title},</if>
+			<if test="description != null and description != ''">#{description},</if>
+			<if test="amount != null and amount != ''">#{amount},</if>
+			<if test="pay_userid != null and pay_userid != ''">#{pay_userid},</if>
+			<if test="income_userid != null and income_userid != ''">#{income_userid},</if>
+			<if test="paytime != null and paytime != ''">#{paytime},</if>
+		</trim>
+	</insert>
+	
+	<!-- 新增交易记录表 -->
+	<insert id="insertTradeRecord" parameterType="map">
+		insert into tick_trade_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="tradeid != null and tradeid != ''">tradeid,</if>
+			<if test="incomepay != null and incomepay != ''">incomepay,</if>
+			<if test="amount != null and amount != ''">amount,</if>
+			<if test="paymethod != null and paymethod != ''">paymethod,</if>
+			<if test="paypurposetype != null and paypurposetype != ''">paypurposetype,</if>
+			<if test="pay_userid != null and pay_userid != ''">pay_userid,</if>
+			<if test="income_userid != null and income_userid != ''">income_userid,</if>
+			<if test="status != null and status != ''">status,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+			<if test="tradeorderid != null and tradeorderid != ''">tradeorderid,</if>
+			<if test="orderno != null and orderno != ''">orderno,</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="tradeid != null and tradeid != ''">#{tradeid},</if>
+			<if test="incomepay != null and incomepay != ''">#{incomepay},</if>
+			<if test="amount != null and amount != ''">#{amount},</if>
+			<if test="paymethod != null and paymethod != ''">#{paymethod},</if>
+			<if test="paypurposetype != null and paypurposetype != ''">#{paypurposetype},</if>
+			<if test="pay_userid != null and pay_userid != ''">#{pay_userid},</if>
+			<if test="income_userid != null and income_userid != ''">#{income_userid},</if>
+			<if test="status != null and status != ''">#{status},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+			<if test="tradeorderid != null and tradeorderid != ''">#{tradeorderid},</if>
+			<if test="orderno != null and orderno != ''">#{orderno},</if>
+		</trim>
+	</insert>
+	<!-- 插入用户信誉记录 -->
+	<insert id="insertCredit" parameterType="map">
+		insert into tick_credit
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="creditid != null and creditid != ''">creditid,</if>
+			<if test="userid != null and userid != ''">userid,</if>
+			<if test="description != null and description != ''">description,</if>
+			<if test="createtime != null and createtime != ''">createtime,</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="creditid != null and creditid != ''">#{creditid},</if>
+			<if test="userid != null and userid != ''">#{userid},</if>
+			<if test="description != null and description != ''">#{description},</if>
+			<if test="createtime != null and createtime != ''">#{createtime},</if>
+		</trim>
+	</insert>
+	<select id="getApplyOrderCountByNow" resultType="int">
+		select count(0) from tick_apply_order where to_days(createtime)=to_days(now())
+	</select>
+	<select id="getTradeNumByNow" resultType="int">
+		select count(0) from tick_trade_record where to_days(createtime)=to_days(now()) and paypurposetype=99
+	</select>
+	
+</mapper>

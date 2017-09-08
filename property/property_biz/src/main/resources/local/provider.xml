@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans    
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd    
+        http://code.alibabatech.com/schema/dubbo
+		http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+ 
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="hello-world-app"  />
+ 
+ 	<dubbo:provider timeout="100000"/>
+    <!-- 使用multicast广播注册中心暴露服务地址
+    <dubbo:registry address="multicast://224.5.6.7:1234" />
+     -->
+ 
+    <!-- 用dubbo协议在20881端口暴露服务
+     -->
+    <dubbo:protocol name="dubbo" port="20881" /> 
+    <dubbo:registry check="false" address="zookeeper://localhost:2181" file="/home/wanghan/zookeeper/cache/dubbo.cache"/>    
+	
+    <!-- 和本地bean一样实现服务     -->
+   	<!--  <bean id="testService" class="com.lr.backer.service.impl.TestServiceImpl"/> -->
+   	<bean id="workersService" class="com.lr.backer.service.impl.WorkersServiceImpl"/>
+   	<bean id="orderService" class="com.lr.backer.service.impl.OrderServiceImpl"/>
+   	<bean id="employerService" class="com.lr.backer.service.impl.EmployerServiceImpl"/>
+   	<bean id="indexService" class="com.lr.backer.service.impl.IndexServiceImpl"/>
+    <bean id="systemService" class="com.lr.backer.service.impl.SystemServiceImpl"/>
+    <bean id="noticeService" class="com.lr.backer.service.impl.NoticeServiceImpl"/>
+    <bean id="dictionarieService" class="com.lr.backer.service.impl.DictionarieServiceImpl"/>
+    <bean id="supplierService" class="com.lr.backer.service.impl.SupplierServiceImpl"/>
+    <bean id="complaintService" class="com.lr.backer.service.impl.ComplaintServiceImpl"/>
+    <bean id="evaluationService" class="com.lr.backer.service.impl.EvaluationServiceImpl"/>
+
+
+	<bean id="tradeService" class="com.lr.backer.service.impl.TradeServiceImpl"/>
+    <bean id="myService" class="com.lr.backer.service.impl.MyServiceImpl"/>   
+
+
+    <bean id="agencyService" class="com.lr.backer.service.impl.AgencyServiceImpl"/>
+    <!-- 微信 -->
+    <bean id="memberService" class="com.lr.weixin.backer.service.impl.MemberServiceImp"/>
+    <bean id="batteryService" class="com.lr.weixin.backer.service.impl.BatteryServiceImp"/>
+    <bean id="weiXinSetService" class="com.lr.weixin.backer.service.impl.WeiXinSetServiceImp"/>
+    <bean id="systemWXService" class="com.lr.weixin.backer.service.impl.SystemWXServiceImp"/>
+
+  
+    
+    <!-- 声明需要暴露的服务接口     -->
+    <dubbo:service interface="com.lr.backer.service.WorkersService" ref="workersService" />
+    <dubbo:service interface="com.lr.backer.service.OrderService" ref="orderService" />
+    <dubbo:service interface="com.lr.backer.service.EmployerService" ref="employerService" />
+    <dubbo:service interface="com.lr.backer.service.IndexService" ref="indexService" />
+    <dubbo:service interface="com.lr.backer.service.SystemService" ref="systemService" />
+    <dubbo:service interface="com.lr.backer.service.NoticeService" ref="noticeService" />
+    <dubbo:service interface="com.lr.backer.service.DictionarieService" ref="dictionarieService" />
+    <dubbo:service interface="com.lr.backer.service.SupplierService" ref="supplierService" />
+    <dubbo:service interface="com.lr.backer.service.ComplaintService" ref="complaintService" />
+    <dubbo:service interface="com.lr.backer.service.EvaluationService" ref="evaluationService" />
+    <dubbo:service interface="com.lr.backer.service.TradeService" ref="tradeService" />
+
+    <dubbo:service interface="com.lr.backer.service.AgencyService" ref="agencyService" />
+
+    <dubbo:service interface="com.lr.backer.service.MyService" ref="myService" />
+    
+    
+    <dubbo:service interface="com.lr.weixin.backer.service.MemberService" ref="memberService" />
+	<dubbo:service interface="com.lr.weixin.backer.service.BatteryService" ref="batteryService" />
+	<dubbo:service interface="com.lr.weixin.backer.service.WeiXinSetService" ref="weiXinSetService" />
+	<dubbo:service interface="com.lr.weixin.backer.service.SystemWXService" ref="systemWXService" />
+
+
+
+
+</beans>
